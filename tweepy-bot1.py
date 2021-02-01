@@ -26,7 +26,7 @@ logging.basicConfig(
 )
 
 
-pylib = '/workspaces/private_vyperlogix_lib3'
+pylib = '/home/raychorn/projects/python-projects/private_vyperlogix_lib3/zips/vyperlogix39.zip'
 if (not any([f == pylib for f in sys.path])):
     print('Adding {}'.format(pylib))
     sys.path.insert(0, pylib)
@@ -52,7 +52,7 @@ def get_environ_keys(*args, **kwargs):
     print('\t{} -> {}'.format(k, v))
     return True
 
-env_path = '/workspaces/private-microservices-framework/microservices_framework/rest-test/.env'
+env_path = '/home/raychorn/projects/python-projects/tweepy-twitter-bot1/.env'
 
 environ.load_env(env_path=env_path, environ=os.environ, cwd=env_path, verbose=True, ignoring_re='.git|.venv|__pycache__', callback=lambda *args, **kwargs:get_environ_keys(args, **kwargs))
 
@@ -347,7 +347,7 @@ if (__name__ == '__main__'):
                         print(msg)
                         logger.info(msg)
                     print('\n'*2)
-            msg = 'Sleeping for 5 mins. (Press any key to exit.)'
+            msg = 'Sleeping for {} mins. (Press any key to exit.)'.format(int(tweet_period_secs / 60))
             print(msg)
             logger.info(msg)
             time.sleep(tweet_period_secs)
