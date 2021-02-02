@@ -32,19 +32,15 @@ do_the_tweet = 'do_the_tweet'
 articles_list = 'articles_list'
 get_the_real_list = 'get_the_real_list'
 update_the_article = 'update_the_article'
+get_articles = 'get_articles'
 
-pylib = '/home/raychorn/projects/python-projects/private_vyperlogix_lib3/zips/vyperlogix39.zip'
+pylib = '/home/raychorn/projects/python-projects/private_vyperlogix_lib3'
 if (not any([f == pylib for f in sys.path])):
     print('Adding {}'.format(pylib))
     sys.path.insert(0, pylib)
     
 from vyperlogix.misc import _utils
 from vyperlogix.env import environ
-
-from vyperlogix.mongo import vyperapi
-from vyperlogix.decorators import __with
-from bson.objectid import ObjectId
-from vyperlogix.iterators.dict import dictutils
 
 __env__ = {}
 def get_environ_keys(*args, **kwargs):
@@ -173,7 +169,7 @@ class ServiceRunner():
         any dynamic imports via the exec method.
         '''
         import imp
-        response = {}
+        response = None
         try:
             m = None
             for root in self.__modules__.keys():
@@ -185,11 +181,11 @@ class ServiceRunner():
                 if (self.logger):
                     self.logger.info('*** {}.exec :: module_name -> {}'.format(self.__class__.__name__, module_name))
             f = getattr(m, func_name)
-            response['{}.{}'.format(module_name, func_name)] = self.exec_the_function_no_sandbox(f, args, **kwargs)
+            response = self.exec_the_function_no_sandbox(f, args, **kwargs)
         except Exception as ex:
             extype, ex, tb = sys.exc_info()
             formatted = traceback.format_exception_only(extype, ex)[-1]
-            response['exception'] = formatted
+            response = formatted
             if (self.logger):
                 self.logger.error('BEGIN: Exception')
                 for l in traceback.format_exception(extype, ex, tb):
@@ -246,90 +242,6 @@ class PluginManager(object):
 
 
 
-def __get_articles(_id=None, criteria=None, callback=None):
-    @__with.database(environ=__env__)
-    def db_get_articles(db=None):
-        assert vyperapi.is_not_none(db), 'There is no db context.'
-
-        tb_name = mongo_db_name
-        col_name = mongo_articles_col_name
-        table = db[tb_name]
-        coll = table[col_name]
-
-        find_in_collection = lambda c,criteria=criteria:c.find() if (not criteria) else c.find(criteria)
-        recs = []
-        if (not _id):
-            recs = [str(doc.get('_id')) for doc in find_in_collection(coll, criteria=criteria)]
-        else:
-            recs = coll.find_one({"_id": ObjectId(_id)})
-        if (callable(callback)):
-            callback(coll=coll, recs=recs, _id=_id)
-        return recs
-    return db_get_articles()
-
-
-def __get_articles(_id=None, criteria=None, callback=None):
-    @__with.database(environ=__env__)
-    def db_get_articles(db=None):
-        assert vyperapi.is_not_none(db), 'There is no db context.'
-
-        tb_name = mongo_db_name
-        col_name = mongo_articles_col_name
-        table = db[tb_name]
-        coll = table[col_name]
-
-        find_in_collection = lambda c,criteria=criteria:c.find() if (not criteria) else c.find(criteria)
-        recs = []
-        if (not _id):
-            recs = [str(doc.get('_id')) for doc in find_in_collection(coll, criteria=criteria)]
-        else:
-            recs = coll.find_one({"_id": ObjectId(_id)})
-        if (callable(callback)):
-            callback(coll=coll, recs=recs, _id=_id)
-        return recs
-    return db_get_articles()
-
-
-
-def __store_article_data(data, update=None):
-    @__with.database(environ=__env__)
-    def db_store_article_data(db=None, data=None):
-        assert vyperapi.is_not_none(db), 'There is no db context.'
-
-        tb_name = mongo_db_name
-        col_name = mongo_articles_col_name
-        table = db[tb_name]
-        coll = table[col_name]
-
-        count = -1
-        u = data.get('url')
-        if (u) and (len(u) > 0):
-            try:
-                d = dict([tuple(t.split('=')) for t in u.split('?')[-1].split('&')])
-                k = d.get('source')
-                v = d.get('sk')
-                if (k and v):
-                    data[k] = v
-            except ValueError:
-                pass
-            doc = coll.find_one({ "url": u })
-            if (doc):
-                if (any([k.find('_time') > -1 for k in update.keys()])):
-                    newvalue = { "$set": update }
-                else:
-                    data['updated_time'] = datetime.utcnow()
-                    newvalue = { "$set": data }
-                coll.update_one({'_id': doc.get('_id')}, newvalue)
-            else:
-                data['created_time'] = datetime.utcnow()
-                coll.insert_one(data)
-
-            count = coll.count_documents({})
-        return count
-    return db_store_article_data(data=data)
-
-
-
 def get_hashtags_for(api, screen_name, count=200, verbose=False, hashtags_dict={}):
     tweets = api.user_timeline(screen_name=screen_name,count=count)
     for tweet in tweets:
@@ -377,9 +289,24 @@ if (__name__ == '__main__'):
 
             print('\n'*2)
 
-            the_list = __get_articles()
+            d_parms = {}
+            d_parms['_id'] = None
+            d_parms['environ'] = __env__
+            d_parms['mongo_db_name'] = mongo_db_name
+            d_parms['mongo_articles_col_name'] = mongo_articles_col_name
+            d_parms['logger'] = logger
+            the_list = service_runner.exec(articles_list, get_articles, **d_parms)
             
-            the_real_list = service_runner.exec(articles_list, get_the_real_list, the_list=the_list, get_articles=__get_articles, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=tweet_period_secs, logger=logger)
+            d_parms = {}
+            d_parms['the_list'] = the_list
+            d_parms['logger'] = logger
+            d_parms['ts_tweeted_time'] = ts_tweeted_time
+            d_parms['tweet_period_secs'] = tweet_period_secs
+            d_parms['environ'] = __env__
+            d_parms['mongo_db_name'] = mongo_db_name
+            d_parms['mongo_articles_col_name'] = mongo_articles_col_name
+            the_real_list = service_runner.exec(articles_list, get_the_real_list, **d_parms)
+
             msg = '='*30
             print(msg)
             logger.info(msg)
@@ -404,11 +331,26 @@ if (__name__ == '__main__'):
                 
                 the_chosen.add(the_choice)
 
-                item = __get_articles(_id=the_choice)
+                d_parms = {}
+                d_parms['_id'] = the_choice
+                d_parms['environ'] = __env__
+                d_parms['mongo_db_name'] = mongo_db_name
+                d_parms['mongo_articles_col_name'] = mongo_articles_col_name
+                d_parms['logger'] = logger
+                item = service_runner.exec(articles_list, get_articles, **d_parms)
                 assert item, 'Did not retrieve an item for {}.'.format(the_choice)
                 if (item):
                     service_runner.exec(twitter_verse, do_the_tweet, api=api, item=item, logger=logger)
-                    the_rotation = service_runner.exec(articles_list, update_the_article, the_choice=the_choice, ts_current_time=ts_current_time, store_article_data=__store_article_data, item=item, logger=logger)
+
+                    d_parms = {}
+                    d_parms['_id'] = the_choice
+                    d_parms['environ'] = __env__
+                    d_parms['mongo_db_name'] = mongo_db_name
+                    d_parms['mongo_articles_col_name'] = mongo_articles_col_name
+                    d_parms['logger'] = logger
+                    d_parms['item'] = item
+                    d_parms['ts_current_time'] = ts_current_time
+                    the_rotation = service_runner.exec(articles_list, update_the_article, **d_parms)
                     
                     msg = 'BEGIN: the_rotation'
                     print(msg)
