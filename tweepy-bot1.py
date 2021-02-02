@@ -201,7 +201,7 @@ def do_the_tweet(api, item, popular_hashtags=None):
     sample_tweet = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
     url = item.get('url')
     assert url and (len(url) > 0), 'Problem with URL in do_the_tweet().'
-    u = get_shorter_url(url)
+    u = get_shorter_url(url) if (len(url) > os.environ.get('minimum_url_length', 40)) else url
     msg = 'URL: {} -> {}'.format(url, u)
     print(msg)
     logger.info(msg)
@@ -272,7 +272,6 @@ if (__name__ == '__main__'):
                 item = __get_articles(_id=anId)
                 if (item):
                     sz = item.get('friends_link')
-                    assert (sz) and (len(sz) > 0), 'Missing the friends_link for {}.'.format(anId)
                     tt = item.get('tweeted_time')
                     msg = 'id: {}, sz: {}, tt: {}'.format(anId, sz, tt)
                     print(msg)
