@@ -310,8 +310,9 @@ if (__name__ == '__main__'):
             
             the_chosen = set()
             random.seed(datetime.now())
+            wait_per_choice = tweet_period_secs / int(required_velocity)
             for i in range(int(required_velocity)):
-                the_choice = list(set(the_real_list) - the_chosen)[random.randint(0, len(the_real_list))]
+                the_choice = list(set(the_real_list) - the_chosen)[random.randint(0, len(list(set(the_real_list) - the_chosen)))]
                 print('the_choice: {}'.format(the_choice))
                 
                 the_chosen.add(the_choice)
@@ -350,6 +351,10 @@ if (__name__ == '__main__'):
                         print(msg)
                         logger.info(msg)
                     print('\n'*2)
+                msg = 'Sleeping for {} mins for choice. (Press any key to exit.)'.format(int(wait_per_choice / 60))
+                print(msg)
+                logger.info(msg)
+                time.sleep(wait_per_choice)
             msg = 'Sleeping for {} mins. (Press any key to exit.)'.format(int(tweet_period_secs / 60))
             print(msg)
             logger.info(msg)
@@ -362,6 +367,7 @@ if (__name__ == '__main__'):
         except Exception as ex:
             extype, ex, tb = sys.exc_info()
             formatted = traceback.format_exception_only(extype, ex)[-1]
-            print(formatted)
-            log_traceback(ex)
+            for l in traceback.format_exception(extype, ex, tb):
+                print(l.rstrip())
+                logger.error(l.rstrip())
             break        
