@@ -284,9 +284,6 @@ if (__name__ == '__main__'):
     
     api = service_runner.exec(twitter_verse, get_api, **get_kwargs(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger))
     
-    popular_hashtags = get_top_trending_hashtags(api)
-    print(popular_hashtags)
-    
     while(1):
         try:
             print('\n'*10)
@@ -337,23 +334,19 @@ if (__name__ == '__main__'):
                 if (item):
                     service_runner.exec(twitter_verse, do_the_tweet, **get_kwargs(api=api, item=item, logger=logger))
 
-                    the_rotation = service_runner.exec(articles_list, update_the_article, **get_kwargs(_id=the_choice, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
+                    the_rotation = service_runner.exec(articles_list, update_the_article, **get_kwargs(the_choice=the_choice, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
                     
                     msg = 'BEGIN: the_rotation'
                     print(msg)
                     logger.info(msg)
                     
-                    for k,values in the_rotation.items():
-                        msg = '{}'.format(k)
+                    for v in the_rotation:
+                        msg = '\t{}'.format(v)
                         print(msg)
                         logger.info(msg)
-                        for v in values:
-                            msg = '\t{}'.format(v)
-                            print(msg)
-                            logger.info(msg)
-                        msg = 'END!!! the_rotation'
-                        print(msg)
-                        logger.info(msg)
+                    msg = 'END!!! the_rotation'
+                    print(msg)
+                    logger.info(msg)
                     print('\n'*2)
                 msg = 'Sleeping for {} mins for choice. (Press any key to exit.)'.format(int(wait_per_choice / 60))
                 print(msg)

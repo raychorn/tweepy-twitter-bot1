@@ -149,7 +149,7 @@ def __get_the_real_list(the_list=None, logger=None, ts_tweeted_time=None, tweet_
 
 def most_recent_30_days(bucket):
     period_secs = 30*24*60*60
-    thirty_days_ago = _utils.timeStamp(offset=-period_secs, use_iso=True)
+    thirty_days_ago = datetime.fromisoformat(_utils.timeStamp(offset=-period_secs, use_iso=True))
     new_bucket = []
     for ts_tweeted_time in bucket:
         dt = datetime.fromisoformat(ts_tweeted_time)
