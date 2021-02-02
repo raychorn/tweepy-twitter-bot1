@@ -313,7 +313,8 @@ if (__name__ == '__main__'):
             total_wait_for_choices = 0
             wait_per_choice = tweet_period_secs / int(required_velocity)
             for i in range(int(required_velocity)):
-                the_choice = list(set(the_real_list) - the_chosen)[random.randint(0, len(list(set(the_real_list) - the_chosen)))]
+                l = list(set(the_real_list) - the_chosen)
+                the_choice = l[random.randint(0, len(l)-1)]
                 print('the_choice: {}'.format(the_choice))
                 
                 the_chosen.add(the_choice)
