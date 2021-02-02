@@ -314,7 +314,7 @@ if (__name__ == '__main__'):
                 the_choice = list(set(the_real_list) - the_chosen)[random.randint(0, len(the_real_list))]
                 print('the_choice: {}'.format(the_choice))
                 
-                the_chosen = the_chosen.add(the_choice)
+                the_chosen.add(the_choice)
 
                 item = __get_articles(_id=the_choice)
                 assert item, 'Did not retrieve an item for {}.'.format(the_choice)
