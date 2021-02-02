@@ -308,9 +308,13 @@ if (__name__ == '__main__'):
             
             required_velocity = math.ceil(len(the_list) / 24)
             
+            the_chosen = set()
+            random.seed(datetime.now())
             for i in range(int(required_velocity)):
-                the_choice = random.choice(the_real_list)
+                the_choice = list(set(the_real_list) - the_chosen)[random.randint(0, len(the_real_list))]
                 print('the_choice: {}'.format(the_choice))
+                
+                the_chosen.append(the_choice)
 
                 item = __get_articles(_id=the_choice)
                 assert item, 'Did not retrieve an item for {}.'.format(the_choice)
