@@ -34,7 +34,21 @@ def get_shorter_url(url):
     return shorten(url, token=bitly_access_token)
 
 
-def do_the_tweet(api=None, item=None, popular_hashtags=None, logger=None, silent=False):
+def do_the_tweet(p1={},p2={}):
+    '''
+    Called from outside this module because there are issues with the way kwargs are being used.
+    '''
+    d = p1 if (isinstance(p1, dict)) else p2 if (isinstance(p2, dict)) else None
+    assert d, 'Missing parameters.'
+    api = d.get('api')
+    item = d.get('item', {})
+    popular_hashtags = d.get('popular_hashtags', [])
+    logger = d.get('logger')
+    silent = d.get('silent', False)
+    return __do_the_tweet(api=api, item=item, popular_hashtags=popular_hashtags, logger=logger, silent=silent)
+
+
+def __do_the_tweet(api=None, item=None, popular_hashtags=None, logger=None, silent=False):
     sample_tweet = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
     url = item.get('url')
     assert url and (len(url) > 0), 'Problem with URL in do_the_tweet().'

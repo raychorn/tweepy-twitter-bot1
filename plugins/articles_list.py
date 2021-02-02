@@ -104,7 +104,7 @@ def get_the_real_list(p1={},p2={}):
     environ = d.get('environ', {})
     mongo_db_name = d.get('mongo_db_name')
     mongo_articles_col_name = d.get('mongo_articles_col_name')
-    return __get_the_real_list(the_list=the_list, logger=logger, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=tweet_period_secse, environ=environ, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name)
+    return __get_the_real_list(the_list=the_list, logger=logger, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=tweet_period_secs, environ=environ, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name)
 
 
 def __get_the_real_list(the_list=None, logger=None, ts_tweeted_time=None, tweet_period_secs=None, environ=None, mongo_db_name=None, mongo_articles_col_name=None):
