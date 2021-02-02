@@ -201,7 +201,7 @@ def do_the_tweet(api, item, popular_hashtags=None):
     sample_tweet = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
     url = item.get('url')
     assert url and (len(url) > 0), 'Problem with URL in do_the_tweet().'
-    u = get_shorter_url(url) if (len(url) > os.environ.get('minimum_url_length', 40)) else url
+    u = get_shorter_url(url) if (len(url) > int(os.environ.get('minimum_url_length', 40))) else url
     msg = 'URL: {} -> {}'.format(url, u)
     print(msg)
     logger.info(msg)
