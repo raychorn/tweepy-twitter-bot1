@@ -5,7 +5,21 @@ import tweepy
 from vyperlogix.misc import _utils
 
 
-def get_api(consumer_key=None, consumer_secret=None, access_token=None, access_token_secret=None, logger=None):
+def get_api(p1={},p2={}):
+    '''
+    Called from outside this module because there are issues with the way kwargs are being used.
+    '''
+    d = p1 if (isinstance(p1, dict)) else p2 if (isinstance(p2, dict)) else None
+    assert d, 'Missing parameters.'
+    consumer_key = d.get('consumer_key')
+    consumer_secret = d.get('consumer_secret')
+    access_token = d.get('access_token')
+    access_token_secret = d.get('access_token_secret')
+    logger = d.get('logger')
+    return __get_api(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger)
+
+
+def __get_api(consumer_key=None, consumer_secret=None, access_token=None, access_token_secret=None, logger=None):
     try:
         auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
         auth.set_access_token(access_token, access_token_secret)

@@ -272,11 +272,20 @@ def log_traceback(ex, ex_traceback=None):
     logger.critical(tb_lines)
 
 
+def get_top_trending_hashtags(api):
+    data = api.trends_place(1)
+    hashtags = dict([tuple([trend['name'], trend['tweet_volume']]) for trend in data[0]['trends'] if (trend['name'].startswith('#')) and (len(_utils.ascii_only(trend['name'])) == len(trend['name']))])
+    return _utils.sorted_dict(hashtags, reversed=True, default=-1)
+    
+
 if (__name__ == '__main__'):
     plugins_manager = PluginManager(plugins, debug=True)
     service_runner = plugins_manager.get_runner()
     
-    api = service_runner.exec(twitter_verse, get_api, consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger)
+    api = service_runner.exec(twitter_verse, get_api, **get_kwargs(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger))
+    
+    popular_hashtags = get_top_trending_hashtags(api)
+    print(popular_hashtags)
     
     while(1):
         try:
