@@ -7,7 +7,7 @@ from vyperlogix.decorators import __with
 
 
 def __get_articles(_id=None, environ=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None):
-    @__with.database(environ=environ.get('environ', environ))
+    @__with.database(environ=environ)
     def db_get_articles(db=None, _id=None):
         mongo_db_name = environ.get('mongo_db_name')
         mongo_articles_col_name = environ.get('mongo_articles_col_name')
@@ -49,7 +49,7 @@ def get_articles(p1={},p2={}):
 
 
 def __store_article_data(data, environ=None, mongo_db_name=None, mongo_articles_col_name=None, update=None):
-    @__with.database(environ=environ.get('environ', environ))
+    @__with.database(environ=environ)
     def db_store_article_data(db=None, data=None):
         mongo_db_name = environ.get('mongo_db_name')
         mongo_articles_col_name = environ.get('mongo_articles_col_name')

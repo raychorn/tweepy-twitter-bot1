@@ -93,6 +93,12 @@ plugins = os.environ.get('plugins')
 assert is_really_a_string(plugins) and os.path.exists(plugins), 'Missing plugins.'
 
 
+def get_kwargs(**kwargs):
+    d_parms = {}
+    for k,v in kwargs.items():
+        d_parms[k] = v
+    return d_parms
+
 
 class ServiceRunner():
     '''
@@ -289,23 +295,9 @@ if (__name__ == '__main__'):
 
             print('\n'*2)
 
-            d_parms = {}
-            d_parms['_id'] = None
-            d_parms['environ'] = __env__
-            d_parms['mongo_db_name'] = mongo_db_name
-            d_parms['mongo_articles_col_name'] = mongo_articles_col_name
-            d_parms['logger'] = logger
-            the_list = service_runner.exec(articles_list, get_articles, **d_parms)
+            the_list = service_runner.exec(articles_list, get_articles, **get_kwargs(_id=None, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
             
-            d_parms = {}
-            d_parms['the_list'] = the_list
-            d_parms['logger'] = logger
-            d_parms['ts_tweeted_time'] = ts_tweeted_time
-            d_parms['tweet_period_secs'] = tweet_period_secs
-            d_parms['environ'] = __env__
-            d_parms['mongo_db_name'] = mongo_db_name
-            d_parms['mongo_articles_col_name'] = mongo_articles_col_name
-            the_real_list = service_runner.exec(articles_list, get_the_real_list, **d_parms)
+            the_real_list = service_runner.exec(articles_list, get_the_real_list, **get_kwargs(the_list=the_list, logger=logger, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=tweet_period_secs, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
 
             msg = '='*30
             print(msg)
@@ -331,26 +323,12 @@ if (__name__ == '__main__'):
                 
                 the_chosen.add(the_choice)
 
-                d_parms = {}
-                d_parms['_id'] = the_choice
-                d_parms['environ'] = __env__
-                d_parms['mongo_db_name'] = mongo_db_name
-                d_parms['mongo_articles_col_name'] = mongo_articles_col_name
-                d_parms['logger'] = logger
-                item = service_runner.exec(articles_list, get_articles, **d_parms)
+                item = service_runner.exec(articles_list, get_articles, **get_kwargs(_id=the_choice, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
                 assert item, 'Did not retrieve an item for {}.'.format(the_choice)
                 if (item):
                     service_runner.exec(twitter_verse, do_the_tweet, api=api, item=item, logger=logger)
 
-                    d_parms = {}
-                    d_parms['_id'] = the_choice
-                    d_parms['environ'] = __env__
-                    d_parms['mongo_db_name'] = mongo_db_name
-                    d_parms['mongo_articles_col_name'] = mongo_articles_col_name
-                    d_parms['logger'] = logger
-                    d_parms['item'] = item
-                    d_parms['ts_current_time'] = ts_current_time
-                    the_rotation = service_runner.exec(articles_list, update_the_article, **d_parms)
+                    the_rotation = service_runner.exec(articles_list, update_the_article, **get_kwargs(_id=the_choice, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
                     
                     msg = 'BEGIN: the_rotation'
                     print(msg)
