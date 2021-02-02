@@ -25,6 +25,13 @@ logging.basicConfig(
     filename=(log_filename),
 )
 
+twitter_verse = 'twitter_verse'
+get_api = 'get_api'
+do_the_tweet = 'do_the_tweet'
+
+articles_list = 'articles_list'
+get_the_real_list = 'get_the_real_list'
+update_the_article = 'update_the_article'
 
 pylib = '/home/raychorn/projects/python-projects/private_vyperlogix_lib3/zips/vyperlogix39.zip'
 if (not any([f == pylib for f in sys.path])):
@@ -33,7 +40,6 @@ if (not any([f == pylib for f in sys.path])):
     
 from vyperlogix.misc import _utils
 from vyperlogix.env import environ
-from vyperlogix.bitly import shorten
 
 from vyperlogix.mongo import vyperapi
 from vyperlogix.decorators import __with
@@ -56,22 +62,23 @@ env_path = '/home/raychorn/projects/python-projects/tweepy-twitter-bot1/.env'
 
 environ.load_env(env_path=env_path, environ=os.environ, cwd=env_path, verbose=True, ignoring_re='.git|.venv|__pycache__', callback=lambda *args, **kwargs:get_environ_keys(args, **kwargs))
 
+is_really_a_string = lambda s:s and len(s)
 
 access_token = os.environ.get('access_token')
 access_token_secret = os.environ.get('access_token_secret')
 consumer_key = os.environ.get('consumer_key')
 consumer_secret = os.environ.get('consumer_secret')
 
-assert access_token and len(access_token), 'Missing access_token.'
-assert access_token_secret and len(access_token_secret), 'Missing access_token_secret.'
-assert consumer_key and len(consumer_key), 'Missing consumer_key.'
-assert consumer_secret and len(consumer_secret), 'Missing consumer_secret.'
+assert is_really_a_string(access_token), 'Missing access_token.'
+assert is_really_a_string(access_token_secret), 'Missing access_token_secret.'
+assert is_really_a_string(consumer_key), 'Missing consumer_key.'
+assert is_really_a_string(consumer_secret), 'Missing consumer_secret.'
 
 __domain__ = os.environ.get('__domain__')
 __uuid__ = os.environ.get('__uuid__')
 
-assert __domain__ and len(__domain__), 'Missing __domain__.'
-assert __uuid__ and len(__uuid__), 'Missing __uuid__.'
+assert is_really_a_string(__domain__), 'Missing __domain__.'
+assert is_really_a_string(__uuid__), 'Missing __uuid__.'
 
 mongo_db_name = os.environ.get('mongo_db_name')
 mongo_articles_col_name = os.environ.get('mongo_articles_col_name')
@@ -79,11 +86,164 @@ mongo_article_text_col_name = os.environ.get('mongo_article_text_col_name')
 mongo_words_col_name = os.environ.get('mongo_words_col_name')
 mongo_cloud_col_name = os.environ.get('mongo_cloud_col_name')
 
-assert mongo_db_name and len(mongo_db_name), 'Missing mongo_db_name.'
-assert mongo_articles_col_name and len(mongo_articles_col_name), 'Missing mongo_articles_col_name.'
-assert mongo_article_text_col_name and len(mongo_article_text_col_name), 'Missing mongo_article_text_col_name.'
-assert mongo_words_col_name and len(mongo_words_col_name), 'Missing mongo_words_col_name.'
-assert mongo_cloud_col_name and len(mongo_cloud_col_name), 'Missing mongo_cloud_col_name.'
+assert is_really_a_string(mongo_db_name), 'Missing mongo_db_name.'
+assert is_really_a_string(mongo_articles_col_name), 'Missing mongo_articles_col_name.'
+assert is_really_a_string(mongo_article_text_col_name), 'Missing mongo_article_text_col_name.'
+assert is_really_a_string(mongo_words_col_name), 'Missing mongo_words_col_name.'
+assert is_really_a_string(mongo_cloud_col_name), 'Missing mongo_cloud_col_name.'
+
+
+plugins = os.environ.get('plugins')
+assert is_really_a_string(plugins) and os.path.exists(plugins), 'Missing plugins.'
+
+
+
+class ServiceRunner():
+    '''
+    Performs discovery and collects functions from the modules.
+    '''
+    def __init__(self, root,  debug=False, logger=None):
+        self.root = root
+        self.logger = logger
+        self.debug = debug
+        self.module_names = []
+        if (not isinstance(self.root, list)):
+            self.root = [self.root]
+        self.__modules__ = {}
+        for root in self.root:
+            __is__ = False
+            for f in sys.path:
+                if (f == root):
+                    __is__ = True
+                    break
+            if (not __is__):
+                sys.path.insert(0, root)
+            if (os.path.exists(root) and os.path.isdir(root)):
+                module_names = [os.sep.join([root, f]) for f in os.listdir(root) if (not (os.path.splitext(f)[0] in ['__init__'])) and (os.path.splitext(f)[-1] in ['.py', '.pyc'])]
+                for f in module_names:
+                    self.module_names.append(f)
+        
+        for m in self.module_names:
+            self.import_the_module_no_sandbox(m)
+
+
+    @property
+    def modules(self):
+        return self.__modules__
+    
+    
+    def __import_the_module__(self, m):
+        import importlib
+        root = 'exception'
+        try:
+            m_name = os.path.splitext(os.path.basename(m))[0]
+            for root in self.root:
+                full_module_name = '{}'.format(m_name)
+                m1 = importlib.import_module(full_module_name)
+                if (self.logger):
+                    self.logger.info('\tm_name -> {}'.format(m_name))
+                self.__modules__[root] = self.__modules__.get(root, {})
+                self.__modules__.get(root, {})[m_name] = m1
+        except Exception as ex:
+            extype, ex, tb = sys.exc_info()
+            if (self.debug):
+                self.logger.error('BEGIN: Exception')
+                for l in traceback.format_exception(extype, ex, tb):
+                    print(l.rstrip())
+                    self.logger.error(l.rstrip())
+                self.logger.error('END!!! Exception')
+
+
+    def import_the_module_no_sandbox(self, m):
+        return self.__import_the_module__(m)
+    
+
+    def __exec_the_function__(self, f, *args, **kwargs):
+        return f(args, kwargs)
+
+
+    def exec_the_function_no_sandbox(self, f, *args, **kwargs):
+        return self.__exec_the_function__(f, *args, **kwargs)
+    
+
+    def exec(self, module_name, func_name, *args, **kwargs):
+        '''
+        this method does not require any sandboxing because import sandbox limits the functions available which means
+        there is no way for people to import anything potentially dangerous due to sandbox limits do nobody "can" do
+        any dynamic imports via the exec method.
+        '''
+        import imp
+        response = {}
+        try:
+            m = None
+            for root in self.__modules__.keys():
+                m = self.__modules__[root].get(module_name, None)
+                if (m):
+                    imp.reload(m)
+                    break
+            if (m is None):
+                if (self.logger):
+                    self.logger.info('*** {}.exec :: module_name -> {}'.format(self.__class__.__name__, module_name))
+            f = getattr(m, func_name)
+            response['{}.{}'.format(module_name, func_name)] = self.exec_the_function_no_sandbox(f, args, **kwargs)
+        except Exception as ex:
+            extype, ex, tb = sys.exc_info()
+            formatted = traceback.format_exception_only(extype, ex)[-1]
+            response['exception'] = formatted
+            if (self.logger):
+                self.logger.error('BEGIN: Exception')
+                for l in traceback.format_exception(extype, ex, tb):
+                    print(l.rstrip())
+                    self.logger.error(l.rstrip())
+                self.logger.error('END!!! Exception')
+        return response
+
+
+
+class PluginManager(object):
+
+    def __init__(self, plugins, debug=False):
+        self.plugins = plugins if (isinstance(plugins, list)) else [plugins]
+        self.debug = debug
+
+
+    @property
+    def plugins(self):
+        return self.__plugins__
+    
+    
+    @plugins.setter
+    def plugins(self, value):
+        self.__plugins__ = value
+
+
+    @property
+    def debug(self):
+        return self.__debug
+    
+
+    @debug.setter
+    def debug(self, value):
+        self.__debug = value
+
+
+    def get_runner(self):
+        __fp_plugins__ = self.plugins
+        for fp_plugins in __fp_plugins__:
+            has_plugins = os.path.exists(fp_plugins) and os.path.isdir(fp_plugins)
+            if (not has_plugins):
+                os.mkdir(fp_plugins)
+                has_plugins = os.path.exists(fp_plugins) and os.path.isdir(fp_plugins)
+            fp_plugins_initpy = os.sep.join([fp_plugins, '__init__.py'])
+            if (not (os.path.exists(fp_plugins_initpy) and (os.path.isfile(fp_plugins_initpy)))):
+                with open(fp_plugins_initpy, 'w') as fOut:
+                    fOut.write('{}\n'.format('#'*40))
+                    fOut.write('# (c). Copyright, Vyper Logix Corp, All Rights Reserved.\n')
+                    fOut.write('{}\n'.format('#'*40))
+                    fOut.write('\n\n')
+                    fOut.flush()
+        return ServiceRunner(__fp_plugins__,  logger=logger, debug=self.debug)
+
 
 
 def __get_articles(_id=None, criteria=None, callback=None):
@@ -144,11 +304,14 @@ def __store_article_data(data, update=None):
         count = -1
         u = data.get('url')
         if (u) and (len(u) > 0):
-            d = dict([tuple(t.split('=')) for t in u.split('?')[-1].split('&')])
-            k = d.get('source')
-            v = d.get('sk')
-            if (k and v):
-                data[k] = v
+            try:
+                d = dict([tuple(t.split('=')) for t in u.split('?')[-1].split('&')])
+                k = d.get('source')
+                v = d.get('sk')
+                if (k and v):
+                    data[k] = v
+            except ValueError:
+                pass
             doc = coll.find_one({ "url": u })
             if (doc):
                 if (any([k.find('_time') > -1 for k in update.keys()])):
@@ -183,50 +346,6 @@ def get_hashtags_for(api, screen_name, count=200, verbose=False, hashtags_dict={
             print('{} -> {}'.format(t, hashtags_dict.get(t)))
     return hashtags_dict
     
-    
-def get_top_trending_hashtags(api):
-    data = api.trends_place(1)
-    hashtags = dict([tuple([trend['name'], trend['tweet_volume']]) for trend in data[0]['trends'] if (trend['name'].startswith('#')) and (len(_utils.ascii_only(trend['name'])) == len(trend['name']))])
-    return _utils.sorted_dict(hashtags, reversed=True, default=-1)
-    
-
-def get_shorter_url(url):
-    bitly_access_token = os.environ.get('bitly_access_token')
-    assert bitly_access_token and (len(bitly_access_token) > 0), 'Missing the bitly_access_token. Check your .env file.'
-
-    return shorten(url, token=bitly_access_token)
-
-
-def do_the_tweet(api, item, popular_hashtags=None):
-    sample_tweet = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-    url = item.get('url')
-    assert url and (len(url) > 0), 'Problem with URL in do_the_tweet().'
-    u = get_shorter_url(url) if (len(url) > int(os.environ.get('minimum_url_length', 40))) else url
-    msg = 'URL: {} -> {}'.format(url, u)
-    print(msg)
-    logger.info(msg)
-    the_tweet = '{}\n{}\n(raychorn.github.io + raychorn.medium.com)\n'.format(item.get('name'), u)
-    num_chars = len(sample_tweet) - len(the_tweet)
-    popular_hashtags = get_top_trending_hashtags(api) if (not popular_hashtags) else popular_hashtags
-    if (num_chars > 0):
-        while (1):
-            if (len(popular_hashtags) > 0):
-                hashtag = popular_hashtags[0]
-                if (len(the_tweet) + len(hashtag) + 1) < len(sample_tweet):
-                    the_tweet += ' {}'.format(hashtag)
-                    del popular_hashtags[0]
-                else:
-                    break
-            else:
-                break
-    print('TWEET:\n{}'.format(the_tweet))
-    logger.info('BEGIN: TWEET')
-    logger.info(the_tweet)
-    logger.info('END!!! TWEET')
-    if (1):
-        api.update_status(the_tweet)
-
-
 def log_traceback(ex, ex_traceback=None):
     if ex_traceback is None:
         ex_traceback = ex.__traceback__
@@ -236,18 +355,11 @@ def log_traceback(ex, ex_traceback=None):
 
 
 if (__name__ == '__main__'):
-    try:
-        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-        auth.set_access_token(access_token, access_token_secret)
-        api = tweepy.API(auth)
-    except:
-        msg = 'Problem connecting to the twitter?'
-        print(msg)
-        logger.error(msg)
-        sys.exit()
-
-    the_rotation = {}
-    num_choices = 0
+    plugins_manager = PluginManager(plugins, debug=True)
+    service_runner = plugins_manager.get_runner()
+    
+    api = service_runner.exec(twitter_verse, get_api, consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger)
+    
     while(1):
         try:
             print('\n'*10)
@@ -267,37 +379,7 @@ if (__name__ == '__main__'):
 
             the_list = __get_articles()
             
-            the_real_list = []
-            for anId in the_list:
-                item = __get_articles(_id=anId)
-                if (item):
-                    sz = item.get('friends_link')
-                    tt = item.get('tweeted_time')
-                    msg = 'id: {}, sz: {}, tt: {}'.format(anId, sz, tt)
-                    print(msg)
-                    logger.info(msg)
-                    
-                    if (tt is None):
-                        the_real_list.append(anId)
-                        msg = 'Added to the_real_list: {}\n'.format(anId)
-                        print(msg)
-                        logger.info(msg)
-                        continue
-                    
-                    dt_target = datetime.fromisoformat(ts_tweeted_time)
-                    dt_item = datetime.fromisoformat(tt)
-                    delta = max(dt_target, dt_item) - min(dt_target, dt_item)
-                    __is__ = delta.total_seconds() > tweet_period_secs
-                    msg = 'delta: {}, dt_target: {}, dt_item: {}, delta.total_seconds(): {}, tweet_period_secs: {}, __is__: {}'.format(delta, dt_target, dt_item, delta.total_seconds(), tweet_period_secs, __is__)
-                    print(msg)
-                    logger.info(msg)
-                    
-                    if (__is__):
-                        the_real_list.append(anId)
-                        msg = 'Added to the_real_list: {}\n'.format(anId)
-                        print(msg)
-                        logger.info(msg)
-                        continue
+            the_real_list = service_runner.exec(articles_list, get_the_real_list, the_list=the_list, get_articles=__get_articles, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=tweet_period_secs, logger=logger)
             msg = '='*30
             print(msg)
             logger.info(msg)
@@ -325,33 +407,21 @@ if (__name__ == '__main__'):
                 item = __get_articles(_id=the_choice)
                 assert item, 'Did not retrieve an item for {}.'.format(the_choice)
                 if (item):
-                    do_the_tweet(api, item)
-                    the_update = { 'tweeted_time': ts_current_time}
-                    msg = 'Updating: id: {}, {}'.format(the_choice, the_update)
+                    service_runner.exec(twitter_verse, do_the_tweet, api=api, item=item, logger=logger)
+                    the_rotation = service_runner.exec(articles_list, update_the_article, the_choice=the_choice, ts_current_time=ts_current_time, store_article_data=__store_article_data, item=item, logger=logger)
+                    
+                    msg = 'BEGIN: the_rotation'
                     print(msg)
                     logger.info(msg)
-                    resp = __store_article_data(item, update=the_update)
-                    assert isinstance(resp, int), 'Problem with the response? Expected int value but got {}'.format(resp)
-                    print('Update was done.')
                     
-                    b = the_rotation.get(the_choice, [])
-                    b.append(ts_current_time)
-                    the_rotation[the_choice] = b
-                    num_choices += 1
-                    
-                    if (num_choices % len(the_list)) == 0:
-                        msg = 'BEGIN: the_rotation'
+                    for k,values in the_rotation.items():
+                        msg = '{}'.format(k)
                         print(msg)
                         logger.info(msg)
-                        
-                        for k,values in the_rotation.items():
-                            msg = '{}'.format(k)
+                        for v in values:
+                            msg = '\t{}'.format(v)
                             print(msg)
                             logger.info(msg)
-                            for v in values:
-                                msg = '\t{}'.format(v)
-                                print(msg)
-                                logger.info(msg)
                         msg = 'END!!! the_rotation'
                         print(msg)
                         logger.info(msg)
