@@ -314,7 +314,10 @@ if (__name__ == '__main__'):
             wait_per_choice = tweet_period_secs / int(required_velocity)
             for i in range(int(required_velocity)):
                 l = list(set(the_real_list) - the_chosen)
-                the_choice = l[random.randint(0, len(l)-1)]
+                if (len(l) == 0):
+                    break
+                i_choice = max(random.randint(0, len(l)), len(l)-1)
+                the_choice = l[i_choice if (len(l) > 0) else 0]
                 print('the_choice: {}'.format(the_choice))
                 
                 the_chosen.add(the_choice)
