@@ -310,6 +310,7 @@ if (__name__ == '__main__'):
             
             the_chosen = set()
             random.seed(datetime.now())
+            total_wait_for_choices = 0
             wait_per_choice = tweet_period_secs / int(required_velocity)
             for i in range(int(required_velocity)):
                 the_choice = list(set(the_real_list) - the_chosen)[random.randint(0, len(list(set(the_real_list) - the_chosen)))]
@@ -354,11 +355,13 @@ if (__name__ == '__main__'):
                 msg = 'Sleeping for {} mins for choice. (Press any key to exit.)'.format(int(wait_per_choice / 60))
                 print(msg)
                 logger.info(msg)
+                total_wait_for_choices += wait_per_choice
                 time.sleep(wait_per_choice)
-            msg = 'Sleeping for {} mins. (Press any key to exit.)'.format(int(tweet_period_secs / 60))
-            print(msg)
-            logger.info(msg)
-            time.sleep(tweet_period_secs)
+            if (tweet_period_secs - total_wait_for_choices) > 0:
+                msg = 'Sleeping for {} mins. (Press any key to exit.)'.format(int((tweet_period_secs - total_wait_for_choices) / 60))
+                print(msg)
+                logger.info(msg)
+                time.sleep(tweet_period_secs - total_wait_for_choices)
         except KeyboardInterrupt:
             msg = 'KeyboardInterrupt.'
             print(msg)
