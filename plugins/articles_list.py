@@ -1,9 +1,13 @@
+import random
 from datetime import datetime
+
 from vyperlogix.misc import _utils
 from bson.objectid import ObjectId
 from vyperlogix.mongo import vyperapi
 from vyperlogix.decorators import __with
+from vyperlogix.decorators import args
 
+__rotation__ = '__rotation__'
 
 
 def __get_articles(_id=None, environ=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None):
@@ -33,20 +37,9 @@ def __get_articles(_id=None, environ=None, mongo_db_name=None, mongo_articles_co
     return db_get_articles(_id=_id)
 
 
-def get_articles(p1={},p2={}):
-    '''
-    Called from outside this module because there are issues with the way kwargs are being used.
-    '''
-    d = p1 if (isinstance(p1, dict)) else p2 if (isinstance(p2, dict)) else None
-    assert d, 'Missing parameters.'
-    _id = d.get('_id')
-    environ = d.get('environ', {})
-    mongo_db_name = d.get('mongo_db_name')
-    mongo_articles_col_name = d.get('mongo_articles_col_name')
-    criteria = d.get('criteria')
-    callback = d.get('callback')
-    return __get_articles(_id=_id, environ=environ, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, criteria=criteria, callback=callback)
-
+@args.kwargs(__get_articles)
+def get_articles(*args, **kwargs):
+    pass
 
 def __store_article_data(data, environ=None, mongo_db_name=None, mongo_articles_col_name=None, update=None):
     @__with.database(environ=environ)
@@ -91,25 +84,8 @@ def __store_article_data(data, environ=None, mongo_db_name=None, mongo_articles_
 
 
 
-def get_the_real_list(p1={},p2={}):
-    '''
-    Called from outside this module because there are issues with the way kwargs are being used.
-    '''
-    d = p1 if (isinstance(p1, dict)) else p2 if (isinstance(p2, dict)) else None
-    assert d, 'Missing parameters.'
-    the_list = d.get('the_list', [])
-    logger = d.get('logger')
-    ts_tweeted_time = d.get('ts_tweeted_time')
-    tweet_period_secs = d.get('tweet_period_secs')
-    environ = d.get('environ', {})
-    mongo_db_name = d.get('mongo_db_name')
-    mongo_articles_col_name = d.get('mongo_articles_col_name')
-    return __get_the_real_list(the_list=the_list, logger=logger, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=tweet_period_secs, environ=environ, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name)
-
-
 def __get_the_real_list(the_list=None, logger=None, ts_tweeted_time=None, tweet_period_secs=None, environ=None, mongo_db_name=None, mongo_articles_col_name=None):
     the_real_list = []
-    # _utils.timeStamp(offset=-(1*60*60), use_iso=True)
     for anId in the_list:
         item = __get_articles(_id=anId, environ=environ, mongo_db_name=mongo_db_name,  mongo_articles_col_name=mongo_articles_col_name)
         if (item):
@@ -131,21 +107,43 @@ def __get_the_real_list(the_list=None, logger=None, ts_tweeted_time=None, tweet_
             dt_target = datetime.fromisoformat(ts_tweeted_time)
             dt_item = datetime.fromisoformat(tt)
             delta = max(dt_target, dt_item) - min(dt_target, dt_item)
-            __is__ = delta.total_seconds() > tweet_period_secs
+            __is__ = (delta.total_seconds() < tweet_period_secs) or (not item.get(__rotation__))
             msg = 'delta: {}, dt_target: {}, dt_item: {}, delta.total_seconds(): {}, tweet_period_secs: {}, __is__: {}'.format(delta, dt_target, dt_item, delta.total_seconds(), tweet_period_secs, __is__)
             print(msg)
             if (logger):
                 logger.info(msg)
             
-            if (__is__):
-                the_real_list.append(anId)
-                msg = 'Added to the_real_list: {}\n'.format(anId)
-                print(msg)
-                if (logger):
-                    logger.info(msg)
-                continue
+            the_real_list.append({'_id':anId, __rotation__:len(item.get(__rotation__, [])), 'secs': delta.total_seconds(), '__is__': __is__})
+            msg = 'Added to the_real_list: {}\n'.format(anId)
+            print(msg)
+            if (logger):
+                logger.info(msg)
     return the_real_list
 
+
+@args.kwargs(__get_the_real_list)
+def get_the_real_list(*args, **kwargs):
+    pass
+
+def __get_a_choice(the_list=None, the_chosen=None, logger=None):
+    choice = None
+    priorities1 = [item for item in the_list if (isinstance(item, str))]
+    if (len(priorities1) > 0):
+        choice = random.choice(priorities1)
+    else:
+        priorities2 = [item for item in the_list if (not isinstance(item, str)) and (not item.get(__rotation__))]
+        if (len(priorities2) > 0):
+            choice = random.choice(priorities1).get('_id')
+        else:
+            priorities3 = [item for item in the_list if (not isinstance(item, str)) and (item.get(__rotation__, -1) > 0)]
+            if (len(priorities3) > 0):
+                priorities3 = sorted(priorities3, key=lambda item: item.get(__rotation__, -1), reverse=False)
+                choice = priorities3[0].get('_id')
+    return choice
+
+@args.kwargs(__get_a_choice)
+def get_a_choice(*args, **kwargs):
+    pass
 
 def most_recent_30_days(bucket):
     period_secs = 30*24*60*60
@@ -160,22 +158,6 @@ def most_recent_30_days(bucket):
     return new_bucket
 
 
-def update_the_article(p1={},p2={}):
-    '''
-    Called from outside this module because there are issues with the way kwargs are being used.
-    '''
-    d = p1 if (isinstance(p1, dict)) else p2 if (isinstance(p2, dict)) else None
-    assert d, 'Missing parameters.'
-    item = d.get('item', {})
-    the_choice = d.get('the_choice')
-    ts_current_time = d.get('ts_current_time')
-    logger = d.get('logger')
-    environ = d.get('environ', {})
-    mongo_db_name = d.get('mongo_db_name')
-    mongo_articles_col_name = d.get('mongo_articles_col_name')
-    return __update_the_article(item=item, the_choice=the_choice, ts_current_time=ts_current_time, logger=logger, environ=environ, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name)
-
-
 def __update_the_article(item=None, the_choice=None, ts_current_time=None, logger=None, environ={}, mongo_db_name=None, mongo_articles_col_name=None):
     assert item, 'Missing item.'
     assert the_choice, 'Missing the_choice.'
@@ -183,7 +165,6 @@ def __update_the_article(item=None, the_choice=None, ts_current_time=None, logge
     
     the_update = { 'tweeted_time': ts_current_time}
 
-    __rotation__ = '__rotation__'
     bucket = item.get(__rotation__, [])
     bucket.append(ts_current_time)
     the_update[__rotation__] = most_recent_30_days(bucket)
@@ -197,3 +178,8 @@ def __update_the_article(item=None, the_choice=None, ts_current_time=None, logge
     print('Update was done.')
     
     return the_update[__rotation__]
+
+@args.kwargs(__update_the_article)
+def update_the_article(*args, **kwargs):
+    pass
+

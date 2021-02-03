@@ -33,6 +33,7 @@ articles_list = 'articles_list'
 get_the_real_list = 'get_the_real_list'
 update_the_article = 'update_the_article'
 get_articles = 'get_articles'
+get_a_choice = 'get_a_choice'
 
 pylib = '/home/raychorn/projects/python-projects/private_vyperlogix_lib3'
 if (not any([f == pylib for f in sys.path])):
@@ -165,7 +166,7 @@ class ServiceRunner():
 
 
     def exec_the_function_no_sandbox(self, f, *args, **kwargs):
-        return self.__exec_the_function__(f, *args, **kwargs)
+        return self.__exec_the_function__(f, args, kwargs)
     
 
     def exec(self, module_name, func_name, *args, **kwargs):
@@ -284,6 +285,10 @@ if (__name__ == '__main__'):
     
     api = service_runner.exec(twitter_verse, get_api, **get_kwargs(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger))
     
+    if (0):
+        h = get_top_trending_hashtags(api)
+        print(h)
+
     while(1):
         try:
             print('\n'*10)
@@ -298,10 +303,22 @@ if (__name__ == '__main__'):
             msg = 'Tweeted time:  {}'.format(ts_tweeted_time)
             print(msg)
             logger.info(msg)
+            
+            today = _utils.today_utctime()
+            secs_until_tomorrow_morning = ((17 - today.hour) * (60*60)) + ((59 - today.minute) * 60)
+            tomorrow_morning = _utils.timeStamp(offset=secs_until_tomorrow_morning, use_iso=True)
+            dt_tomorrow_morning = datetime.fromisoformat(tomorrow_morning)
+            delta = max(dt_tomorrow_morning, today) - min(dt_tomorrow_morning, today)
+            secs_until_tomorrow_morning = max(delta.total_seconds(), secs_until_tomorrow_morning)
 
             print('\n'*2)
 
-            the_list = service_runner.exec(articles_list, get_articles, **get_kwargs(_id=None, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
+            the_list = service_runner.exec(articles_list, get_articles, **get_kwargs(_id=None, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+            
+            wait_per_choice = secs_until_tomorrow_morning / len(the_list)
+            msg = 'wait_per_choice: {}'.format(wait_per_choice)
+            print(msg)
+            logger.info(msg)
             
             the_real_list = service_runner.exec(articles_list, get_the_real_list, **get_kwargs(the_list=the_list, logger=logger, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=tweet_period_secs, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
 
@@ -313,21 +330,22 @@ if (__name__ == '__main__'):
             print(msg)
             logger.info(msg)
             
-            required_velocity = math.ceil(len(the_list) / 24)
+            required_velocity = len(the_real_list)
+            msg = 'required_velocity: {}'.format(required_velocity)
+            print(msg)
+            logger.info(msg)
             
-            the_chosen = set()
-            random.seed(datetime.now())
+            the_chosen = []
+            random.seed(int(time.time()))
             total_wait_for_choices = 0
-            wait_per_choice = tweet_period_secs / int(required_velocity)
             for i in range(int(required_velocity)):
-                l = list(set(the_real_list) - the_chosen)
-                if (len(l) == 0):
-                    break
-                i_choice = max(random.randint(0, len(l)), len(l)-1)
-                the_choice = l[i_choice if (len(l) > 0) else 0]
-                print('the_choice: {}'.format(the_choice))
+                the_choice = service_runner.exec(articles_list, get_a_choice, **get_kwargs(the_list=the_real_list, the_chosen=the_chosen, logger=logger))
+                assert the_choice, 'Nothing in the list?  Please check.'
+                msg = 'the_choice: {}'.format(the_choice)
+                print(msg)
+                logger.info(msg)
                 
-                the_chosen.add(the_choice)
+                the_chosen.append(the_choice)
 
                 item = service_runner.exec(articles_list, get_articles, **get_kwargs(_id=the_choice, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
                 assert item, 'Did not retrieve an item for {}.'.format(the_choice)
@@ -353,11 +371,6 @@ if (__name__ == '__main__'):
                 logger.info(msg)
                 total_wait_for_choices += wait_per_choice
                 time.sleep(wait_per_choice)
-            if (tweet_period_secs - total_wait_for_choices) > 0:
-                msg = 'Sleeping for {} mins. (Press any key to exit.)'.format(int((tweet_period_secs - total_wait_for_choices) / 60))
-                print(msg)
-                logger.info(msg)
-                time.sleep(tweet_period_secs - total_wait_for_choices)
         except KeyboardInterrupt:
             msg = 'KeyboardInterrupt.'
             print(msg)
