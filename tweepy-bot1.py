@@ -45,12 +45,15 @@ from vyperlogix.env import environ
 
 __env__ = {}
 def get_environ_keys(*args, **kwargs):
+    from expandvars import expandvars
+    
     k = kwargs.get('key')
     v = kwargs.get('value')
     assert (k is not None) and (v is not None), 'Problem with kwargs -> {}, k={}, v={}'.format(kwargs,k,v)
+    v = expandvars(v)
     environ = kwargs.get('environ', {})
     __env__[k] = v
-    if (environ.get(k) == None):
+    if (not environ.get(k)):
         environ[k] = v
     print('\t{} -> {}'.format(k, v))
     return True
