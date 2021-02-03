@@ -347,7 +347,7 @@ if (__name__ == '__main__'):
                 
                 the_chosen.append(the_choice)
 
-                item = service_runner.exec(articles_list, get_articles, **get_kwargs(_id=the_choice, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
+                item = service_runner.exec(articles_list, get_articles, **get_kwargs(_id=the_choice, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
                 assert item, 'Did not retrieve an item for {}.'.format(the_choice)
                 if (item):
                     service_runner.exec(twitter_verse, do_the_tweet, **get_kwargs(api=api, item=item, logger=logger))
