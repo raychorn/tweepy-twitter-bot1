@@ -73,6 +73,7 @@ from vyperlogix.misc import _utils
 from vyperlogix.env import environ
 
 __env__ = {}
+env_literals = ['MONGO_INITDB_ROOT_PASSWORD']
 def get_environ_keys(*args, **kwargs):
     from expandvars import expandvars
     
@@ -80,17 +81,17 @@ def get_environ_keys(*args, **kwargs):
     v = kwargs.get('value')
     assert (k is not None) and (v is not None), 'Problem with kwargs -> {}, k={}, v={}'.format(kwargs,k,v)
     __logger__ = kwargs.get('logger')
-    v = expandvars(v)
+    v = expandvars(v) if (k not in env_literals) else v
     environ = kwargs.get('environ', {})
     __env__[k] = str(v)
     environ[k] = str(v)
     if (__logger__):
-        __logger__.info('\t{} -> {}'.format(k, v))
+        __logger__.info('\t{} -> {}'.format(k, environ.get(k)))
     return True
 
 env_path = '/home/raychorn/projects/python-projects/tweepy-twitter-bot1/.env'
 
-environ.load_env(env_path=env_path, environ=os.environ, cwd=env_path, verbose=True, ignoring_re='.git|.venv|__pycache__', callback=lambda *args, **kwargs:get_environ_keys(args, **kwargs))
+environ.load_env(env_path=env_path, environ=os.environ, cwd=env_path, verbose=True, logger=logger, ignoring_re='.git|.venv|__pycache__', callback=lambda *args, **kwargs:get_environ_keys(args, **kwargs))
 
 is_really_a_string = lambda s:s and len(s)
 
