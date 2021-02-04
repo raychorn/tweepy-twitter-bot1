@@ -123,7 +123,7 @@ def get_the_real_list(*args, **kwargs):
 
 def __get_a_choice(the_list=None, the_chosen=None, logger=None):
     choice = None
-    assert the_chosen and (isinstance(the_chosen, list)), 'Missing the_chosen or not a list.'
+    assert (isinstance(the_chosen, list)), 'Missing the_chosen or not a list.'
     the_list = [item for item in the_list if (isinstance(item, str) and (item not in the_chosen)) or ( (not isinstance(item, str)) and (item.get('_id') not in the_chosen) )]
     msg = 'the_list - the_chosen has {} items.'.format(len(the_list))
     logger.info(msg)
@@ -138,7 +138,7 @@ def __get_a_choice(the_list=None, the_chosen=None, logger=None):
             msg = 'priorities2 has {} items.'.format(len(priorities2))
             logger.info(msg)
             if (len(priorities2) > 0):
-                choice = random.choice(priorities1).get('_id')
+                choice = random.choice(priorities2).get('_id')
             else:
                 priorities3 = [item for item in the_list if (not isinstance(item, str)) and (item.get(__rotation__, -1) > 0)]
                 msg = 'priorities3 has {} items.'.format(len(priorities3))
