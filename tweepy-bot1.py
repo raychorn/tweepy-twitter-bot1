@@ -18,10 +18,10 @@ something_greater_than_zero = lambda s:(s > 0)
 default_timestamp = lambda t:t.isoformat().replace(':', '').replace('-','').split('.')[0]
 
 
-def get_stream_handler(streamformat):
+def get_stream_handler(streamformat="%(asctime)s:%(levelname)s:%(message)s"):
     stream = logging.StreamHandler()
     stream.setLevel(logging.INFO)
-    stream.setFormatter(streamformat[0] if (not isinstance(streamformat, str)) else streamformat)
+    stream.setFormatter(logging.Formatter(streamformat))
     return stream
 
     
@@ -52,7 +52,7 @@ logging.basicConfig(
 )
 
 logger = setup_rotating_file_handler(base_filename, log_filename, (1024*1024*1024), 10)
-logger.addHandler(get_stream_handler(log_format))
+logger.addHandler(get_stream_handler())
 
 twitter_verse = 'twitter_verse'
 get_api = 'get_api'
@@ -79,12 +79,13 @@ def get_environ_keys(*args, **kwargs):
     k = kwargs.get('key')
     v = kwargs.get('value')
     assert (k is not None) and (v is not None), 'Problem with kwargs -> {}, k={}, v={}'.format(kwargs,k,v)
+    __logger__ = kwargs.get('logger')
     v = expandvars(v)
     environ = kwargs.get('environ', {})
-    __env__[k] = v
-    if (not environ.get(k)):
-        environ[k] = v
-    print('\t{} -> {}'.format(k, v))
+    __env__[k] = str(v)
+    environ[k] = str(v)
+    if (__logger__):
+        __logger__.info('\t{} -> {}'.format(k, v))
     return True
 
 env_path = '/home/raychorn/projects/python-projects/tweepy-twitter-bot1/.env'
@@ -93,27 +94,27 @@ environ.load_env(env_path=env_path, environ=os.environ, cwd=env_path, verbose=Tr
 
 is_really_a_string = lambda s:s and len(s)
 
-access_token = os.environ.get('access_token')
-access_token_secret = os.environ.get('access_token_secret')
-consumer_key = os.environ.get('consumer_key')
-consumer_secret = os.environ.get('consumer_secret')
+access_token = os.environ.get('access_token', __env__.get('access_token'))
+access_token_secret = os.environ.get('access_token_secret', __env__.get('access_token_secret'))
+consumer_key = os.environ.get('consumer_key', __env__.get('consumer_key'))
+consumer_secret = os.environ.get('consumer_secret', __env__.get('consumer_secret'))
 
 assert is_really_a_string(access_token), 'Missing access_token.'
 assert is_really_a_string(access_token_secret), 'Missing access_token_secret.'
 assert is_really_a_string(consumer_key), 'Missing consumer_key.'
 assert is_really_a_string(consumer_secret), 'Missing consumer_secret.'
 
-__domain__ = os.environ.get('__domain__')
-__uuid__ = os.environ.get('__uuid__')
+__domain__ = os.environ.get('__domain__', __env__.get('__domain__'))
+__uuid__ = os.environ.get('__uuid__', __env__.get('__uuid__'))
 
 assert is_really_a_string(__domain__), 'Missing __domain__.'
 assert is_really_a_string(__uuid__), 'Missing __uuid__.'
 
-mongo_db_name = os.environ.get('mongo_db_name')
-mongo_articles_col_name = os.environ.get('mongo_articles_col_name')
-mongo_article_text_col_name = os.environ.get('mongo_article_text_col_name')
-mongo_words_col_name = os.environ.get('mongo_words_col_name')
-mongo_cloud_col_name = os.environ.get('mongo_cloud_col_name')
+mongo_db_name = os.environ.get('mongo_db_name', __env__.get('mongo_db_name'))
+mongo_articles_col_name = os.environ.get('mongo_articles_col_name', __env__.get('mongo_articles_col_name'))
+mongo_article_text_col_name = os.environ.get('mongo_article_text_col_name', __env__.get('mongo_article_text_col_name'))
+mongo_words_col_name = os.environ.get('mongo_words_col_name', __env__.get('mongo_words_col_name'))
+mongo_cloud_col_name = os.environ.get('mongo_cloud_col_name', __env__.get('mongo_cloud_col_name'))
 
 assert is_really_a_string(mongo_db_name), 'Missing mongo_db_name.'
 assert is_really_a_string(mongo_articles_col_name), 'Missing mongo_articles_col_name.'
@@ -122,7 +123,7 @@ assert is_really_a_string(mongo_words_col_name), 'Missing mongo_words_col_name.'
 assert is_really_a_string(mongo_cloud_col_name), 'Missing mongo_cloud_col_name.'
 
 
-plugins = os.environ.get('plugins')
+plugins = __env__.get('plugins')
 assert is_really_a_string(plugins) and os.path.exists(plugins), 'Missing plugins.'
 
 
