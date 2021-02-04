@@ -1,9 +1,18 @@
 import os
 import sys
+import time
 import tweepy
 
 from vyperlogix.misc import _utils
 from vyperlogix.decorators import args
+from vyperlogix.plugins import handler as plugins_handler
+
+
+word_cloud = 'word_cloud'
+get_final_word_cloud = 'get_final_word_cloud'
+store_one_hashtag = 'store_one_hashtag'
+get_hashtag_matching = 'get_hashtag_matching'
+delete_all_hashtags = 'delete_all_hashtags'
 
 
 def __get_api(consumer_key=None, consumer_secret=None, access_token=None, access_token_secret=None, logger=None):
@@ -23,13 +32,13 @@ def __get_api(consumer_key=None, consumer_secret=None, access_token=None, access
 def get_api(*args, **kwargs):
     pass
 
-def get_top_trending_hashtags(api):
+def __get_top_trending_hashtags(api):
     data = api.trends_place(1)
     hashtags = dict([tuple([trend['name'], trend['tweet_volume']]) for trend in data[0]['trends'] if (trend['name'].startswith('#')) and (len(_utils.ascii_only(trend['name'])) == len(trend['name']))])
     return _utils.sorted_dict(hashtags, reversed=True, default=-1)
     
 
-def get_shorter_url(url):
+def __get_shorter_url(url):
     from vyperlogix.bitly import shorten
 
     bitly_access_token = os.environ.get('bitly_access_token')
@@ -42,13 +51,13 @@ def __do_the_tweet(api=None, item=None, popular_hashtags=None, logger=None, sile
     sample_tweet = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
     url = item.get('url')
     assert url and (len(url) > 0), 'Problem with URL in do_the_tweet().'
-    u = get_shorter_url(url) if (len(url) > int(os.environ.get('minimum_url_length', 40))) else url
+    u = __get_shorter_url(url) if (len(url) > int(os.environ.get('minimum_url_length', 40))) else url
     msg = 'URL: {} -> {}'.format(url, u)
     if (logger):
         logger.info(msg)
     the_tweet = '{}\n{}\n(raychorn.github.io + raychorn.medium.com)\n'.format(item.get('name'), u)
     num_chars = len(sample_tweet) - len(the_tweet)
-    popular_hashtags = get_top_trending_hashtags(api) if (not popular_hashtags) else popular_hashtags
+    popular_hashtags = __get_top_trending_hashtags(api) if (not popular_hashtags) else popular_hashtags
     if (num_chars > 0):
         while (1):
             if (len(popular_hashtags) > 0):
@@ -71,5 +80,75 @@ def __do_the_tweet(api=None, item=None, popular_hashtags=None, logger=None, sile
 
 @args.kwargs(__do_the_tweet)
 def do_the_tweet(*args, **kwargs):
+    pass
+
+
+def __handle_hashtags(service_runner=None, environ=None, logger=None, hashtags=[]):
+    for hashtag in hashtags:
+        doc = service_runner.exec(word_cloud, get_hashtag_matching, **plugins_handler.get_kwargs(hashtag=hashtag, environ=environ, logger=logger))
+        if (not doc):
+            count = service_runner.exec(word_cloud, store_one_hashtag, **plugins_handler.get_kwargs(data={'hashtag': hashtag}, environ=environ))
+            assert count > -1, 'Problem with store_one_hashtag for {}.'.format(count)
+
+
+def __handle_one_available_hashtag(api=None, service_runner=None, environ=None, logger=None):
+    ts_follower_time = _utils.timeStamp(offset=0, use_iso=True)
+    assert service_runner, 'Missing service_runner.'
+    assert environ, 'Missing environ.'
+
+    if (0):
+        words = service_runner.exec(word_cloud, get_final_word_cloud, **plugins_handler.get_kwargs(environ=environ, callback=None, logger=logger))
+        for k,v in words.get('word-cloud', {}).items():
+            doc = service_runner.exec(word_cloud, get_hashtag_matching, **plugins_handler.get_kwargs(hashtag=k, environ=environ, logger=logger))
+            if (doc) and (not doc.get('last_followers')):
+                pass
+            
+    doc = service_runner.exec(word_cloud, get_hashtag_matching, **plugins_handler.get_kwargs(criteria={ "last_followers" : { "$exists": False } }, environ=environ, logger=logger))
+    if (doc) and (not doc.get('last_followers')):
+        hashtag = doc.get('hashtag')
+        if (hashtag):
+            for tweeter in tweepy.Cursor(api.search, q='{}{}'.format('#' if (hashtag.find('#') == -1) else '', hashtag)).items():
+                api.create_friendship(screen_name=tweeter.screen_name)
+                if (logger):
+                    logger.info('followed {}'.format(tweeter.screen_name))
+    else:
+        count = service_runner.exec(word_cloud, delete_all_hashtags, **plugins_handler.get_kwargs(environ=environ, logger=logger))
+        assert count == 0, 'Did not delete all the hashtags for followers.'
+        if (logger):
+            logger.info('Resetting hashtags for new followers.')
+
+
+def __get_more_followers(api=None, environ=None, service_runner=None, logger=None, hashtags=[], silent=False, runtime=0):
+    assert api, 'Missing api.'
+    assert service_runner, 'Missing service_runner.'
+    
+    count = 0
+    me = api.me()
+    for follower in api.followers(me.screen_name):
+        if (logger):
+            logger.info('follower: {}'.format(follower.screen_name))
+            friends = api.show_friendship(source_screen_name=follower.screen_name, target_screen_name=me.screen_name)
+            if (not any([f.following for f in friends])):
+                count += 1
+                if (logger):
+                    logger.info('follow the follower: {}'.format(follower.screen_name))
+                api.create_friendship(follower.id)
+    most_popular_hashtags = __get_top_trending_hashtags(api)
+    __handle_hashtags(service_runner=service_runner, environ=environ, hashtags=list(set(hashtags+most_popular_hashtags)), logger=logger)
+    start_time = time.time()
+    while (1):
+        __handle_one_available_hashtag(api=api, service_runner=service_runner, environ=environ, logger=logger)
+
+        time_now = time.time()
+        et = time_now - start_time
+        if (et > runtime):
+            break
+    if (count > 0):
+        if (logger):
+            logger.info('followed {} followers'.format(count))
+
+
+@args.kwargs(__get_more_followers)
+def get_more_followers(*args, **kwargs):
     pass
 

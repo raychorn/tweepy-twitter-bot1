@@ -17,6 +17,8 @@ something_greater_than_zero = lambda s:(s > 0)
 
 default_timestamp = lambda t:t.isoformat().replace(':', '').replace('-','').split('.')[0]
 
+is_uppercase = lambda ch:''.join([c for c in str(ch) if c.isupper()])
+
 
 def get_stream_handler(streamformat="%(asctime)s:%(levelname)s:%(message)s"):
     stream = logging.StreamHandler()
@@ -54,15 +56,24 @@ logging.basicConfig(
 logger = setup_rotating_file_handler(base_filename, log_filename, (1024*1024*1024), 10)
 logger.addHandler(get_stream_handler())
 
+
 twitter_verse = 'twitter_verse'
 get_api = 'get_api'
 do_the_tweet = 'do_the_tweet'
+
 
 articles_list = 'articles_list'
 get_the_real_list = 'get_the_real_list'
 update_the_article = 'update_the_article'
 get_articles = 'get_articles'
 get_a_choice = 'get_a_choice'
+get_more_followers = 'get_more_followers'
+
+
+word_cloud = 'word_cloud'
+get_final_word_cloud = 'get_final_word_cloud'
+store_one_hashtag = 'store_one_hashtag'
+
 
 pylib = '/home/raychorn/projects/python-projects/private_vyperlogix_lib3'
 if (not any([f == pylib for f in sys.path])):
@@ -71,6 +82,7 @@ if (not any([f == pylib for f in sys.path])):
     
 from vyperlogix.misc import _utils
 from vyperlogix.env import environ
+from vyperlogix.plugins import handler as plugins_handler
 
 __env__ = {}
 env_literals = ['MONGO_INITDB_ROOT_PASSWORD']
@@ -128,159 +140,6 @@ plugins = __env__.get('plugins')
 assert is_really_a_string(plugins) and os.path.exists(plugins), 'Missing plugins.'
 
 
-def get_kwargs(**kwargs):
-    d_parms = {}
-    for k,v in kwargs.items():
-        d_parms[k] = v
-    return d_parms
-
-
-class ServiceRunner():
-    '''
-    Performs discovery and collects functions from the modules.
-    '''
-    def __init__(self, root,  debug=False, logger=None):
-        self.root = root
-        self.logger = logger
-        self.debug = debug
-        self.module_names = []
-        if (not isinstance(self.root, list)):
-            self.root = [self.root]
-        self.__modules__ = {}
-        for root in self.root:
-            __is__ = False
-            for f in sys.path:
-                if (f == root):
-                    __is__ = True
-                    break
-            if (not __is__):
-                sys.path.insert(0, root)
-            if (os.path.exists(root) and os.path.isdir(root)):
-                module_names = [os.sep.join([root, f]) for f in os.listdir(root) if (not (os.path.splitext(f)[0] in ['__init__'])) and (os.path.splitext(f)[-1] in ['.py', '.pyc'])]
-                for f in module_names:
-                    self.module_names.append(f)
-        
-        for m in self.module_names:
-            self.import_the_module_no_sandbox(m)
-
-
-    @property
-    def modules(self):
-        return self.__modules__
-    
-    
-    def __import_the_module__(self, m):
-        import importlib
-        root = 'exception'
-        try:
-            m_name = os.path.splitext(os.path.basename(m))[0]
-            for root in self.root:
-                full_module_name = '{}'.format(m_name)
-                m1 = importlib.import_module(full_module_name)
-                if (self.logger):
-                    self.logger.info('\tm_name -> {}'.format(m_name))
-                self.__modules__[root] = self.__modules__.get(root, {})
-                self.__modules__.get(root, {})[m_name] = m1
-        except Exception as ex:
-            extype, ex, tb = sys.exc_info()
-            if (self.debug):
-                self.logger.error('BEGIN: Exception')
-                for l in traceback.format_exception(extype, ex, tb):
-                    self.logger.error(l.rstrip())
-                self.logger.error('END!!! Exception')
-
-
-    def import_the_module_no_sandbox(self, m):
-        return self.__import_the_module__(m)
-    
-
-    def __exec_the_function__(self, f, *args, **kwargs):
-        return f(args, kwargs)
-
-
-    def exec_the_function_no_sandbox(self, f, *args, **kwargs):
-        return self.__exec_the_function__(f, args, kwargs)
-    
-
-    def exec(self, module_name, func_name, *args, **kwargs):
-        '''
-        this method does not require any sandboxing because import sandbox limits the functions available which means
-        there is no way for people to import anything potentially dangerous due to sandbox limits do nobody "can" do
-        any dynamic imports via the exec method.
-        '''
-        import imp
-        response = None
-        try:
-            m = None
-            for root in self.__modules__.keys():
-                m = self.__modules__[root].get(module_name, None)
-                if (m):
-                    imp.reload(m)
-                    break
-            if (m is None):
-                if (self.logger):
-                    self.logger.info('*** {}.exec :: module_name -> {}'.format(self.__class__.__name__, module_name))
-            f = getattr(m, func_name)
-            response = self.exec_the_function_no_sandbox(f, args, **kwargs)
-        except Exception as ex:
-            extype, ex, tb = sys.exc_info()
-            formatted = traceback.format_exception_only(extype, ex)[-1]
-            response = formatted
-            if (self.logger):
-                self.logger.error('BEGIN: Exception')
-                for l in traceback.format_exception(extype, ex, tb):
-                    self.logger.error(l.rstrip())
-                self.logger.error('END!!! Exception')
-        return response
-
-
-
-class PluginManager(object):
-
-    def __init__(self, plugins, debug=False):
-        self.plugins = plugins if (isinstance(plugins, list)) else [plugins]
-        self.debug = debug
-
-
-    @property
-    def plugins(self):
-        return self.__plugins__
-    
-    
-    @plugins.setter
-    def plugins(self, value):
-        self.__plugins__ = value
-
-
-    @property
-    def debug(self):
-        return self.__debug
-    
-
-    @debug.setter
-    def debug(self, value):
-        self.__debug = value
-
-
-    def get_runner(self):
-        __fp_plugins__ = self.plugins
-        for fp_plugins in __fp_plugins__:
-            has_plugins = os.path.exists(fp_plugins) and os.path.isdir(fp_plugins)
-            if (not has_plugins):
-                os.mkdir(fp_plugins)
-                has_plugins = os.path.exists(fp_plugins) and os.path.isdir(fp_plugins)
-            fp_plugins_initpy = os.sep.join([fp_plugins, '__init__.py'])
-            if (not (os.path.exists(fp_plugins_initpy) and (os.path.isfile(fp_plugins_initpy)))):
-                with open(fp_plugins_initpy, 'w') as fOut:
-                    fOut.write('{}\n'.format('#'*40))
-                    fOut.write('# (c). Copyright, Vyper Logix Corp, All Rights Reserved.\n')
-                    fOut.write('{}\n'.format('#'*40))
-                    fOut.write('\n\n')
-                    fOut.flush()
-        return ServiceRunner(__fp_plugins__,  logger=logger, debug=self.debug)
-
-
-
 def get_hashtags_for(api, screen_name, count=200, verbose=False, hashtags_dict={}):
     tweets = api.user_timeline(screen_name=screen_name,count=count)
     for tweet in tweets:
@@ -312,11 +171,24 @@ def get_top_trending_hashtags(api):
     
 
 if (__name__ == '__main__'):
-    plugins_manager = PluginManager(plugins, debug=True)
+    plugins_manager = plugins_handler.PluginManager(plugins, debug=True)
     service_runner = plugins_manager.get_runner()
     
-    api = service_runner.exec(twitter_verse, get_api, **get_kwargs(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger))
+    api = service_runner.exec(twitter_verse, get_api, **plugins_handler.get_kwargs(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger))
     
+    if (1):
+        hashtags = []
+        criteria = os.environ.get('hashtags_criteria')
+        if (criteria.find('is_uppercase') > -1):
+            criteria = is_uppercase
+        threshold = int(os.environ.get('minimum_word_cloud_count', 1))
+        min_hashtag_length = int(os.environ.get('minimum_hashtags_length', 1))
+        words = service_runner.exec(word_cloud, get_final_word_cloud, **plugins_handler.get_kwargs(environ=os.environ, callback=None, logger=logger))
+        for k,v in words.get('word-cloud', {}).items():
+            if ( (len(k) > min_hashtag_length) and (v > threshold) ) or (criteria(k)):
+                hashtags.append(k)
+        service_runner.exec(twitter_verse, get_more_followers, **plugins_handler.get_kwargs(api=api, environ=__env__, service_runner=service_runner, hashtags=hashtags, silent=False, runtime=60*10, logger=logger))
+
     if (0):
         h = get_top_trending_hashtags(api)
         print(h)
@@ -344,13 +216,13 @@ if (__name__ == '__main__'):
 
             print('\n'*2)
 
-            the_list = service_runner.exec(articles_list, get_articles, **get_kwargs(_id=None, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+            the_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
             
             wait_per_choice = secs_until_tomorrow_morning / len(the_list)
             msg = 'wait_per_choice: {}'.format(wait_per_choice)
             logger.info(msg)
             
-            the_real_list = service_runner.exec(articles_list, get_the_real_list, **get_kwargs(the_list=the_list, logger=logger, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=tweet_period_secs, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+            the_real_list = service_runner.exec(articles_list, get_the_real_list, **plugins_handler.get_kwargs(the_list=the_list, logger=logger, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=tweet_period_secs, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
 
             msg = '='*30
             logger.info(msg)
@@ -366,7 +238,7 @@ if (__name__ == '__main__'):
             random.seed(int(time.time()))
             total_wait_for_choices = 0
             for i in range(int(required_velocity)):
-                the_choice = service_runner.exec(articles_list, get_a_choice, **get_kwargs(the_list=the_real_list, the_chosen=the_chosen, logger=logger))
+                the_choice = service_runner.exec(articles_list, get_a_choice, **plugins_handler.get_kwargs(the_list=the_real_list, the_chosen=the_chosen, logger=logger))
                 assert the_choice, 'Nothing in the list?  Please check.'
                 msg = 'the_choice: {}'.format(the_choice)
                 logger.info(msg)
@@ -377,12 +249,12 @@ if (__name__ == '__main__'):
                     msg = 'the_chosen has {} items.'.format(len(the_chosen))
                     logger.info(msg)
 
-                    item = service_runner.exec(articles_list, get_articles, **get_kwargs(_id=the_choice, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+                    item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=the_choice, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
                     assert item, 'Did not retrieve an item for {}.'.format(the_choice)
                     if (item):
-                        service_runner.exec(twitter_verse, do_the_tweet, **get_kwargs(api=api, item=item, logger=logger))
+                        service_runner.exec(twitter_verse, do_the_tweet, **plugins_handler.get_kwargs(api=api, item=item, logger=logger))
 
-                        the_rotation = service_runner.exec(articles_list, update_the_article, **get_kwargs(the_choice=the_choice, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
+                        the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=the_choice, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
                         
                         msg = 'BEGIN: the_rotation'
                         logger.info(msg)
