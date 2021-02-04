@@ -7,6 +7,7 @@ import mujson as json
 import tweepy
 import pprint
 import logging
+from logging.handlers import RotatingFileHandler
 import traceback
 
 from datetime import datetime
@@ -27,7 +28,7 @@ def get_stream_handler(streamformat):
 def setup_rotating_file_handler(logfile, max_bytes, backup_count):
     assert is_really_something(backup_count, something_greater_than_zero), 'Missing backup_count?'
     assert is_really_something(max_bytes, something_greater_than_zero), 'Missing max_bytes?'
-    ch = logging.handlers.RotatingFileHandler(logfile, 'a', max_bytes, backup_count)
+    ch = RotatingFileHandler(logfile, 'a', max_bytes, backup_count)
     return logging.getLogger().addHandler(ch)
 
 
