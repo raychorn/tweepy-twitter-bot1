@@ -6,14 +6,37 @@ import random
 import mujson as json
 import tweepy
 import pprint
+import logging
 import traceback
 
 from datetime import datetime
 
-import logging
-logger = logging.getLogger(__name__)
+is_really_something = lambda s,t:s and t(s)
+something_greater_than_zero = lambda s:(s > 0)
 
-log_filename = '{}{}{}.log'.format(os.path.dirname(__file__), os.sep, os.path.splitext(os.path.basename(__file__))[0])
+default_timestamp = lambda t:t.isoformat().replace(':', '').replace('-','').split('.')[0]
+
+
+def get_stream_handler(streamformat):
+    stream = logging.StreamHandler()
+    stream.setLevel(logging.INFO)
+    stream.setFormatter(streamformat)
+    return stream
+
+    
+def setup_rotating_file_handler(logfile, max_bytes, backup_count):
+    assert is_really_something(backup_count, something_greater_than_zero), 'Missing backup_count?'
+    assert is_really_something(max_bytes, something_greater_than_zero), 'Missing max_bytes?'
+    ch = logging.handlers.RotatingFileHandler(logfile, 'a', max_bytes, backup_count)
+    return logging.getLogger().addHandler(ch)
+
+
+base_filename = os.path.splitext(os.path.basename(__file__))[0]
+
+log_filename = '{}{}{}{}{}_{}.log'.format('logs', os.sep, base_filename, os.sep, base_filename, default_timestamp(datetime.utcnow()))
+
+if not os.path.exists(os.path.dirname(log_filename)):
+    os.makedirs(os.path.dirname(log_filename))
 
 if (os.path.exists(log_filename)):
     os.remove(log_filename)
@@ -24,6 +47,9 @@ logging.basicConfig(
     format=log_format,
     filename=(log_filename),
 )
+
+logger = setup_rotating_file_handler(log_filename, (1024*1024*1024), 10)
+logger.addHandler(get_stream_handler(log_format))
 
 twitter_verse = 'twitter_verse'
 get_api = 'get_api'
@@ -155,7 +181,6 @@ class ServiceRunner():
             if (self.debug):
                 self.logger.error('BEGIN: Exception')
                 for l in traceback.format_exception(extype, ex, tb):
-                    print(l.rstrip())
                     self.logger.error(l.rstrip())
                 self.logger.error('END!!! Exception')
 
@@ -199,7 +224,6 @@ class ServiceRunner():
             if (self.logger):
                 self.logger.error('BEGIN: Exception')
                 for l in traceback.format_exception(extype, ex, tb):
-                    print(l.rstrip())
                     self.logger.error(l.rstrip())
                 self.logger.error('END!!! Exception')
         return response
@@ -297,22 +321,21 @@ if (__name__ == '__main__'):
             print('\n'*10)
             ts_current_time = _utils.timeStamp(offset=0, use_iso=True)
             msg = 'Current time: {}'.format(ts_current_time)
-            print(msg)
             logger.info(msg)
 
             tweet_period_secs = 1*60*60
             
             ts_tweeted_time = _utils.timeStamp(offset=-tweet_period_secs, use_iso=True)
             msg = 'Tweeted time:  {}'.format(ts_tweeted_time)
-            print(msg)
             logger.info(msg)
             
-            today = _utils.today_utctime()
-            secs_until_tomorrow_morning = ((17 - today.hour) * (60*60)) + ((59 - today.minute) * 60)
-            tomorrow_morning = _utils.timeStamp(offset=secs_until_tomorrow_morning, use_iso=True)
-            dt_tomorrow_morning = datetime.fromisoformat(tomorrow_morning)
-            delta = max(dt_tomorrow_morning, today) - min(dt_tomorrow_morning, today)
-            secs_until_tomorrow_morning = max(delta.total_seconds(), secs_until_tomorrow_morning)
+            if (0):
+                today = _utils.today_utctime()
+                secs_until_tomorrow_morning = ((24 - today.hour) * (60*60)) + ((59 - today.minute) * 60)
+                tomorrow_morning = _utils.timeStamp(offset=secs_until_tomorrow_morning, use_iso=True)
+                dt_tomorrow_morning = datetime.fromisoformat(tomorrow_morning)
+                delta = max(dt_tomorrow_morning, today) - min(dt_tomorrow_morning, today)
+            secs_until_tomorrow_morning = 24*60*60 #  max(delta.total_seconds(), secs_until_tomorrow_morning)
 
             print('\n'*2)
 
@@ -320,22 +343,18 @@ if (__name__ == '__main__'):
             
             wait_per_choice = secs_until_tomorrow_morning / len(the_list)
             msg = 'wait_per_choice: {}'.format(wait_per_choice)
-            print(msg)
             logger.info(msg)
             
             the_real_list = service_runner.exec(articles_list, get_the_real_list, **get_kwargs(the_list=the_list, logger=logger, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=tweet_period_secs, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
 
             msg = '='*30
-            print(msg)
             logger.info(msg)
 
             msg = 'the_real_list has {} items and the_list has {} items.'.format(len(the_real_list), len(the_list))
-            print(msg)
             logger.info(msg)
             
             required_velocity = len(the_real_list)
             msg = 'required_velocity: {}'.format(required_velocity)
-            print(msg)
             logger.info(msg)
             
             the_chosen = []
@@ -345,44 +364,47 @@ if (__name__ == '__main__'):
                 the_choice = service_runner.exec(articles_list, get_a_choice, **get_kwargs(the_list=the_real_list, the_chosen=the_chosen, logger=logger))
                 assert the_choice, 'Nothing in the list?  Please check.'
                 msg = 'the_choice: {}'.format(the_choice)
-                print(msg)
                 logger.info(msg)
                 
-                the_chosen.append(the_choice)
-
-                item = service_runner.exec(articles_list, get_articles, **get_kwargs(_id=the_choice, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
-                assert item, 'Did not retrieve an item for {}.'.format(the_choice)
-                if (item):
-                    service_runner.exec(twitter_verse, do_the_tweet, **get_kwargs(api=api, item=item, logger=logger))
-
-                    the_rotation = service_runner.exec(articles_list, update_the_article, **get_kwargs(the_choice=the_choice, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
-                    
-                    msg = 'BEGIN: the_rotation'
-                    print(msg)
+                if (the_choice):
+                
+                    the_chosen.append(the_choice)
+                    msg = 'the_chosen has {} items.'.format(len(the_chosen))
                     logger.info(msg)
-                    
-                    for v in the_rotation:
-                        msg = '\t{}'.format(v)
-                        print(msg)
+
+                    item = service_runner.exec(articles_list, get_articles, **get_kwargs(_id=the_choice, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+                    assert item, 'Did not retrieve an item for {}.'.format(the_choice)
+                    if (item):
+                        service_runner.exec(twitter_verse, do_the_tweet, **get_kwargs(api=api, item=item, logger=logger))
+
+                        the_rotation = service_runner.exec(articles_list, update_the_article, **get_kwargs(the_choice=the_choice, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
+                        
+                        msg = 'BEGIN: the_rotation'
                         logger.info(msg)
-                    msg = 'END!!! the_rotation'
-                    print(msg)
+                        
+                        for v in the_rotation:
+                            msg = '\t{}'.format(v)
+                            logger.info(msg)
+                        msg = 'END!!! the_rotation'
+                        logger.info(msg)
+                        print('\n'*2)
+                    msg = 'Sleeping for {} mins for choice. (Press any key to exit.)'.format(int(wait_per_choice / 60))
                     logger.info(msg)
-                    print('\n'*2)
-                msg = 'Sleeping for {} mins for choice. (Press any key to exit.)'.format(int(wait_per_choice / 60))
-                print(msg)
-                logger.info(msg)
-                total_wait_for_choices += wait_per_choice
-                time.sleep(wait_per_choice)
+                    total_wait_for_choices += wait_per_choice
+                    time.sleep(wait_per_choice)
+                else:
+                    msg = 'Processing complete. (No more choices)'
+                    logger.info(msg)
+
+                    msg = 'Choices reset. Start over.'
+                    logger.info(msg)
         except KeyboardInterrupt:
             msg = 'KeyboardInterrupt.'
-            print(msg)
             logger.info(msg)
-            break
+            sys.exit()
         except Exception as ex:
             extype, ex, tb = sys.exc_info()
             formatted = traceback.format_exception_only(extype, ex)[-1]
             for l in traceback.format_exception(extype, ex, tb):
-                print(l.rstrip())
                 logger.error(l.rstrip())
-            break        
+            sys.exit()

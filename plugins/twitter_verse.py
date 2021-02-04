@@ -13,7 +13,6 @@ def __get_api(consumer_key=None, consumer_secret=None, access_token=None, access
         api = tweepy.API(auth)
     except:
         msg = 'Problem connecting to the twitter?'
-        print(msg)
         if (logger):
             logger.error(msg)
         sys.exit()
@@ -45,7 +44,6 @@ def __do_the_tweet(api=None, item=None, popular_hashtags=None, logger=None, sile
     assert url and (len(url) > 0), 'Problem with URL in do_the_tweet().'
     u = get_shorter_url(url) if (len(url) > int(os.environ.get('minimum_url_length', 40))) else url
     msg = 'URL: {} -> {}'.format(url, u)
-    print(msg)
     if (logger):
         logger.info(msg)
     the_tweet = '{}\n{}\n(raychorn.github.io + raychorn.medium.com)\n'.format(item.get('name'), u)

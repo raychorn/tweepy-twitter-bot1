@@ -92,14 +92,12 @@ def __get_the_real_list(the_list=None, logger=None, ts_tweeted_time=None, tweet_
             sz = item.get('friends_link')
             tt = item.get('tweeted_time')
             msg = 'id: {}, sz: {}, tt: {}'.format(anId, sz, tt)
-            print(msg)
             if (logger):
                 logger.info(msg)
             
             if (tt is None):
                 the_real_list.append(anId)
                 msg = 'Added to the_real_list: {}\n'.format(anId)
-                print(msg)
                 if (logger):
                     logger.info(msg)
                 continue
@@ -109,13 +107,11 @@ def __get_the_real_list(the_list=None, logger=None, ts_tweeted_time=None, tweet_
             delta = max(dt_target, dt_item) - min(dt_target, dt_item)
             __is__ = (delta.total_seconds() < tweet_period_secs) or (not item.get(__rotation__))
             msg = 'delta: {}, dt_target: {}, dt_item: {}, delta.total_seconds(): {}, tweet_period_secs: {}, __is__: {}'.format(delta, dt_target, dt_item, delta.total_seconds(), tweet_period_secs, __is__)
-            print(msg)
             if (logger):
                 logger.info(msg)
             
             the_real_list.append({'_id':anId, __rotation__:len(item.get(__rotation__, [])), 'secs': delta.total_seconds(), '__is__': __is__})
             msg = 'Added to the_real_list: {}\n'.format(anId)
-            print(msg)
             if (logger):
                 logger.info(msg)
     return the_real_list
@@ -127,18 +123,31 @@ def get_the_real_list(*args, **kwargs):
 
 def __get_a_choice(the_list=None, the_chosen=None, logger=None):
     choice = None
-    priorities1 = [item for item in the_list if (isinstance(item, str))]
-    if (len(priorities1) > 0):
-        choice = random.choice(priorities1)
-    else:
-        priorities2 = [item for item in the_list if (not isinstance(item, str)) and (not item.get(__rotation__))]
-        if (len(priorities2) > 0):
-            choice = random.choice(priorities1).get('_id')
+    assert the_chosen and (isinstance(the_chosen, list)), 'Missing the_chosen or not a list.'
+    the_list = [item for item in the_list if (isinstance(item, str) and (item not in the_chosen)) or ( (not isinstance(item, str)) and (item.get('_id') not in the_chosen) )]
+    msg = 'the_list - the_chosen has {} items.'.format(len(the_list))
+    logger.info(msg)
+    if (len(the_list) > 0):
+        priorities1 = [item for item in the_list if (isinstance(item, str))]
+        msg = 'priorities1 has {} items.'.format(len(priorities1))
+        logger.info(msg)
+        if (len(priorities1) > 0):
+            choice = random.choice(priorities1)
         else:
-            priorities3 = [item for item in the_list if (not isinstance(item, str)) and (item.get(__rotation__, -1) > 0)]
-            if (len(priorities3) > 0):
-                priorities3 = sorted(priorities3, key=lambda item: item.get(__rotation__, -1), reverse=False)
-                choice = priorities3[0].get('_id')
+            priorities2 = [item for item in the_list if (not isinstance(item, str)) and (not item.get(__rotation__))]
+            msg = 'priorities2 has {} items.'.format(len(priorities2))
+            logger.info(msg)
+            if (len(priorities2) > 0):
+                choice = random.choice(priorities1).get('_id')
+            else:
+                priorities3 = [item for item in the_list if (not isinstance(item, str)) and (item.get(__rotation__, -1) > 0)]
+                msg = 'priorities3 has {} items.'.format(len(priorities3))
+                logger.info(msg)
+                if (len(priorities3) > 0):
+                    priorities3 = sorted(priorities3, key=lambda item: item.get(__rotation__, -1), reverse=False)
+                    choice = priorities3[0].get('_id')
+    msg = 'choice is  {}.'.format(choice)
+    logger.info(msg)
     return choice
 
 @args.kwargs(__get_a_choice)
@@ -170,7 +179,6 @@ def __update_the_article(item=None, the_choice=None, ts_current_time=None, logge
     the_update[__rotation__] = most_recent_30_days(bucket)
 
     msg = 'Updating: id: {}, {}'.format(the_choice, the_update)
-    print(msg)
     if (logger):
         logger.info(msg)
     resp = __store_article_data(item, update=the_update, environ=environ, mongo_db_name=mongo_db_name,  mongo_articles_col_name=mongo_articles_col_name)
