@@ -21,15 +21,17 @@ default_timestamp = lambda t:t.isoformat().replace(':', '').replace('-','').spli
 def get_stream_handler(streamformat):
     stream = logging.StreamHandler()
     stream.setLevel(logging.INFO)
-    stream.setFormatter(streamformat)
+    stream.setFormatter(streamformat[0] if (not isinstance(streamformat, str)) else streamformat)
     return stream
 
     
-def setup_rotating_file_handler(logfile, max_bytes, backup_count):
+def setup_rotating_file_handler(logname, logfile, max_bytes, backup_count):
     assert is_really_something(backup_count, something_greater_than_zero), 'Missing backup_count?'
     assert is_really_something(max_bytes, something_greater_than_zero), 'Missing max_bytes?'
     ch = RotatingFileHandler(logfile, 'a', max_bytes, backup_count)
-    return logging.getLogger().addHandler(ch)
+    l = logging.getLogger(logname)
+    l.addHandler(ch)
+    return l
 
 
 base_filename = os.path.splitext(os.path.basename(__file__))[0]
@@ -49,7 +51,7 @@ logging.basicConfig(
     filename=(log_filename),
 )
 
-logger = setup_rotating_file_handler(log_filename, (1024*1024*1024), 10)
+logger = setup_rotating_file_handler(base_filename, log_filename, (1024*1024*1024), 10)
 logger.addHandler(get_stream_handler(log_format))
 
 twitter_verse = 'twitter_verse'
