@@ -13,6 +13,11 @@ get_final_word_cloud = 'get_final_word_cloud'
 store_one_hashtag = 'store_one_hashtag'
 get_hashtag_matching = 'get_hashtag_matching'
 delete_all_hashtags = 'delete_all_hashtags'
+delete_one_hashtag = 'delete_one_hashtag'
+reset_all_hashtags = 'reset_all_hashtags'
+
+
+last_followers = 'last_followers'
 
 
 def __get_api(consumer_key=None, consumer_secret=None, access_token=None, access_token_secret=None, logger=None):
@@ -55,7 +60,11 @@ def __do_the_tweet(api=None, item=None, popular_hashtags=None, logger=None, sile
     msg = 'URL: {} -> {}'.format(url, u)
     if (logger):
         logger.info(msg)
-    the_tweet = '{}\n{}\n(raychorn.github.io + raychorn.medium.com)\n'.format(item.get('name'), u)
+    if (0):
+        extra_domains = '(raychorn.github.io + raychorn.medium.com)\n'
+        the_tweet = '{}\n{}\n{}'.format(item.get('name'), u, extra_domains)
+    else:
+        the_tweet = '{}\n{}\n'.format(item.get('name'), u)
     num_chars = len(sample_tweet) - len(the_tweet)
     popular_hashtags = __get_top_trending_hashtags(api) if (not popular_hashtags) else popular_hashtags
     if (num_chars > 0):
@@ -84,6 +93,9 @@ def do_the_tweet(*args, **kwargs):
 
 
 def __handle_hashtags(service_runner=None, environ=None, logger=None, hashtags=[]):
+    if (1):
+        docs = service_runner.exec(word_cloud, get_hashtag_matching, **plugins_handler.get_kwargs(environ=environ, logger=logger))
+        print()
     for hashtag in hashtags:
         doc = service_runner.exec(word_cloud, get_hashtag_matching, **plugins_handler.get_kwargs(hashtag=hashtag, environ=environ, logger=logger))
         if (not doc):
@@ -102,28 +114,39 @@ def __handle_one_available_hashtag(api=None, service_runner=None, environ=None, 
         words = service_runner.exec(word_cloud, get_final_word_cloud, **plugins_handler.get_kwargs(environ=environ, callback=None, logger=logger))
         for k,v in words.get('word-cloud', {}).items():
             doc = service_runner.exec(word_cloud, get_hashtag_matching, **plugins_handler.get_kwargs(hashtag=k, environ=environ, logger=logger))
-            if (doc) and (not doc.get('last_followers')):
+            if (doc) and (not doc.get(last_followers)):
                 pass
             
-    doc = service_runner.exec(word_cloud, get_hashtag_matching, **plugins_handler.get_kwargs(criteria={ "last_followers" : { "$exists": False } }, environ=environ, logger=logger))
-    if (doc) and (not doc.get('last_followers')):
+    doc = service_runner.exec(word_cloud, get_hashtag_matching, **plugins_handler.get_kwargs(criteria={ last_followers : { "$exists": False } }, environ=environ, logger=logger))
+    if (doc) and (not doc.get(last_followers)):
         hashtag = doc.get('hashtag')
         if (hashtag):
+            hashtag_count = 0
             h = '{}{}'.format('#' if (hashtag.find('#') == -1) else '', hashtag)
             for tweeter in tweepy.Cursor(api.search, q=h).items():
                 friends = api.show_friendship(source_screen_name=tweeter.screen_name, target_screen_name=me.screen_name)
                 if (not any([f.following for f in friends])):
                     api.create_friendship(screen_name=tweeter.screen_name)
+                    hashtag_count += 1
+                    time.sleep(environ.get('hashtags_followers_pace', 60))
                     if (logger):
                         logger.info('followed {}'.format(tweeter.screen_name))
+            if (hashtag_count == 0):
+                status = service_runner.exec(word_cloud, delete_one_hashtag, **plugins_handler.get_kwargs(environ=environ, hashtag=hashtag, logger=logger))
+                assert status, 'Did not delete the hashtags {} for followers.'.format(hashtag)
+                if (logger):
+                    logger.warning('Resetting hashtags for new followers.')
     else:
-        count = service_runner.exec(word_cloud, delete_all_hashtags, **plugins_handler.get_kwargs(environ=environ, logger=logger))
-        assert count == 0, 'Did not delete all the hashtags for followers.'
+        status = service_runner.exec(word_cloud, reset_all_hashtags, **plugins_handler.get_kwargs(environ=environ, attr=last_followers, logger=logger))
+        assert status, 'Did not reset all the hashtags for followers.'
         if (logger):
-            logger.info('Resetting hashtags for new followers.')
+            logger.warning('Resetting hashtags for new followers.')
 
 
 def __get_more_followers(api=None, environ=None, service_runner=None, logger=None, hashtags=[], silent=False, runtime=0):
+    '''
+    This function was designed to be a long-running background task that seeks to add followers on a 24x7 basis based on the most popular hashtags.
+    '''
     assert api, 'Missing api.'
     assert service_runner, 'Missing service_runner.'
     
@@ -144,10 +167,11 @@ def __get_more_followers(api=None, environ=None, service_runner=None, logger=Non
     while (1):
         __handle_one_available_hashtag(api=api, service_runner=service_runner, environ=environ, logger=logger)
 
-        time_now = time.time()
-        et = time_now - start_time
-        if (et > runtime):
-            break
+        if (runtime) and (isinstance(runtime, int)) and (runtime > 0):
+            time_now = time.time()
+            et = time_now - start_time
+            if (et > runtime):
+                break
     if (count > 0):
         if (logger):
             logger.info('followed {} followers'.format(count))

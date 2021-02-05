@@ -28,11 +28,11 @@ def __store_hashtag(data, environ=None):
         if ((hashtag) and (len(hashtag) > 0)):
             doc = coll.find_one({ "hashtag": hashtag })
             if (doc):
-                data['updated_time'] = datetime.utcnow()
+                data['modified'] = datetime.utcnow()
                 newvalue = { "$set": data }
                 coll.update_one({'_id': doc.get('_id')}, newvalue)
             else:
-                data['created_time'] = datetime.utcnow()
+                data['created'] = datetime.utcnow()
                 coll.insert_one(data)
 
             count = coll.count_documents({})
@@ -66,8 +66,8 @@ def __get_hashtag_matching(hashtag=None, environ=None, criteria=None, logger=Non
             elif (criteria):
                 find_in_collection = lambda c,criteria=criteria:c.find_one({ "hashtag": hashtag }) if (not criteria) else c.find_one(criteria)
                 docs = find_in_collection(coll, criteria=criteria)
-        elif (criteria):
-            find_in_collection = lambda c,criteria=criteria:c.find_one({ "hashtag": hashtag }) if (not criteria) else c.find_one(criteria)
+        else:
+            find_in_collection = lambda c,criteria=criteria:c.find({}) if (not criteria) else c.find_one(criteria)
             docs = find_in_collection(coll, criteria=criteria)
         return docs
     return db_get_hashtag_matching(hashtag=hashtag)
@@ -75,6 +75,37 @@ def __get_hashtag_matching(hashtag=None, environ=None, criteria=None, logger=Non
 
 @args.kwargs(__get_hashtag_matching)
 def get_hashtag_matching(*args, **kwargs):
+    pass
+
+
+
+def __delete_one_hashtag(hashtag=None, environ=None, logger=None):
+    @__with.database(environ=environ)
+    def db_delete_one_hashtag(db=None, hashtag=None):
+        mongo_db_name = environ.get('mongo_db_name')
+        mongo_hashtags_col_name = environ.get('mongo_hashtags_col_name')
+        assert vyperapi.is_not_none(db), 'There is no db.'
+        assert vyperapi.is_not_none(mongo_db_name), 'There is no mongo_db_name.'
+        assert vyperapi.is_not_none(mongo_hashtags_col_name), 'There is no mongo_hashtags_col_name.'
+
+        tb_name = mongo_db_name
+        col_name = mongo_hashtags_col_name
+        table = db[tb_name]
+        coll = table[col_name]
+
+        status = False
+        if ((hashtag) and (len(hashtag) > 0)):
+            try:
+                coll.delete_one({"hashtag": hashtag})
+                status = True
+            except:
+                status = False
+        return status
+    return db_delete_one_hashtag(hashtag=hashtag)
+
+
+@args.kwargs(__delete_one_hashtag)
+def delete_one_hashtag(*args, **kwargs):
     pass
 
 
@@ -100,6 +131,34 @@ def __delete_all_hashtags(environ=None, logger=None):
 
 @args.kwargs(__delete_all_hashtags)
 def delete_all_hashtags(*args, **kwargs):
+    pass
+
+
+def __reset_all_hashtags(environ=None, attr=None, logger=None):
+    @__with.database(environ=environ)
+    def db_reset_all_hashtags(db=None, hashtag=None):
+        mongo_db_name = environ.get('mongo_db_name')
+        mongo_hashtags_col_name = environ.get('mongo_hashtags_col_name')
+        assert vyperapi.is_not_none(db), 'There is no db.'
+        assert vyperapi.is_not_none(mongo_db_name), 'There is no mongo_db_name.'
+        assert vyperapi.is_not_none(mongo_hashtags_col_name), 'There is no mongo_hashtags_col_name.'
+
+        tb_name = mongo_db_name
+        col_name = mongo_hashtags_col_name
+        table = db[tb_name]
+        coll = table[col_name]
+
+        try:
+            ts_time = _utils.timeStamp(offset=0, use_iso=True)
+            coll.updateMany({}, [{ "$unset": attr }, {"$set": {"modified": ts_time}}])
+            return True
+        except:
+            return False
+    return db_reset_all_hashtags()
+
+
+@args.kwargs(__reset_all_hashtags)
+def reset_all_hashtags(*args, **kwargs):
     pass
 
 

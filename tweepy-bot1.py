@@ -178,16 +178,17 @@ if (__name__ == '__main__'):
     
     if (1):
         hashtags = []
-        criteria = os.environ.get('hashtags_criteria')
-        if (criteria.find('is_uppercase') > -1):
-            criteria = is_uppercase
-        threshold = int(os.environ.get('minimum_word_cloud_count', 1))
-        min_hashtag_length = int(os.environ.get('minimum_hashtags_length', 1))
-        words = service_runner.exec(word_cloud, get_final_word_cloud, **plugins_handler.get_kwargs(environ=os.environ, callback=None, logger=logger))
-        for k,v in words.get('word-cloud', {}).items():
-            if ( (len(k) > min_hashtag_length) and (v > threshold) ) or (criteria(k)):
-                hashtags.append(k)
-        service_runner.exec(twitter_verse, get_more_followers, **plugins_handler.get_kwargs(api=api, environ=__env__, service_runner=service_runner, hashtags=hashtags, silent=False, runtime=60*10, logger=logger))
+        if (0):
+            criteria = os.environ.get('hashtags_criteria')
+            if (criteria.find('is_uppercase') > -1):
+                criteria = is_uppercase
+            threshold = int(os.environ.get('minimum_word_cloud_count', 1))
+            min_hashtag_length = int(os.environ.get('minimum_hashtags_length', 1))
+            words = service_runner.exec(word_cloud, get_final_word_cloud, **plugins_handler.get_kwargs(environ=os.environ, callback=None, logger=logger))
+            for k,v in words.get('word-cloud', {}).items():
+                if ( (len(k) > min_hashtag_length) and (v > threshold) ) or (criteria(k)):
+                    hashtags.append(k)
+        service_runner.exec(twitter_verse, get_more_followers, **plugins_handler.get_kwargs(api=api, environ=__env__, service_runner=service_runner, hashtags=hashtags, silent=False, runtime=0, logger=logger))
 
     if (0):
         h = get_top_trending_hashtags(api)
