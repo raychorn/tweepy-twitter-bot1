@@ -96,6 +96,8 @@ def __handle_one_available_hashtag(api=None, service_runner=None, environ=None, 
     assert service_runner, 'Missing service_runner.'
     assert environ, 'Missing environ.'
 
+    me = api.me()
+
     if (0):
         words = service_runner.exec(word_cloud, get_final_word_cloud, **plugins_handler.get_kwargs(environ=environ, callback=None, logger=logger))
         for k,v in words.get('word-cloud', {}).items():
@@ -107,10 +109,13 @@ def __handle_one_available_hashtag(api=None, service_runner=None, environ=None, 
     if (doc) and (not doc.get('last_followers')):
         hashtag = doc.get('hashtag')
         if (hashtag):
-            for tweeter in tweepy.Cursor(api.search, q='{}{}'.format('#' if (hashtag.find('#') == -1) else '', hashtag)).items():
-                api.create_friendship(screen_name=tweeter.screen_name)
-                if (logger):
-                    logger.info('followed {}'.format(tweeter.screen_name))
+            h = '{}{}'.format('#' if (hashtag.find('#') == -1) else '', hashtag)
+            for tweeter in tweepy.Cursor(api.search, q=h).items():
+                friends = api.show_friendship(source_screen_name=tweeter.screen_name, target_screen_name=me.screen_name)
+                if (not any([f.following for f in friends])):
+                    api.create_friendship(screen_name=tweeter.screen_name)
+                    if (logger):
+                        logger.info('followed {}'.format(tweeter.screen_name))
     else:
         count = service_runner.exec(word_cloud, delete_all_hashtags, **plugins_handler.get_kwargs(environ=environ, logger=logger))
         assert count == 0, 'Did not delete all the hashtags for followers.'
