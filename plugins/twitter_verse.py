@@ -63,7 +63,7 @@ class TwitterAPIProxy(MagicObject2):
         self.n = [n for n in self.n if (n != '__iter__')]
         if (len(self.n) > 0):
             self.calls_count += 1
-            if (0):
+            if (1):
                 # this seems to work.
                 et = time.time() - self.start_time
                 v = self.calls_count / et
@@ -76,7 +76,8 @@ class TwitterAPIProxy(MagicObject2):
                         time.sleep(1)
                         et = time.time() - self.start_time
                         v = self.calls_count / et
-            if (1):
+            if (0):
+                # this seems to fail.
                 if (self.__any_rate_limits_getting_low__(5)):
                     if (self.logger):
                         self.logger.info('Some rate limits are getting low.')
