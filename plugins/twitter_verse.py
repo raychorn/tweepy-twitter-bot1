@@ -63,32 +63,19 @@ class TwitterAPIProxy(MagicObject2):
         self.n = [n for n in self.n if (n != '__iter__')]
         if (len(self.n) > 0):
             self.calls_count += 1
-            if (1):
-                # this seems to work.
-                et = time.time() - self.start_time
-                v = self.calls_count / et
-                if (self.logger):
-                    self.logger.info('Twitter rate limits? ({} calls in {} secs)  (v is {} of {})'.format(self.calls_count, et, v, self.rate_limit))
-                if (v > self.rate_limit):
-                    while (v > self.rate_limit):
-                        if (self.logger):
-                            self.logger.info('Sleeping due to twitter rate limits. (v is {} of {})'.format(v, self.rate_limit))
-                        time.sleep(1)
-                        et = time.time() - self.start_time
-                        v = self.calls_count / et
-            if (0):
-                # this seems to fail.
-                if (self.__any_rate_limits_getting_low__(5)):
+            # heuristic begins.
+            et = time.time() - self.start_time
+            v = self.calls_count / et
+            if (self.logger):
+                self.logger.info('Twitter rate limits? ({} calls in {} secs)  (v is {} of {})'.format(self.calls_count, et, v, self.rate_limit))
+            if (v > self.rate_limit):
+                while (v > self.rate_limit):
                     if (self.logger):
-                        self.logger.info('Some rate limits are getting low.')
-                    while (1):
-                        if (self.logger):
-                            self.logger.info('Sleeping for 5 secs.')
-                        time.sleep(5)
-                        if (not self.__any_rate_limits_getting_low__(5)):
-                            if (self.logger):
-                                self.logger.info('Some rate limits are ok now. Proceed.')
-                            break
+                        self.logger.info('Sleeping due to twitter rate limits. (v is {} of {})'.format(v, self.rate_limit))
+                    time.sleep(1)
+                    et = time.time() - self.start_time
+                    v = self.calls_count / et
+            # heuristic ends.
             method = self.n.pop()
             s = 'self.api.%s(*args,**kwargs)' % (method)
             if (self.logger):
