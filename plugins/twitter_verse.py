@@ -80,24 +80,14 @@ class TwitterAPIProxy(MagicObject2):
             s = 'self.api.%s(*args,**kwargs)' % (method)
             if (self.logger):
                 self.logger.info('{} {}'.format(self.__class__, s))
-            time.sleep(0.25)
+            time.sleep(0.5)
             resp = None
-            while (1):
-                try:
-                    resp = eval(s)
-                    break
-                except tweepy.error.RateLimitError:
-                    while (1):
-                        if (self.logger):
-                            self.logger.info('Sleeping for 30 secs')
-                        time.sleep(30)
-                        if (self.logger):
-                            self.logger.info('Refreshing rate limits data.')
-                        self.__refresh_rate_limits__()
-                        if (not self.__any_rate_limits_getting_low__(5)):
-                            if (self.logger):
-                                self.logger.info('Rate limits ok, proceed.')
-                            break
+            try:
+                resp = eval(s)
+            except tweepy.error.RateLimitError:
+                if (self.logger):
+                    self.logger.info('Sleeping for 30 secs due to rate limit issues.')
+                time.sleep(30)
             return resp
         return None
     
