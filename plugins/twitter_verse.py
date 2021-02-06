@@ -55,7 +55,10 @@ class TwitterAPIProxy(MagicObject2):
     
     def __any_rate_limits_getting_low__(self, threshold):
         self.__refresh_rate_limits__()
-        return any([int(k) < threshold for k in self.rate_limit_stats.keys()])
+        items = []
+        for i in [list(k) for k in [v.keys() for v in self.rate_limit_stats.get('remaining', {}).keys()]]:
+            items.append(i)
+        return any([int(i) < threshold for i in items])
 
 
     def __call__(self,*args,**kwargs):
@@ -105,7 +108,7 @@ class TwitterAPIProxy(MagicObject2):
                         if (self.logger):
                             self.logger.info('Refreshing rate limits data.')
                         self.__refresh_rate_limits__()
-                        if (any([int(k) > 10 for k in self.rate_limit_stats.keys()])):
+                        if (not self.__any_rate_limits_getting_low__(5)):
                             if (self.logger):
                                 self.logger.info('Rate limits ok, proceed.')
                             break
@@ -113,11 +116,13 @@ class TwitterAPIProxy(MagicObject2):
         return None
     
     
-    def ingest_rate_limit_stats(self, stats):
+    def ingest_rate_limit_stats(self, stats, ignoring=['labs']):
         for category,cat_stats in stats.items():
             if (category not in ['rate_limit_context']):
                 for subcat,subcat_stats in cat_stats.items():
                     for specific,specific_stats in subcat_stats.items():
+                        if (subcat in ignoring):
+                            continue
                         p = '{}:{}:{}'.format(category, subcat, specific)
                         for k,v in specific_stats.items():
                             bucket = self.rate_limit_stats.get(k, {})
