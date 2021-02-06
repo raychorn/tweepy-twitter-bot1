@@ -4,4 +4,4 @@ export PYTHONPATH=/home/raychorn/projects/python-projects/private_vyperlogix_lib
 
 . /home/raychorn/projects/python-projects/tweepy-twitter-bot1/.venv391/bin/activate
 
-python /home/raychorn/projects/python-projects/tweepy-twitter-bot1/tweepy-bot1.py
+python /home/raychorn/projects/python-projects/tweepy-twitter-bot1/tweepy-bot1.py "production"

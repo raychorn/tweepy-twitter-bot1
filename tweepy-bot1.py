@@ -84,6 +84,9 @@ from vyperlogix.misc import _utils
 from vyperlogix.env import environ
 from vyperlogix.plugins import handler as plugins_handler
 
+from vyperlogix.threads import pooled
+from vyperlogix.decorators import executor
+
 __env__ = {}
 env_literals = ['MONGO_INITDB_ROOT_PASSWORD']
 def get_environ_keys(*args, **kwargs):
@@ -176,24 +179,17 @@ if (__name__ == '__main__'):
     
     api = service_runner.exec(twitter_verse, get_api, **plugins_handler.get_kwargs(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger))
     
-    if (1):
-        hashtags = []
-        if (0):
-            criteria = os.environ.get('hashtags_criteria')
-            if (criteria.find('is_uppercase') > -1):
-                criteria = is_uppercase
-            threshold = int(os.environ.get('minimum_word_cloud_count', 1))
-            min_hashtag_length = int(os.environ.get('minimum_hashtags_length', 1))
-            words = service_runner.exec(word_cloud, get_final_word_cloud, **plugins_handler.get_kwargs(environ=os.environ, callback=None, logger=logger))
-            for k,v in words.get('word-cloud', {}).items():
-                if ( (len(k) > min_hashtag_length) and (v > threshold) ) or (criteria(k)):
-                    hashtags.append(k)
-        service_runner.exec(twitter_verse, get_more_followers, **plugins_handler.get_kwargs(api=api, environ=__env__, service_runner=service_runner, hashtags=hashtags, silent=False, runtime=0, logger=logger))
-
     if (0):
         h = get_top_trending_hashtags(api)
         print(h)
 
+    __production__ = any([arg == 'production' for arg in sys.argv])
+    __executor_running__ = not __production__
+    
+    def __callback__(*args, **kwargs):
+        global __executor_running__
+        __executor_running__ = False
+    
     while(1):
         try:
             print('\n'*10)
@@ -201,12 +197,6 @@ if (__name__ == '__main__'):
             msg = 'Current time: {}'.format(ts_current_time)
             logger.info(msg)
 
-            tweet_period_secs = 1*60*60
-            
-            ts_tweeted_time = _utils.timeStamp(offset=-tweet_period_secs, use_iso=True)
-            msg = 'Tweeted time:  {}'.format(ts_tweeted_time)
-            logger.info(msg)
-            
             if (0):
                 today = _utils.today_utctime()
                 secs_until_tomorrow_morning = ((24 - today.hour) * (60*60)) + ((59 - today.minute) * 60)
@@ -223,7 +213,31 @@ if (__name__ == '__main__'):
             msg = 'wait_per_choice: {}'.format(wait_per_choice)
             logger.info(msg)
             
-            the_real_list = service_runner.exec(articles_list, get_the_real_list, **plugins_handler.get_kwargs(the_list=the_list, logger=logger, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=tweet_period_secs, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+            ts_tweeted_time = _utils.timeStamp(offset=-wait_per_choice, use_iso=True)
+            msg = 'Tweeted time:  {}'.format(ts_tweeted_time)
+            logger.info(msg)
+
+            if (not __executor_running__):
+                __executor__ = pooled.BoundedExecutor(1, 10, callback=__callback__)
+                
+                @executor.threaded(__executor__)
+                def go_get_more_followers(runtime=0):
+                    hashtags = []
+                    if (0):
+                        criteria = os.environ.get('hashtags_criteria')
+                        if (criteria.find('is_uppercase') > -1):
+                            criteria = is_uppercase
+                        threshold = int(os.environ.get('minimum_word_cloud_count', 1))
+                        min_hashtag_length = int(os.environ.get('minimum_hashtags_length', 1))
+                        words = service_runner.exec(word_cloud, get_final_word_cloud, **plugins_handler.get_kwargs(environ=os.environ, callback=None, logger=logger))
+                        for k,v in words.get('word-cloud', {}).items():
+                            if ( (len(k) > min_hashtag_length) and (v > threshold) ) or (criteria(k)):
+                                hashtags.append(k)
+                    service_runner.exec(twitter_verse, get_more_followers, **plugins_handler.get_kwargs(api=api, environ=__env__, service_runner=service_runner, hashtags=hashtags, silent=False, runtime=runtime, logger=logger))
+                go_get_more_followers(runtime=(wait_per_choice - 60))
+                __executor_running__ = True
+
+            the_real_list = service_runner.exec(articles_list, get_the_real_list, **plugins_handler.get_kwargs(the_list=the_list, logger=logger, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=wait_per_choice, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
 
             msg = '='*30
             logger.info(msg)

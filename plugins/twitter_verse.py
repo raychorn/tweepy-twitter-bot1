@@ -35,6 +35,7 @@ class TwitterAPIProxy(MagicObject2):
         assert self.rate_limit and (isinstance(self.rate_limit, str)) and (len(self.rate_limit) > 0), 'Missing rate_limit.'
         self.rate_limit = float(self.rate_limit)
         self.rate_limit_stats = {}
+        self.is_rate_limit_blown = False
         
         try:
             self.auth = tweepy.OAuthHandler(self.consumer_key, self.consumer_secret)
@@ -80,11 +81,12 @@ class TwitterAPIProxy(MagicObject2):
             s = 'self.api.%s(*args,**kwargs)' % (method)
             if (self.logger):
                 self.logger.info('{} {}'.format(self.__class__, s))
-            time.sleep(0.5)
+            time.sleep(1.0)
             resp = None
             try:
                 resp = eval(s)
             except tweepy.error.RateLimitError:
+                self.is_rate_limit_blown = True
                 if (self.logger):
                     self.logger.info('Sleeping for 30 secs due to rate limit issues.')
                 time.sleep(30)
@@ -209,6 +211,10 @@ def __handle_one_available_hashtag(api=None, service_runner=None, environ=None, 
                     time.sleep(environ.get('hashtags_followers_pace', 60))
                     if (logger):
                         logger.info('followed {}'.format(tweeter.screen_name))
+                if (api.is_rate_limit_blown):
+                    if (logger):
+                        logger.info('Twitter rate limit was blown.')
+                    break
             if (hashtag_count == 0):
                 status = service_runner.exec(word_cloud, delete_one_hashtag, **plugins_handler.get_kwargs(environ=environ, hashtag=hashtag, logger=logger))
                 assert status, 'Did not delete the hashtags {} for followers.'.format(hashtag)
@@ -226,23 +232,29 @@ def __get_more_followers(api=None, environ=None, service_runner=None, logger=Non
     This function was designed to be a long-running background task that seeks to add followers on a 24x7 basis based on the most popular hashtags.
     '''
     assert api, 'Missing api.'
+    assert environ, 'Missing environ.'
     assert service_runner, 'Missing service_runner.'
     
     count = 0
     me = api.me()
-    for anId in api.followers_ids(me.id):
-        follower = api.get_user(anId)
-        if (logger):
-            logger.info('Checking follower: {}'.format(follower.screen_name))
-        friends = api.show_friendship(source_screen_name=follower.screen_name, target_screen_name=me.screen_name)
-        time.sleep(1)
-        friends2 = api.show_friendship(source_screen_name=me.screen_name, target_screen_name=follower.screen_name)
-        time.sleep(1)
-        if (not any([f.following for f in friends])) or (not any([f.following for f in friends2])):
-            count += 1
+    if (environ.get('twitter_follow_followers')):
+        for anId in api.followers_ids(me.id):
+            follower = api.get_user(anId)
             if (logger):
-                logger.info('follow the follower: {}'.format(follower.screen_name))
-            api.create_friendship(follower.id)
+                logger.info('Checking follower: {}'.format(follower.screen_name))
+            friends = api.show_friendship(source_screen_name=follower.screen_name, target_screen_name=me.screen_name)
+            time.sleep(1)
+            friends2 = api.show_friendship(source_screen_name=me.screen_name, target_screen_name=follower.screen_name)
+            time.sleep(1)
+            if (not any([f.following for f in friends])) or (not any([f.following for f in friends2])):
+                count += 1
+                if (logger):
+                    logger.info('follow the follower: {}'.format(follower.screen_name))
+                api.create_friendship(follower.id)
+            if (api.is_rate_limit_blown):
+                if (logger):
+                    logger.info('Twitter rate limit was blown.')
+                break
     most_popular_hashtags = __get_top_trending_hashtags(api)
     __handle_hashtags(service_runner=service_runner, environ=environ, hashtags=list(set(hashtags+most_popular_hashtags)), logger=logger)
     start_time = time.time()
@@ -254,6 +266,10 @@ def __get_more_followers(api=None, environ=None, service_runner=None, logger=Non
             et = time_now - start_time
             if (et > runtime):
                 break
+        if (api.is_rate_limit_blown):
+            if (logger):
+                logger.info('Twitter rate limit was blown.')
+            break
     if (count > 0):
         if (logger):
             logger.info('followed {} followers'.format(count))
