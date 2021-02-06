@@ -154,7 +154,11 @@ def __get_a_choice(the_list=None, the_chosen=None, logger=None):
 def get_a_choice(*args, **kwargs):
     pass
 
+
 def most_recent_30_days(bucket):
+    '''
+    To Do: Do some analysis to see if there are any articles that have not been tweeted recently? (Whatever thay means.)
+    '''
     period_secs = 30*24*60*60
     thirty_days_ago = datetime.fromisoformat(_utils.timeStamp(offset=-period_secs, use_iso=True))
     new_bucket = []
@@ -185,7 +189,7 @@ def __update_the_article(item=None, the_choice=None, ts_current_time=None, logge
     assert isinstance(resp, int), 'Problem with the response? Expected int value but got {}'.format(resp)
     print('Update was done.')
     
-    return the_update[__rotation__]
+    return the_update.get(__rotation__, [])
 
 @args.kwargs(__update_the_article)
 def update_the_article(*args, **kwargs):
