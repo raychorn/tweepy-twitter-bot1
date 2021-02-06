@@ -239,6 +239,8 @@ def __get_more_followers(api=None, environ=None, service_runner=None, logger=Non
     count = 0
     me = api.me()
     start_time = time.time()
+    if (logger):
+        logger.info('Started __get_more_followers')
     if (environ.get('twitter_follow_followers')):
         for anId in api.followers_ids(me.id):
             follower = api.get_user(anId)
@@ -260,12 +262,22 @@ def __get_more_followers(api=None, environ=None, service_runner=None, logger=Non
     most_popular_hashtags = __get_top_trending_hashtags(api)
     __handle_hashtags(service_runner=service_runner, environ=environ, hashtags=list(set(hashtags+most_popular_hashtags)), logger=logger)
     while (1):
+        if (logger):
+            logger.info('BEGIN: __handle_one_available_hashtag')
         __handle_one_available_hashtag(api=api, service_runner=service_runner, environ=environ, logger=logger)
+        if (logger):
+            logger.info('END!!! __handle_one_available_hashtag')
 
+        if (logger):
+            logger.info('runtime: {}'.format(runtime))
         if (runtime) and (isinstance(runtime, int)) and (runtime > 0):
             time_now = time.time()
             et = time_now - start_time
+            if (logger):
+                logger.info('et: {}, runtime: {}'.format(et, runtime))
             if (et > runtime):
+                if (logger):
+                    logger.info('et: {} is greater than runtime: {}'.format(et, runtime))
                 break
         if (api.is_rate_limit_blown):
             if (logger):
@@ -288,11 +300,19 @@ def __like_own_tweets(api=None, environ=None, logger=None, runtime=0):
     assert api, 'Missing api.'
     assert environ, 'Missing environ.'
 
+    if (logger):
+        logger.info('Started __like_own_tweets')
     for tweet in tweepy.Cursor(api.user_timeline):
         if (not tweet.favorited):
             tweet.favorite()
             if (logger):
                 logger.info('liked {}'.format(tweet))
+        if (api.is_rate_limit_blown):
+            if (logger):
+                logger.info('Twitter rate limit was blown.')
+            break
+    if (logger):
+        logger.info('Completed __like_own_tweets')
 
 @args.kwargs(__like_own_tweets)
 def like_own_tweets(*args, **kwargs):
