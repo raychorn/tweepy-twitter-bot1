@@ -40,7 +40,7 @@ class TwitterAPIProxy(MagicObject2):
         try:
             self.auth = tweepy.OAuthHandler(self.consumer_key, self.consumer_secret)
             self.auth.set_access_token(self.access_token, self.access_token_secret)
-            self.api = tweepy.API(self.auth)
+            self.api = tweepy.API(self.auth, wait_on_rate_limit=True)
             self.ingest_rate_limit_stats(self.api.rate_limit_status())
         except:
             msg = 'Problem connecting to the twitter?'
@@ -204,8 +204,9 @@ def __handle_one_available_hashtag(api=None, service_runner=None, environ=None, 
             hashtag_count = 0
             h = '{}{}'.format('#' if (hashtag.find('#') == -1) else '', hashtag)
             for tweeter in tweepy.Cursor(api.search, q=h).items():
-                friends = api.show_friendship(source_screen_name=tweeter.screen_name, target_screen_name=me.screen_name)
-                if (not any([f.following for f in friends])):
+                friends1 = api.show_friendship(source_screen_name=tweeter.screen_name, target_screen_name=me.screen_name)
+                friends2 = api.show_friendship(source_screen_name=me.screen_name, target_screen_name=tweeter.screen_name)
+                if (not any([f.following for f in friends1])) or (not any([f.following for f in friends2])):
                     api.create_friendship(screen_name=tweeter.screen_name)
                     hashtag_count += 1
                     time.sleep(environ.get('hashtags_followers_pace', 60))
@@ -237,6 +238,7 @@ def __get_more_followers(api=None, environ=None, service_runner=None, logger=Non
     
     count = 0
     me = api.me()
+    start_time = time.time()
     if (environ.get('twitter_follow_followers')):
         for anId in api.followers_ids(me.id):
             follower = api.get_user(anId)
@@ -257,7 +259,6 @@ def __get_more_followers(api=None, environ=None, service_runner=None, logger=Non
                 break
     most_popular_hashtags = __get_top_trending_hashtags(api)
     __handle_hashtags(service_runner=service_runner, environ=environ, hashtags=list(set(hashtags+most_popular_hashtags)), logger=logger)
-    start_time = time.time()
     while (1):
         __handle_one_available_hashtag(api=api, service_runner=service_runner, environ=environ, logger=logger)
 
@@ -279,3 +280,20 @@ def __get_more_followers(api=None, environ=None, service_runner=None, logger=Non
 def get_more_followers(*args, **kwargs):
     pass
 
+
+def __like_own_tweets(api=None, environ=None, logger=None, runtime=0):
+    '''
+    This function was designed to be a long-running background task that seeks to like my own tweets because who better to like my tweets.
+    '''
+    assert api, 'Missing api.'
+    assert environ, 'Missing environ.'
+
+    for tweet in tweepy.Cursor(api.user_timeline):
+        if (not tweet.favorited):
+            tweet.favorite()
+            if (logger):
+                logger.info('liked {}'.format(tweet))
+
+@args.kwargs(__like_own_tweets)
+def like_own_tweets(*args, **kwargs):
+    pass

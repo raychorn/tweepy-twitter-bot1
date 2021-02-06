@@ -60,6 +60,7 @@ logger.addHandler(get_stream_handler())
 twitter_verse = 'twitter_verse'
 get_api = 'get_api'
 do_the_tweet = 'do_the_tweet'
+like_own_tweets = 'like_own_tweets'
 
 
 articles_list = 'articles_list'
@@ -184,11 +185,16 @@ if (__name__ == '__main__'):
         print(h)
 
     __production__ = any([arg == 'production' for arg in sys.argv])
-    __executor_running__ = not __production__
+    __followers_executor_running__ = not __production__
+    __likes_executor_running__ = not __production__
     
-    def __callback__(*args, **kwargs):
-        global __executor_running__
-        __executor_running__ = False
+    def __followers_callback__(*args, **kwargs):
+        global __followers_executor_running__
+        __followers_executor_running__ = False
+    
+    def __likes_callback__(*args, **kwargs):
+        global __likes_executor_running__
+        __likes_executor_running__ = False
     
     while(1):
         try:
@@ -217,10 +223,10 @@ if (__name__ == '__main__'):
             msg = 'Tweeted time:  {}'.format(ts_tweeted_time)
             logger.info(msg)
 
-            if (not __executor_running__):
-                __executor__ = pooled.BoundedExecutor(1, 10, callback=__callback__)
+            if (not __followers_executor_running__):
+                __followers_executor__ = pooled.BoundedExecutor(1, 5, callback=__followers_callback__)
                 
-                @executor.threaded(__executor__)
+                @executor.threaded(__followers_executor__)
                 def go_get_more_followers(runtime=0):
                     hashtags = []
                     if (0):
@@ -236,6 +242,15 @@ if (__name__ == '__main__'):
                     service_runner.exec(twitter_verse, get_more_followers, **plugins_handler.get_kwargs(api=api, environ=__env__, service_runner=service_runner, hashtags=hashtags, silent=False, runtime=runtime, logger=logger))
                 go_get_more_followers(runtime=(wait_per_choice - 60))
                 __executor_running__ = True
+
+            if (not __likes_executor_running__):
+                __likes_executor__ = pooled.BoundedExecutor(1, 5, callback=__likes_callback__)
+                
+                @executor.threaded(__likes_executor__)
+                def go_like_own_stuff(runtime=0):
+                    service_runner.exec(twitter_verse, like_own_tweets, **plugins_handler.get_kwargs(api=api, environ=__env__, runtime=runtime, logger=logger))
+                go_like_own_stuff(runtime=(wait_per_choice - 60))
+                __likes_executor_running__ = True
 
             the_real_list = service_runner.exec(articles_list, get_the_real_list, **plugins_handler.get_kwargs(the_list=the_list, logger=logger, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=wait_per_choice, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
 
