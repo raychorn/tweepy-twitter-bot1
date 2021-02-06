@@ -7,6 +7,8 @@ from vyperlogix.misc import _utils
 from vyperlogix.decorators import args
 from vyperlogix.plugins import handler as plugins_handler
 
+from vyperlogix.classes.MagicObject import MagicObject2
+
 
 word_cloud = 'word_cloud'
 get_final_word_cloud = 'get_final_word_cloud'
@@ -20,17 +22,94 @@ reset_all_hashtags = 'reset_all_hashtags'
 last_followers = 'last_followers'
 
 
+class TwitterAPIProxy(MagicObject2):
+    def __init__(self, consumer_key=None, consumer_secret=None, access_token=None, access_token_secret=None, logger=None):
+        self.consumer_key = consumer_key
+        self.consumer_secret = consumer_secret
+        self.access_token = access_token
+        self.access_token_secret = access_token_secret
+        self.logger = logger
+        self.calls_count = 0
+        self.start_time = time.time()
+        self.rate_limit = os.environ.get('twitter_rate_limit', 0.25)
+        assert self.rate_limit and (isinstance(self.rate_limit, str)) and (len(self.rate_limit) > 0), 'Missing rate_limit.'
+        self.rate_limit = float(self.rate_limit)
+        self.rate_limit_stats = {}
+        
+        try:
+            self.auth = tweepy.OAuthHandler(self.consumer_key, self.consumer_secret)
+            self.auth.set_access_token(self.access_token, self.access_token_secret)
+            self.api = tweepy.API(self.auth)
+            self.ingest_rate_limit_stats(self.api.rate_limit_status())
+        except:
+            msg = 'Problem connecting to the twitter?'
+            if (logger):
+                logger.exception(msg)
+            sys.exit()
+            
+            
+    def __refresh_rate_limits__(self):
+        self.rate_limit_stats = {}
+        self.ingest_rate_limit_stats(self.api.rate_limit_status())
+
+
+    def __call__(self,*args,**kwargs):
+        self.n = [n for n in self.n if (n != '__iter__')]
+        if (len(self.n) > 0):
+            self.calls_count += 1
+            et = time.time() - self.start_time
+            v = self.calls_count / et
+            if (self.logger):
+                self.logger.info('Twitter rate limits? ({} calls in {} secs)  (v is {} of {})'.format(self.calls_count, et, v, self.rate_limit))
+            if (v > self.rate_limit):
+                while (v > self.rate_limit):
+                    if (self.logger):
+                        self.logger.info('Sleeping due to twitter rate limits. (v is {} of {})'.format(v, self.rate_limit))
+                    time.sleep(1)
+                    et = time.time() - self.start_time
+                    v = self.calls_count / et
+            method = self.n.pop()
+            s = 'self.api.%s(*args,**kwargs)' % (method)
+            if (self.logger):
+                self.logger.info('{} {}'.format(self.__class__, s))
+            time.sleep(0.25)
+            resp = None
+            while (1):
+                try:
+                    resp = eval(s)
+                    break
+                except tweepy.error.RateLimitError:
+                    while (1):
+                        if (self.logger):
+                            self.logger.info('Sleeping for 30 secs')
+                        time.sleep(30)
+                        if (self.logger):
+                            self.logger.info('Refreshing rate limits data.')
+                        self.__refresh_rate_limits__()
+                        if (any([int(k) > 10 for k in self.rate_limit_stats.keys()])):
+                            if (self.logger):
+                                self.logger.info('Rate limits ok, proceed.')
+                            break
+            return resp
+        return None
+    
+    
+    def ingest_rate_limit_stats(self, stats):
+        for category,cat_stats in stats.items():
+            if (category not in ['rate_limit_context']):
+                for subcat,subcat_stats in cat_stats.items():
+                    for specific,specific_stats in subcat_stats.items():
+                        p = '{}:{}:{}'.format(category, subcat, specific)
+                        for k,v in specific_stats.items():
+                            bucket = self.rate_limit_stats.get(k, {})
+                            subBucket = bucket.get(v, [])
+                            subBucket.append(p)
+                            bucket[v] = subBucket
+                            self.rate_limit_stats[k] = bucket
+
+
 def __get_api(consumer_key=None, consumer_secret=None, access_token=None, access_token_secret=None, logger=None):
-    try:
-        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-        auth.set_access_token(access_token, access_token_secret)
-        api = tweepy.API(auth)
-    except:
-        msg = 'Problem connecting to the twitter?'
-        if (logger):
-            logger.error(msg)
-        sys.exit()
-    return api
+    return TwitterAPIProxy(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger)
     
 
 @args.kwargs(__get_api)
@@ -93,14 +172,13 @@ def do_the_tweet(*args, **kwargs):
 
 
 def __handle_hashtags(service_runner=None, environ=None, logger=None, hashtags=[]):
-    if (1):
-        docs = service_runner.exec(word_cloud, get_hashtag_matching, **plugins_handler.get_kwargs(environ=environ, logger=logger))
-        print()
     for hashtag in hashtags:
         doc = service_runner.exec(word_cloud, get_hashtag_matching, **plugins_handler.get_kwargs(hashtag=hashtag, environ=environ, logger=logger))
         if (not doc):
             count = service_runner.exec(word_cloud, store_one_hashtag, **plugins_handler.get_kwargs(data={'hashtag': hashtag}, environ=environ))
             assert count > -1, 'Problem with store_one_hashtag for {}.'.format(count)
+            if (logger):
+                logger.info('Added hashtag ("{}").'.format(hashtag))
 
 
 def __handle_one_available_hashtag(api=None, service_runner=None, environ=None, logger=None):
@@ -152,15 +230,19 @@ def __get_more_followers(api=None, environ=None, service_runner=None, logger=Non
     
     count = 0
     me = api.me()
-    for follower in api.followers(me.screen_name):
+    for anId in api.followers_ids(me.id):
+        follower = api.get_user(anId)
         if (logger):
-            logger.info('follower: {}'.format(follower.screen_name))
-            friends = api.show_friendship(source_screen_name=follower.screen_name, target_screen_name=me.screen_name)
-            if (not any([f.following for f in friends])):
-                count += 1
-                if (logger):
-                    logger.info('follow the follower: {}'.format(follower.screen_name))
-                api.create_friendship(follower.id)
+            logger.info('Checking follower: {}'.format(follower.screen_name))
+        friends = api.show_friendship(source_screen_name=follower.screen_name, target_screen_name=me.screen_name)
+        time.sleep(1)
+        friends2 = api.show_friendship(source_screen_name=me.screen_name, target_screen_name=follower.screen_name)
+        time.sleep(1)
+        if (not any([f.following for f in friends])) or (not any([f.following for f in friends2])):
+            count += 1
+            if (logger):
+                logger.info('follow the follower: {}'.format(follower.screen_name))
+            api.create_friendship(follower.id)
     most_popular_hashtags = __get_top_trending_hashtags(api)
     __handle_hashtags(service_runner=service_runner, environ=environ, hashtags=list(set(hashtags+most_popular_hashtags)), logger=logger)
     start_time = time.time()

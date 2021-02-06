@@ -171,7 +171,7 @@ def get_top_trending_hashtags(api):
     
 
 if (__name__ == '__main__'):
-    plugins_manager = plugins_handler.PluginManager(plugins, debug=True)
+    plugins_manager = plugins_handler.PluginManager(plugins, debug=True, logger=logger)
     service_runner = plugins_manager.get_runner()
     
     api = service_runner.exec(twitter_verse, get_api, **plugins_handler.get_kwargs(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger))

@@ -56,6 +56,8 @@ minimum_hashtags_length=6
 hashtags_criteria=is_uppercase
 
 hashtags_followers_pace=15
+
+twitter_rate_limit=0.3
 ```
 
 ### Installing
