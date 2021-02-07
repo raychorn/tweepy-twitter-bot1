@@ -308,7 +308,8 @@ def __like_own_tweets(api=None, environ=None, logger=None, runtime=0):
 
     if (logger):
         logger.info('Started __like_own_tweets')
-    for tweet in api.user_timeline():
+    tweets = api.user_timeline(screen_name=api.Me().screen_name,count=100)
+    for tweet in tweets:
         if (not tweet.favorited):
             tweet.favorite()
             if (logger):
