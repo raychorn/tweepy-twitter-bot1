@@ -270,6 +270,9 @@ def __get_more_followers(api=None, environ=None, service_runner=None, logger=Non
 
         if (logger):
             logger.info('runtime: {}'.format(runtime))
+            
+            
+            
         if (runtime) and (isinstance(runtime, int)) and (runtime > 0):
             time_now = time.time()
             et = time_now - start_time
