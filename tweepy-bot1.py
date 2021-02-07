@@ -183,8 +183,8 @@ if (__name__ == '__main__'):
     plugins_manager = plugins_handler.PluginManager(plugins, debug=True, logger=logger)
     service_runner = plugins_manager.get_runner()
     
-    __followers_executor_running__ = not __production__
-    __likes_executor_running__ = not __production__
+    __followers_executor_running__ = False #not __production__
+    __likes_executor_running__ = False #not __production__
     
     def __followers_callback__(*args, **kwargs):
         global __followers_executor_running__
