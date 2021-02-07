@@ -243,22 +243,25 @@ def __get_more_followers(api=None, environ=None, service_runner=None, logger=Non
         logger.info('Started __get_more_followers')
     if (environ.get('twitter_follow_followers')):
         for anId in api.followers_ids(me.id):
-            follower = api.get_user(anId)
-            if (logger):
-                logger.info('Checking follower: {}'.format(follower.screen_name))
-            friends = api.show_friendship(source_screen_name=follower.screen_name, target_screen_name=me.screen_name)
-            time.sleep(1)
-            friends2 = api.show_friendship(source_screen_name=me.screen_name, target_screen_name=follower.screen_name)
-            time.sleep(1)
-            if (not any([f.following for f in friends])) or (not any([f.following for f in friends2])):
-                count += 1
+            try:
+                follower = api.get_user(anId)
                 if (logger):
-                    logger.info('follow the follower: {}'.format(follower.screen_name))
-                api.create_friendship(follower.id)
-            if (api.is_rate_limit_blown):
-                if (logger):
-                    logger.info('Twitter rate limit was blown.')
-                break
+                    logger.info('Checking follower: {}'.format(follower.screen_name))
+                friends = api.show_friendship(source_screen_name=follower.screen_name, target_screen_name=me.screen_name)
+                time.sleep(1)
+                friends2 = api.show_friendship(source_screen_name=me.screen_name, target_screen_name=follower.screen_name)
+                time.sleep(1)
+                if (not any([f.following for f in friends])) or (not any([f.following for f in friends2])):
+                    count += 1
+                    if (logger):
+                        logger.info('follow the follower: {}'.format(follower.screen_name))
+                    api.create_friendship(follower.id)
+                if (api.is_rate_limit_blown):
+                    if (logger):
+                        logger.info('Twitter rate limit was blown.')
+                    break
+            except:
+                pass
     most_popular_hashtags = __get_top_trending_hashtags(api)
     __handle_hashtags(service_runner=service_runner, environ=environ, hashtags=list(set(hashtags+most_popular_hashtags)), logger=logger)
     while (1):
