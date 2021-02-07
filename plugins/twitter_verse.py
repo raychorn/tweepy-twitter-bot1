@@ -305,7 +305,7 @@ def __like_own_tweets(api=None, environ=None, logger=None, runtime=0):
 
     if (logger):
         logger.info('Started __like_own_tweets')
-    for tweet in tweepy.Cursor(api.user_timeline):
+    for tweet in tweepy.Cursor(api.user_timeline).items():
         if (not tweet.favorited):
             tweet.favorite()
             if (logger):
