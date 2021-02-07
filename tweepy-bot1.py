@@ -35,10 +35,15 @@ def setup_rotating_file_handler(logname, logfile, max_bytes, backup_count):
     l.addHandler(ch)
     return l
 
+production_token = 'production'
+
+__production__ = any([arg == production_token for arg in sys.argv])
+
+production_token = production_token if (__production__) else 'development'
 
 base_filename = os.path.splitext(os.path.basename(__file__))[0]
 
-log_filename = '{}{}{}{}{}_{}.log'.format('logs', os.sep, base_filename, os.sep, base_filename, default_timestamp(datetime.utcnow()))
+log_filename = '{}{}{}{}{}{}{}_{}.log'.format('logs', os.sep, base_filename, os.sep, production_token, os.sep, base_filename, default_timestamp(datetime.utcnow()))
 
 if not os.path.exists(os.path.dirname(log_filename)):
     os.makedirs(os.path.dirname(log_filename))
@@ -178,7 +183,6 @@ if (__name__ == '__main__'):
     plugins_manager = plugins_handler.PluginManager(plugins, debug=True, logger=logger)
     service_runner = plugins_manager.get_runner()
     
-    __production__ = any([arg == 'production' for arg in sys.argv])
     __followers_executor_running__ = not __production__
     __likes_executor_running__ = not __production__
     
