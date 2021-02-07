@@ -313,7 +313,7 @@ def __like_own_tweets(api=None, environ=None, logger=None, runtime=0):
         if (not tweet.favorited):
             tweet.favorite()
             if (logger):
-                logger.info('liked {}'.format(tweet))
+                logger.info('liked {}'.format(tweet.text))
         if (api.is_rate_limit_blown):
             if (logger):
                 logger.info('Twitter rate limit was blown.')
