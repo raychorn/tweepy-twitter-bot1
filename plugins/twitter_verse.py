@@ -242,8 +242,9 @@ def __get_more_followers(api=None, environ=None, service_runner=None, logger=Non
     if (logger):
         logger.info('Started __get_more_followers')
     if (environ.get('twitter_follow_followers')):
-        for anId in api.followers_ids(me.id):
-            try:
+        items = api.followers_ids(me.id)
+        if (isinstance(items, list)):
+            for anId in items:
                 follower = api.get_user(anId)
                 if (logger):
                     logger.info('Checking follower: {}'.format(follower.screen_name))
@@ -260,8 +261,6 @@ def __get_more_followers(api=None, environ=None, service_runner=None, logger=Non
                     if (logger):
                         logger.info('Twitter rate limit was blown.')
                     break
-            except:
-                pass
     most_popular_hashtags = __get_top_trending_hashtags(api)
     __handle_hashtags(service_runner=service_runner, environ=environ, hashtags=list(set(hashtags+most_popular_hashtags)), logger=logger)
     while (1):
