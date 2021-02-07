@@ -80,7 +80,7 @@ class TwitterAPIProxy(MagicObject2):
             method = self.n.pop()
             s = 'self.api.%s(*args,**kwargs)' % (method)
             if (self.logger):
-                self.logger.info('{} {}'.format(self.__class__, s))
+                self.logger.info('{} {} ({}, {}s)'.format(self.__class__, s, args, kwargs))
             time.sleep(1.0)
             resp = None
             try:
@@ -305,7 +305,7 @@ def __like_own_tweets(api=None, environ=None, logger=None, runtime=0):
 
     if (logger):
         logger.info('Started __like_own_tweets')
-    for tweet in tweepy.Cursor(api.user_timeline).items():
+    for tweet in api.user_timeline():
         if (not tweet.favorited):
             tweet.favorite()
             if (logger):
