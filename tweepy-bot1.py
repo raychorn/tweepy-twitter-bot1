@@ -178,12 +178,6 @@ if (__name__ == '__main__'):
     plugins_manager = plugins_handler.PluginManager(plugins, debug=True, logger=logger)
     service_runner = plugins_manager.get_runner()
     
-    api = service_runner.exec(twitter_verse, get_api, **plugins_handler.get_kwargs(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger))
-    
-    if (0):
-        h = get_top_trending_hashtags(api)
-        print(h)
-
     __production__ = any([arg == 'production' for arg in sys.argv])
     __followers_executor_running__ = not __production__
     __likes_executor_running__ = not __production__
@@ -196,6 +190,12 @@ if (__name__ == '__main__'):
         global __likes_executor_running__
         __likes_executor_running__ = False
     
+    api = service_runner.exec(twitter_verse, get_api, **plugins_handler.get_kwargs(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger))
+    
+    if (0):
+        h = get_top_trending_hashtags(api)
+        print(h)
+
     while(1):
         try:
             print('\n'*10)
@@ -305,6 +305,11 @@ if (__name__ == '__main__'):
 
                     msg = 'Choices reset. Start over.'
                     logger.info(msg)
+
+                if (api.is_rate_limit_blown):
+                    if (logger):
+                        logger.warning('Twitter rate limit was blown. Halting to sleep then begin again.')
+                    break
         except KeyboardInterrupt:
             msg = 'KeyboardInterrupt.'
             logger.info(msg)
@@ -315,3 +320,8 @@ if (__name__ == '__main__'):
             for l in traceback.format_exception(extype, ex, tb):
                 logger.error(l.rstrip())
             sys.exit()
+        if (api.is_rate_limit_blown):
+            if (logger):
+                logger.warning('Twitter rate limit was blown. Restarting after sleeping...')
+            time.sleep(3600)
+            api = service_runner.exec(twitter_verse, get_api, **plugins_handler.get_kwargs(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger))
