@@ -21,6 +21,9 @@ Python 3.x, Python 3.9.1 was used.
 #### .env
 
 ```
+__LITERALS__=MONGO_INITDB_ROOT_PASSWORD # item|item
+__ESCAPED__=MONGO_INITDB_ROOT_USERNAME|MONGO_INITDB_ROOT_PASSWORD # item|item
+
 __domain__=0.0.0.0:9000
 __uuid__=vyperapi-uuid-goes-here
 
@@ -39,6 +42,10 @@ MONGO_URI=mongodb://$MONGO_HOST:$MONGO_PORT/?connectTimeoutMS=300000
 MONGO_INITDB_ROOT_USERNAME=
 MONGO_INITDB_ROOT_PASSWORD=
 MONGO_AUTH_MECHANISM=SCRAM-SHA-256
+
+IGNORING=MONGO_CLUSTER # item|item
+MONGO_CLUSTER=mongodb+srv://root:$MONGO_INITDB_ROOT_PASSWORD@cluster0.as9re.mongodb.net/$MONGO_INITDB_DATABASE?retryWrites=true&w=majority
+MONGO_CLUSTER_AUTH_MECHANISM=
 
 mongo_db_name=WORD-CLOUD
 mongo_articles_col_name=articles
