@@ -93,6 +93,16 @@ from vyperlogix.plugins import handler as plugins_handler
 from vyperlogix.threads import pooled
 from vyperlogix.decorators import executor
 
+
+def __escape(v):
+    from urllib import parse
+    return parse.quote_plus(v)
+
+def __unescape(v):
+    from urllib import parse
+    return parse.unquote_plus(v)
+
+
 __env__ = {}
 env_literals = ['MONGO_INITDB_ROOT_PASSWORD']
 def get_environ_keys(*args, **kwargs):
@@ -103,9 +113,12 @@ def get_environ_keys(*args, **kwargs):
     assert (k is not None) and (v is not None), 'Problem with kwargs -> {}, k={}, v={}'.format(kwargs,k,v)
     __logger__ = kwargs.get('logger')
     v = expandvars(v) if (k not in env_literals) else v
+    v = __escape(v) if (k in __env__.get('__ESCAPED__', '').split('|')) else v
     environ = kwargs.get('environ', {})
-    __env__[k] = str(v)
+    ignoring = __env__.get('IGNORING', '').split('|')
     environ[k] = str(v)
+    if (k not in ignoring):
+        __env__[k] = str(v)
     if (__logger__):
         __logger__.info('\t{} -> {}'.format(k, environ.get(k)))
     return True
@@ -113,6 +126,14 @@ def get_environ_keys(*args, **kwargs):
 env_path = '/home/raychorn/projects/python-projects/tweepy-twitter-bot1/.env'
 
 environ.load_env(env_path=env_path, environ=os.environ, cwd=env_path, verbose=True, logger=logger, ignoring_re='.git|.venv|__pycache__', callback=lambda *args, **kwargs:get_environ_keys(args, **kwargs))
+
+__env2__ = dict([tuple([k,v]) for k,v in __env__.items()])
+
+__env2__['MONGO_URI'] = os.environ.get('MONGO_CLUSTER')
+__env2__['MONGO_AUTH_MECHANISM'] = os.environ.get('MONGO_CLUSTER_AUTH_MECHANISM')
+
+for k in __env__.get('__ESCAPED__', '').split('|'):
+    __env__[k] = __unescape(__env__.get(k, ''))
 
 is_really_a_string = lambda s:s and len(s)
 
@@ -217,8 +238,15 @@ if (__name__ == '__main__'):
 
             print('\n'*2)
 
-            the_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+            the_master_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
             
+            for item in the_master_list: # store the article from the master database into the local database. Does nothing if the article exists.
+                msg = 'Storing article locally: {}'.format(item.get('url'))
+                logger.info(msg)
+                the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item))
+
+            the_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+
             wait_per_choice = secs_until_tomorrow_morning / len(the_list)
             msg = 'wait_per_choice: {}'.format(wait_per_choice)
             logger.info(msg)

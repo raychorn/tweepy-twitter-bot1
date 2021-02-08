@@ -68,12 +68,13 @@ def __store_article_data(data, environ=None, mongo_db_name=None, mongo_articles_
                 pass
             doc = coll.find_one({ "url": u })
             if (doc):
-                if (any([k.find('_time') > -1 for k in update.keys()])):
-                    newvalue = { "$set": update }
-                else:
-                    data['updated_time'] = datetime.utcnow()
-                    newvalue = { "$set": data }
-                coll.update_one({'_id': doc.get('_id')}, newvalue)
+                if (update is not None):
+                    if (any([k.find('_time') > -1 for k in update.keys()])):
+                        newvalue = { "$set": update }
+                    else:
+                        data['updated_time'] = datetime.utcnow()
+                        newvalue = { "$set": data }
+                    coll.update_one({'_id': doc.get('_id')}, newvalue)
             else:
                 data['created_time'] = datetime.utcnow()
                 coll.insert_one(data)
@@ -173,23 +174,24 @@ def most_recent_30_days(bucket):
 
 def __update_the_article(item=None, the_choice=None, ts_current_time=None, logger=None, environ={}, mongo_db_name=None, mongo_articles_col_name=None):
     assert item, 'Missing item.'
-    assert the_choice, 'Missing the_choice.'
     assert ts_current_time, 'Missing ts_current_time.'
     
-    the_update = { 'tweeted_time': ts_current_time}
+    the_update = the_choice
+    if (the_choice is not None):
+        the_update = { 'tweeted_time': ts_current_time}
 
-    bucket = item.get(__rotation__, [])
-    bucket.append(ts_current_time)
-    the_update[__rotation__] = most_recent_30_days(bucket)
+        bucket = item.get(__rotation__, [])
+        bucket.append(ts_current_time)
+        the_update[__rotation__] = most_recent_30_days(bucket)
 
-    msg = 'Updating: id: {}, {}'.format(the_choice, the_update)
-    if (logger):
-        logger.info(msg)
+        msg = 'Updating: id: {}, {}'.format(the_choice, the_update)
+        if (logger):
+            logger.info(msg)
     resp = __store_article_data(item, update=the_update, environ=environ, mongo_db_name=mongo_db_name,  mongo_articles_col_name=mongo_articles_col_name)
     assert isinstance(resp, int), 'Problem with the response? Expected int value but got {}'.format(resp)
     print('Update was done.')
     
-    return the_update.get(__rotation__, [])
+    return the_update.get(__rotation__, []) if (the_choice is not None) else []
 
 @args.kwargs(__update_the_article)
 def update_the_article(*args, **kwargs):
