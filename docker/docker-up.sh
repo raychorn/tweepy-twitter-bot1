@@ -45,6 +45,6 @@ then
     echo "Restarting $CID"
     docker restart $CID
 fi
-sleep 5s
-sudo service nginx restart
-sudo service nginx status
+
+num_cpus=$(cat /proc/cpuinfo | grep processor | wc -l)
+echo "There are $num_cpus cpus."

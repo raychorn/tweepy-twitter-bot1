@@ -27,7 +27,7 @@ services:
         deploy:
             resources:
                 limits:
-                    cpus: '1.0'
+                    cpus: '2.0'
                     memory: 200M
 
     webserver:
@@ -38,8 +38,8 @@ services:
             - ./django/logs/:/var/log/django/
             - ..:/workspaces/microservices-framework/
             - /workspaces/plugins/:/workspaces/plugins/
-        ports:
-            - "9000:9000"
+        #ports:
+        #    - "9000:9000"
         depends_on:
             - mongodb
         env_file:
@@ -54,8 +54,8 @@ services:
         deploy:
             resources:
                 limits:
-                    cpus: '1.0'
-                    memory: 1000M
+                    cpus: '2.0'
+                    memory: 500M
         networks:
             vpcbr:
                 ipv4_address: 10.5.0.6
