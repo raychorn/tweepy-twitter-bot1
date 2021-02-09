@@ -1,7 +1,14 @@
 #!/bin/bash
 
-export PYTHONPATH=/home/raychorn/projects/python-projects/private_vyperlogix_lib3/zips/vyperlogix39.zip:/home/raychorn/projects/python-projects/tweepy-twitter-bot1/.venv391/lib/python3.9/site-packages
+basedir=/home/raychorn/projects/python-projects/tweepy-twitter-bot1
+venv=$(ls $basedir/.venv*/bin/activate)
+lib=$(ls $basedir/.venv*/lib/python3.9/site-packages)
+echo "venv=$venv"
+echo "lib=$lib"
+export PYTHONPATH=$basedir/lib3/vyperlogix39.zip:$lib
 
-. /home/raychorn/projects/python-projects/tweepy-twitter-bot1/.venv391/bin/activate
+. $venv
+pip --version
+exit
 
-python /home/raychorn/projects/python-projects/tweepy-twitter-bot1/tweepy-bot1.py "production"
+python $basedir/tweepy-bot1.py "production"

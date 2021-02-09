@@ -203,7 +203,7 @@ def get_top_trending_hashtags(api):
     hashtags = dict([tuple([trend['name'], trend['tweet_volume']]) for trend in data[0]['trends'] if (trend['name'].startswith('#')) and (len(_utils.ascii_only(trend['name'])) == len(trend['name']))])
     return _utils.sorted_dict(hashtags, reversed=True, default=-1)
     
-environ = lambda _: __env__ if (__the_options__ is not TheOptions.use_cluster) else __env2__
+environ = lambda : __env__ if (__the_options__ is not TheOptions.use_cluster) else __env2__
 
 if (__name__ == '__main__'):
     plugins_manager = plugins_handler.PluginManager(plugins, debug=True, logger=logger)

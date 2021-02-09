@@ -31,13 +31,11 @@ services:
                     memory: 200M
 
     webserver:
-        image: raychorn/microservices-framework:2.0.1
+        image: raychorn/ubuntu_focal_all_pythons:latest
         container_name: twitterbot
         restart: unless-stopped
         volumes:
-            - ./django/logs/:/var/log/django/
-            - ..:/workspaces/microservices-framework/
-            - /workspaces/plugins/:/workspaces/plugins/
+            - /home/ubuntu/tweepy-twitter-bot1:/tweepy-twitter-bot1/
         #ports:
         #    - "9000:9000"
         depends_on:
@@ -46,11 +44,11 @@ services:
             - .env
         environment:
             WAIT_HOSTS: mongodb:27017
-        entrypoint:
-            - /bin/bash
+        #entrypoint:
+        #    - /bin/bash
         tty: true
         stdin_open: true
-        #command: ["/workspaces/microservices-framework/runserver.sh"]
+        command: ["/tweepy-twitter-bot1/runner.sh"]
         deploy:
             resources:
                 limits:
