@@ -98,8 +98,8 @@ class TheOptions(Enum.Enum):
     use_local = 0
     master_list = 1
     use_cluster = 2
-    
-__the_options__ = TheOptions.use_local
+
+__the_options__ = TheOptions.use_local if (os.environ.get('OPTIONS') == 'use_local') else TheOptions.master_list if (os.environ.get('OPTIONS') == 'master_list') else TheOptions.use_cluster if (os.environ.get('OPTIONS') == 'use_cluster') else TheOptions.use_local
 
 def __escape(v):
     from urllib import parse

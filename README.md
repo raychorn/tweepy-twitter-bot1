@@ -69,6 +69,8 @@ IGNORING=MONGO_CLUSTER # item|item
 MONGO_CLUSTER=mongodb+srv://root:$MONGO_INITDB_ROOT_PASSWORD@cluster0.as9re.mongodb.net/$MONGO_INITDB_DATABASE?retryWrites=true&w=majority
 MONGO_CLUSTER_AUTH_MECHANISM=
 
+OPTIONS=use_cluster
+
 mongo_db_name=WORD-CLOUD
 mongo_articles_col_name=articles
 mongo_article_text_col_name=articles_text
