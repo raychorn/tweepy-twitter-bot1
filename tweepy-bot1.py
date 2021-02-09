@@ -99,12 +99,6 @@ class TheOptions(Enum.Enum):
     master_list = 1
     use_cluster = 2
     
-explainOptions = lambda x:'use_local' if (x == TheOptions.use_local) else 'master_list' if (x == TheOptions.master_list) else 'use_cluster' if (x == TheOptions.use_cluster) else 'unknown'
-
-__the_options__ = TheOptions.use_local if (os.environ.get('OPTIONS') == 'use_local') else TheOptions.master_list if (os.environ.get('OPTIONS') == 'master_list') else TheOptions.use_cluster if (os.environ.get('OPTIONS') == 'use_cluster') else TheOptions.use_local
-
-logger.info('__the_options__ -> {}'.format(explainOptions(__the_options__)))
-
 def __escape(v):
     from urllib import parse
     return parse.quote_plus(v)
@@ -148,6 +142,12 @@ __env2__['MONGO_AUTH_MECHANISM'] = os.environ.get('MONGO_CLUSTER_AUTH_MECHANISM'
 
 for k in __env__.get('__ESCAPED__', '').split('|'):
     __env__[k] = __unescape(__env__.get(k, ''))
+
+explainOptions = lambda x:'use_local' if (x == TheOptions.use_local) else 'master_list' if (x == TheOptions.master_list) else 'use_cluster' if (x == TheOptions.use_cluster) else 'unknown'
+
+__the_options__ = TheOptions.use_local if (os.environ.get('OPTIONS') == 'use_local') else TheOptions.master_list if (os.environ.get('OPTIONS') == 'master_list') else TheOptions.use_cluster if (os.environ.get('OPTIONS') == 'use_cluster') else TheOptions.use_local
+
+logger.info('__the_options__ -> {}'.format(explainOptions(__the_options__)))
 
 is_really_a_string = lambda s:s and len(s)
 
