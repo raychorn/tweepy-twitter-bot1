@@ -2,15 +2,21 @@
 
 ## Table of Contents
 
-- [About](#about)
-- [Getting Started](#getting_started)
-- [Usage](#usage)
+- [Tripping Tweepy Twitter Bot.](#tripping-tweepy-twitter-bot)
+  - [Table of Contents](#table-of-contents)
+  - [About](#about)
+  - [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+      - [docker .env](#docker-env)
+      - [.env](#env)
+    - [Installing](#installing)
+  - [Usage <a name = "usage"></a>](#usage-)
 
-## About <a name = "about"></a>
+## About
 
 Tweets are schedule and rotated dynamically based on a number of seconds.
 
-## Getting Started <a name = "getting_started"></a>
+## Getting Started
 
 Install and use it.
 
@@ -18,7 +24,23 @@ Install and use it.
 
 Python 3.x, Python 3.9.1 was used.
 
-#### .env
+#### docker .env
+
+```
+# MongoDB
+MONGO_URL=mongodb://mongodb:27017
+MONGO_INITDB_ROOT_USERNAME=
+MONGO_INITDB_ROOT_PASSWORD=
+MONGO_INITDB_DATABASE=
+MONGO_REPLICA_SET_NAME=rs0
+MONGO_AUTH_MECHANISM=SCRAM-SHA-256
+
+SECRETS=
+PYTHONPATH=.:/workspaces/microservices-framework/microservices-framework/python_lib3/vyperlogix38.zip:/workspaces/microservices-framework/microservices-framework/.venv387/lib/python3.8/site-packages
+DJANGO_LOG_LEVEL=INFO
+```
+
+#### .env 
 
 ```
 __LITERALS__=MONGO_INITDB_ROOT_PASSWORD # item|item
@@ -69,7 +91,10 @@ twitter_rate_limit=0.3
 
 ### Installing
 
-git clone blah-blah-blah
+1. git clone blah-blah-blah
+2. Modify the docker stuff for your needs.
+3. ./docker-up.sh
+4. Make it work.
 
 ## Usage <a name = "usage"></a>
 
