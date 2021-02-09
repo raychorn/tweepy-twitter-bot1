@@ -98,8 +98,12 @@ class TheOptions(Enum.Enum):
     use_local = 0
     master_list = 1
     use_cluster = 2
+    
+explainOptions = lambda x:'use_local' if (x == TheOptions.use_local) else 'master_list' if (x == TheOptions.master_list) else 'use_cluster' if (x == TheOptions.use_cluster) else 'unknown'
 
 __the_options__ = TheOptions.use_local if (os.environ.get('OPTIONS') == 'use_local') else TheOptions.master_list if (os.environ.get('OPTIONS') == 'master_list') else TheOptions.use_cluster if (os.environ.get('OPTIONS') == 'use_cluster') else TheOptions.use_local
+
+logger.info('__the_options__ -> {}'.format(explainOptions(__the_options__)))
 
 def __escape(v):
     from urllib import parse
@@ -253,7 +257,8 @@ if (__name__ == '__main__'):
                     the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
 
             the_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
-
+            assert len(the_list) > 0, 'Nothing in the list.'
+            
             wait_per_choice = secs_until_tomorrow_morning / len(the_list)
             msg = 'wait_per_choice: {}'.format(wait_per_choice)
             logger.info(msg)
