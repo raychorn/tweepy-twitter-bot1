@@ -1,6 +1,7 @@
 autopep8==1.5.4
 certifi==2020.12.5
 chardet==4.0.0
+dnspython==2.1.0
 expandvars==0.6.5
 idna==2.10
 mujson==1.4

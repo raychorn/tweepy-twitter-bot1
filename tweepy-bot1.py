@@ -80,12 +80,13 @@ word_cloud = 'word_cloud'
 get_final_word_cloud = 'get_final_word_cloud'
 store_one_hashtag = 'store_one_hashtag'
 
-
-pylib = '/home/raychorn/projects/python-projects/private_vyperlogix_lib3'
-if (not any([f == pylib for f in sys.path])):
-    print('Adding {}'.format(pylib))
-    sys.path.insert(0, pylib)
+if (not __production__):
+    pylib = '/home/raychorn/projects/python-projects/private_vyperlogix_lib3'
+    if (not any([f == pylib for f in sys.path])):
+        print('Adding {}'.format(pylib))
+        sys.path.insert(0, pylib)
     
+from vyperlogix.enum import Enum
 from vyperlogix.misc import _utils
 from vyperlogix.env import environ
 from vyperlogix.plugins import handler as plugins_handler
@@ -93,6 +94,12 @@ from vyperlogix.plugins import handler as plugins_handler
 from vyperlogix.threads import pooled
 from vyperlogix.decorators import executor
 
+class TheOptions(Enum.Enum):
+    use_local = 0
+    master_list = 1
+    use_cluster = 2
+    
+__the_options__ = TheOptions.use_local
 
 def __escape(v):
     from urllib import parse
@@ -123,7 +130,10 @@ def get_environ_keys(*args, **kwargs):
         __logger__.info('\t{} -> {}'.format(k, environ.get(k)))
     return True
 
-env_path = '/home/raychorn/projects/python-projects/tweepy-twitter-bot1/.env'
+if (not __production__):
+    env_path = '/home/raychorn/projects/python-projects/tweepy-twitter-bot1/.env'
+else:
+    env_path = '/tweepy-twitter-bot1/.env'
 
 environ.load_env(env_path=env_path, environ=os.environ, cwd=env_path, verbose=True, logger=logger, ignoring_re='.git|.venv|__pycache__', callback=lambda *args, **kwargs:get_environ_keys(args, **kwargs))
 
@@ -146,12 +156,6 @@ assert is_really_a_string(access_token), 'Missing access_token.'
 assert is_really_a_string(access_token_secret), 'Missing access_token_secret.'
 assert is_really_a_string(consumer_key), 'Missing consumer_key.'
 assert is_really_a_string(consumer_secret), 'Missing consumer_secret.'
-
-__domain__ = os.environ.get('__domain__', __env__.get('__domain__'))
-__uuid__ = os.environ.get('__uuid__', __env__.get('__uuid__'))
-
-assert is_really_a_string(__domain__), 'Missing __domain__.'
-assert is_really_a_string(__uuid__), 'Missing __uuid__.'
 
 mongo_db_name = os.environ.get('mongo_db_name', __env__.get('mongo_db_name'))
 mongo_articles_col_name = os.environ.get('mongo_articles_col_name', __env__.get('mongo_articles_col_name'))
@@ -199,6 +203,7 @@ def get_top_trending_hashtags(api):
     hashtags = dict([tuple([trend['name'], trend['tweet_volume']]) for trend in data[0]['trends'] if (trend['name'].startswith('#')) and (len(_utils.ascii_only(trend['name'])) == len(trend['name']))])
     return _utils.sorted_dict(hashtags, reversed=True, default=-1)
     
+environ = lambda _: __env__ if (__the_options__ is not TheOptions.use_cluster) else __env2__
 
 if (__name__ == '__main__'):
     plugins_manager = plugins_handler.PluginManager(plugins, debug=True, logger=logger)
@@ -238,14 +243,16 @@ if (__name__ == '__main__'):
 
             print('\n'*2)
 
-            the_master_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
-            
-            for item in the_master_list: # store the article from the master database into the local database. Does nothing if the article exists.
-                msg = 'Storing article locally: {}'.format(item.get('url'))
-                logger.info(msg)
-                the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item))
+            if (__the_options__ == TheOptions.master_list):
+                the_master_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+                
+                for anId in the_master_list: # store the article from the master database into the local database. Does nothing if the article exists.
+                    item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=anId, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+                    msg = 'Storing article locally: {}'.format(item.get('url'))
+                    logger.info(msg)
+                    the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
 
-            the_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+            the_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
 
             wait_per_choice = secs_until_tomorrow_morning / len(the_list)
             msg = 'wait_per_choice: {}'.format(wait_per_choice)
@@ -271,7 +278,7 @@ if (__name__ == '__main__'):
                         for k,v in words.get('word-cloud', {}).items():
                             if ( (len(k) > min_hashtag_length) and (v > threshold) ) or (criteria(k)):
                                 hashtags.append(k)
-                    service_runner.exec(twitter_verse, get_more_followers, **plugins_handler.get_kwargs(api=api, environ=__env__, service_runner=service_runner, hashtags=hashtags, silent=False, runtime=runtime, logger=logger))
+                    service_runner.exec(twitter_verse, get_more_followers, **plugins_handler.get_kwargs(api=api, environ=environ(), service_runner=service_runner, hashtags=hashtags, silent=False, runtime=runtime, logger=logger))
                 go_get_more_followers(runtime=(wait_per_choice - 60))
                 __executor_running__ = True
 
@@ -280,11 +287,11 @@ if (__name__ == '__main__'):
                 
                 @executor.threaded(__likes_executor__)
                 def go_like_own_stuff(runtime=0):
-                    service_runner.exec(twitter_verse, like_own_tweets, **plugins_handler.get_kwargs(api=api, environ=__env__, runtime=runtime, logger=logger))
+                    service_runner.exec(twitter_verse, like_own_tweets, **plugins_handler.get_kwargs(api=api, environ=environ(), runtime=runtime, logger=logger))
                 go_like_own_stuff(runtime=(wait_per_choice - 60))
                 __likes_executor_running__ = True
 
-            the_real_list = service_runner.exec(articles_list, get_the_real_list, **plugins_handler.get_kwargs(the_list=the_list, logger=logger, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=wait_per_choice, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+            the_real_list = service_runner.exec(articles_list, get_the_real_list, **plugins_handler.get_kwargs(the_list=the_list, logger=logger, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=wait_per_choice, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
 
             msg = '='*30
             logger.info(msg)
@@ -311,12 +318,12 @@ if (__name__ == '__main__'):
                     msg = 'the_chosen has {} items.'.format(len(the_chosen))
                     logger.info(msg)
 
-                    item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=the_choice, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+                    item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=the_choice, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
                     assert item, 'Did not retrieve an item for {}.'.format(the_choice)
                     if (item):
                         service_runner.exec(twitter_verse, do_the_tweet, **plugins_handler.get_kwargs(api=api, item=item, logger=logger))
 
-                        the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=the_choice, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
+                        the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=the_choice, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
                         
                         msg = 'BEGIN: the_rotation'
                         logger.info(msg)
