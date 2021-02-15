@@ -88,7 +88,9 @@ hashtags_criteria=is_uppercase
 
 hashtags_followers_pace=15
 
-twitter_rate_limit=0.3
+twitter_rate_limit=0.30
+
+twitter_follow_followers=0 # 1 for production
 ```
 
 ### Installing
