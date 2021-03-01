@@ -163,6 +163,7 @@ assert is_really_a_string(consumer_secret), 'Missing consumer_secret.'
 
 mongo_db_name = os.environ.get('mongo_db_name', __env__.get('mongo_db_name'))
 mongo_articles_col_name = os.environ.get('mongo_articles_col_name', __env__.get('mongo_articles_col_name'))
+mongo_articles_plan_col_name = os.environ.get('mongo_articles_plan_col_name', __env__.get('mongo_articles_plan_col_name'))
 mongo_article_text_col_name = os.environ.get('mongo_article_text_col_name', __env__.get('mongo_article_text_col_name'))
 mongo_words_col_name = os.environ.get('mongo_words_col_name', __env__.get('mongo_words_col_name'))
 mongo_cloud_col_name = os.environ.get('mongo_cloud_col_name', __env__.get('mongo_cloud_col_name'))
@@ -176,6 +177,34 @@ assert is_really_a_string(mongo_cloud_col_name), 'Missing mongo_cloud_col_name.'
 
 plugins = __env__.get('plugins')
 assert is_really_a_string(plugins) and os.path.exists(plugins), 'Missing plugins.'
+
+
+class TwitterPlan():
+    def __init__(self, num_items=-1, secs_until_tomorrow_morning=-1):
+        self.num_items = num_items
+        self.secs_until_tomorrow_morning = secs_until_tomorrow_morning
+        self.__wait_per_choice__ = self.secs_until_tomorrow_morning / self.num_items
+        self.__real_list__ = []
+        self.__ts_tweeted_time__ = None
+        
+    @property
+    def real_list(self):
+        return self.__real_list__
+        
+    @property.setter
+    def real_list(self, items):
+        self.__real_list__ = items
+        
+    @property
+    def ts_tweeted_time(self):
+        return self.__ts_tweeted_time__
+        
+    @property.setter
+    def ts_tweeted_time(self, ts_time):
+        self.__ts_tweeted_time__ = ts_time
+        
+    def as_json_serializable(self):
+        return self.__dict__
 
 
 def get_hashtags_for(api, screen_name, count=200, verbose=False, hashtags_dict={}):
@@ -263,9 +292,13 @@ if (__name__ == '__main__'):
             msg = 'wait_per_choice: {}'.format(wait_per_choice)
             logger.info(msg)
             
+            the_twitter_plan = TwitterPlan(len(the_list), secs_until_tomorrow_morning)
+            
             ts_tweeted_time = _utils.timeStamp(offset=-wait_per_choice, use_iso=True)
             msg = 'Tweeted time:  {}'.format(ts_tweeted_time)
             logger.info(msg)
+            
+            the_twitter_plan.ts_tweeted_time = ts_tweeted_time
 
             if (not __followers_executor_running__):
                 __followers_executor__ = pooled.BoundedExecutor(1, 5, callback=__followers_callback__)
