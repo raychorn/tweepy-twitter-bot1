@@ -8,6 +8,55 @@ from vyperlogix.decorators import __with
 from vyperlogix.decorators import args
 
 __rotation__ = '__rotation__'
+__plans__ = '__plans__'
+
+
+def __get_the_plan(environ=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None):
+    @__with.database(environ=environ)
+    def db_get_the_plan(db=None):
+        assert vyperapi.is_not_none(db), 'There is no db.'
+        assert vyperapi.is_not_none(mongo_db_name), 'There is no mongo_db_name.'
+        assert vyperapi.is_not_none(mongo_articles_col_name), 'There is no mongo_articles_col_name.'
+
+        tb_name = mongo_db_name
+        col_name = mongo_articles_col_name
+        table = db[tb_name]
+        coll = table[col_name]
+
+        find_in_collection = lambda c,criteria=criteria:c.find_one() if (not criteria) else c.find_one(criteria)
+        doc = find_in_collection(coll, criteria=criteria)
+        if (callable(callback)):
+            callback(coll=coll, doc=doc)
+        return doc
+    return db_get_the_plan()
+
+
+def __store_the_plan(data, environ=None, mongo_db_name=None, mongo_articles_col_name=None, update=None):
+    @__with.database(environ=environ)
+    def db_store_the_plan(db=None, data=None):
+        assert vyperapi.is_not_none(db), 'There is no db.'
+        assert vyperapi.is_not_none(mongo_db_name), 'There is no mongo_db_name.'
+        assert vyperapi.is_not_none(mongo_articles_col_name), 'There is no mongo_articles_col_name.'
+
+        tb_name = mongo_db_name
+        col_name = mongo_articles_col_name
+        table = db[tb_name]
+        coll = table[col_name]
+
+        count = -1
+        if (data):
+            _id = data.get('_id')
+            if (_id) and (update is not None):
+                update['updated_time'] = datetime.utcnow()
+                newvalue = { "$set": update }
+                coll.update_one({'_id': _id}, newvalue)
+        else:
+            update['created_time'] = datetime.utcnow()
+            coll.insert_one(update)
+
+        count = coll.count_documents({})
+        return count
+    return db_store_the_plan(data=data)
 
 
 def __get_articles(_id=None, environ=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None):
@@ -111,7 +160,7 @@ def __get_the_real_list(the_list=None, logger=None, ts_tweeted_time=None, tweet_
             if (logger):
                 logger.info(msg)
             
-            the_real_list.append({'_id':anId, __rotation__:len(item.get(__rotation__, [])), 'secs': delta.total_seconds(), '__is__': __is__})
+            the_real_list.append({'_id':anId, __rotation__:item.get(__rotation__, []), 'secs': delta.total_seconds(), '__is__': __is__})
             msg = 'Added to the_real_list: {}\n'.format(anId)
             if (logger):
                 logger.info(msg)
@@ -122,11 +171,10 @@ def __get_the_real_list(the_list=None, logger=None, ts_tweeted_time=None, tweet_
 def get_the_real_list(*args, **kwargs):
     pass
 
-def __get_a_choice(the_list=None, the_chosen=None, logger=None):
+def __get_a_choice(the_list=None, ts_current_time=None, logger=None):
     choice = None
-    assert (isinstance(the_chosen, list)), 'Missing the_chosen or not a list.'
-    the_list = [item for item in the_list if (isinstance(item, str) and (item not in the_chosen)) or ( (not isinstance(item, str)) and (item.get('_id') not in the_chosen) )]
-    msg = 'the_list - the_chosen has {} items.'.format(len(the_list))
+    assert isinstance(the_list, list), 'Wheres the list?'
+    msg = 'the_list - the_list has {} items.'.format(len(the_list))
     logger.info(msg)
     if (len(the_list) > 0):
         priorities1 = [item for item in the_list if (isinstance(item, str))]
@@ -134,19 +182,43 @@ def __get_a_choice(the_list=None, the_chosen=None, logger=None):
         logger.info(msg)
         if (len(priorities1) > 0):
             choice = random.choice(priorities1)
+            msg = 'priorities1 has choice {}.'.format(choice)
+            logger.info(msg)
         else:
             priorities2 = [item for item in the_list if (not isinstance(item, str)) and (not item.get(__rotation__))]
             msg = 'priorities2 has {} items.'.format(len(priorities2))
             logger.info(msg)
             if (len(priorities2) > 0):
                 choice = random.choice(priorities2).get('_id')
+                msg = 'priorities2 has choice {}.'.format(choice)
+                logger.info(msg)
             else:
-                priorities3 = [item for item in the_list if (not isinstance(item, str)) and (item.get(__rotation__, -1) > 0)]
+                today_ymd = ts_current_time.split('T')[0]+'T' if (ts_current_time is not None) and (ts_current_time.find('T') > -1) else None
+                def pick_from_list(l_ts):
+                    '''
+                    return True or False. True if no times in list for last 24 hours else False.
+                    '''
+                    for t in l_ts:
+                        if (t.find(today_ymd) > -1):
+                            return False
+                    return True
+                
+                priorities3 = [item for item in the_list if (not isinstance(item, str)) and (pick_from_list(item.get(__rotation__, [])))]
                 msg = 'priorities3 has {} items.'.format(len(priorities3))
                 logger.info(msg)
                 if (len(priorities3) > 0):
-                    priorities3 = sorted(priorities3, key=lambda item: item.get(__rotation__, -1), reverse=False)
+                    priorities3 = sorted(priorities3, key=lambda item: len(item.get(__rotation__, [])), reverse=False)
                     choice = priorities3[0].get('_id')
+                    msg = 'priorities3 has choice {}.'.format(choice)
+                    logger.info(msg)
+                else:
+                    priorities4 = [item for item in the_list if (not isinstance(item, str)) and (not pick_from_list(item.get(__rotation__, [])))]
+                    msg = 'priorities4 has {} items.'.format(len(priorities4))
+                    logger.info(msg)
+                    priorities4 = sorted(priorities4, key=lambda item: len(item.get(__rotation__, [])), reverse=False)
+                    choice = priorities4[0].get('_id')
+                    msg = 'priorities4 has choice {}.'.format(choice)
+                    logger.info(msg)
     msg = 'choice is  {}.'.format(choice)
     logger.info(msg)
     return choice
@@ -162,13 +234,17 @@ def most_recent_30_days(bucket):
     '''
     period_secs = 30*24*60*60
     thirty_days_ago = datetime.fromisoformat(_utils.timeStamp(offset=-period_secs, use_iso=True))
-    new_bucket = []
-    for ts_tweeted_time in bucket:
-        dt = datetime.fromisoformat(ts_tweeted_time)
-        delta = dt - thirty_days_ago
-        __is__ = delta.total_seconds() < period_secs
-        if (__is__):
-            new_bucket.append(ts_tweeted_time)
+    new_bucket = [] if (isinstance(bucket, list)) else {} if (isinstance(bucket, dict)) else None
+    if (new_bucket is not None):
+        for ts in bucket if (isinstance(bucket, list)) else bucket.keys() if (isinstance(bucket, dict)) else []:
+            dt = datetime.fromisoformat(ts)
+            delta = dt - thirty_days_ago
+            __is__ = delta.total_seconds() < period_secs
+            if (__is__):
+                if (isinstance(bucket, list)):
+                    new_bucket.append(ts)
+                elif (isinstance(bucket, dict)):
+                    new_bucket[ts] = bucket.get(ts)
     return new_bucket
 
 
@@ -195,5 +271,30 @@ def __update_the_article(item=None, the_choice=None, ts_current_time=None, logge
 
 @args.kwargs(__update_the_article)
 def update_the_article(*args, **kwargs):
+    pass
+
+
+def __update_the_plan(the_plan=None, ts_current_time=None, logger=None, environ={}, mongo_db_name=None, mongo_articles_col_name=None):
+    assert the_plan, 'Missing the_plan.'
+    assert ts_current_time, 'Missing ts_current_time.'
+    
+    plan = __get_the_plan(mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, environ=environ)
+    plan = plan[0] if (isinstance(plan, list)) else plan
+    the_update = { 'updated_time': ts_current_time}
+
+    bucket = plan.get(__plans__, {}) if (plan) else {}
+    bucket[ts_current_time] = the_plan
+    the_update[__plans__] = most_recent_30_days(bucket)
+
+    msg = 'Updating: id: {}, {}'.format(the_plan, the_update)
+    if (logger):
+        logger.info(msg)
+    resp = __store_the_plan(plan, update=the_update, environ=environ, mongo_db_name=mongo_db_name,  mongo_articles_col_name=mongo_articles_col_name)
+    assert isinstance(resp, int), 'Problem with the response? Expected int value but got {}'.format(resp)
+    
+    return the_update.get(__plans__, [])
+
+@args.kwargs(__update_the_plan)
+def update_the_plan(*args, **kwargs):
     pass
 

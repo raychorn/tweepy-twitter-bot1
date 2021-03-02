@@ -71,6 +71,7 @@ like_own_tweets = 'like_own_tweets'
 articles_list = 'articles_list'
 get_the_real_list = 'get_the_real_list'
 update_the_article = 'update_the_article'
+update_the_plan = 'update_the_plan'
 get_articles = 'get_articles'
 get_a_choice = 'get_a_choice'
 get_more_followers = 'get_more_followers'
@@ -92,6 +93,7 @@ from vyperlogix.env import environ
 from vyperlogix.plugins import handler as plugins_handler
 
 from vyperlogix.threads import pooled
+from vyperlogix.decorators import interval
 from vyperlogix.decorators import executor
 
 class TheOptions(Enum.Enum):
@@ -184,24 +186,47 @@ class TwitterPlan():
         self.num_items = num_items
         self.secs_until_tomorrow_morning = secs_until_tomorrow_morning
         self.__wait_per_choice__ = self.secs_until_tomorrow_morning / self.num_items
-        self.__real_list__ = []
+        self.__real_list__ = {}
         self.__ts_tweeted_time__ = None
+        self.__required_velocity__ = -1
+        self.__wait_per_choice__ = -1
         
     @property
     def real_list(self):
         return self.__real_list__
         
-    @property.setter
+    @real_list.setter
     def real_list(self, items):
-        self.__real_list__ = items
+        ts = _utils.timeStamp(offset=0, use_iso=True)
+        keys = sorted(self.__real_list__.keys(), key=lambda k:datetime.fromisoformat(k), reverse=True)
+        n = 100 if (__production__) else 5
+        if (len(keys) > n):
+            del self.__real_list__[keys[0]]
+        self.__real_list__[ts] = items
         
     @property
     def ts_tweeted_time(self):
         return self.__ts_tweeted_time__
         
-    @property.setter
+    @ts_tweeted_time.setter
     def ts_tweeted_time(self, ts_time):
         self.__ts_tweeted_time__ = ts_time
+        
+    @property
+    def required_velocity(self):
+        return self.__required_velocity__
+        
+    @required_velocity.setter
+    def required_velocity(self, value):
+        self.__required_velocity__ = value
+        
+    @property
+    def wait_per_choice(self):
+        return self.__wait_per_choice__
+        
+    @wait_per_choice.setter
+    def wait_per_choice(self, value):
+        self.__wait_per_choice__ = value
         
     def as_json_serializable(self):
         return self.__dict__
@@ -300,37 +325,41 @@ if (__name__ == '__main__'):
             
             the_twitter_plan.ts_tweeted_time = ts_tweeted_time
 
-            if (not __followers_executor_running__):
-                __followers_executor__ = pooled.BoundedExecutor(1, 5, callback=__followers_callback__)
-                
-                @executor.threaded(__followers_executor__)
-                def go_get_more_followers(runtime=0):
-                    hashtags = []
-                    if (0):
-                        criteria = os.environ.get('hashtags_criteria')
-                        if (criteria.find('is_uppercase') > -1):
-                            criteria = is_uppercase
-                        threshold = int(os.environ.get('minimum_word_cloud_count', 1))
-                        min_hashtag_length = int(os.environ.get('minimum_hashtags_length', 1))
-                        words = service_runner.exec(word_cloud, get_final_word_cloud, **plugins_handler.get_kwargs(environ=os.environ, callback=None, logger=logger))
-                        for k,v in words.get('word-cloud', {}).items():
-                            if ( (len(k) > min_hashtag_length) and (v > threshold) ) or (criteria(k)):
-                                hashtags.append(k)
-                    service_runner.exec(twitter_verse, get_more_followers, **plugins_handler.get_kwargs(api=api, environ=environ(), service_runner=service_runner, hashtags=hashtags, silent=False, runtime=runtime, logger=logger))
-                go_get_more_followers(runtime=(wait_per_choice - 60))
-                __executor_running__ = True
+            if (__production__):
+                if (not __followers_executor_running__):
+                    __followers_executor__ = pooled.BoundedExecutor(1, 5, callback=__followers_callback__)
+                    
+                    @executor.threaded(__followers_executor__)
+                    def go_get_more_followers(runtime=0):
+                        hashtags = []
+                        if (0):
+                            criteria = os.environ.get('hashtags_criteria')
+                            if (criteria.find('is_uppercase') > -1):
+                                criteria = is_uppercase
+                            threshold = int(os.environ.get('minimum_word_cloud_count', 1))
+                            min_hashtag_length = int(os.environ.get('minimum_hashtags_length', 1))
+                            words = service_runner.exec(word_cloud, get_final_word_cloud, **plugins_handler.get_kwargs(environ=os.environ, callback=None, logger=logger))
+                            for k,v in words.get('word-cloud', {}).items():
+                                if ( (len(k) > min_hashtag_length) and (v > threshold) ) or (criteria(k)):
+                                    hashtags.append(k)
+                        service_runner.exec(twitter_verse, get_more_followers, **plugins_handler.get_kwargs(api=api, environ=environ(), service_runner=service_runner, hashtags=hashtags, silent=False, runtime=runtime, logger=logger))
+                    go_get_more_followers(runtime=(wait_per_choice - 60))
+                    __executor_running__ = True
 
-            if (not __likes_executor_running__):
-                __likes_executor__ = pooled.BoundedExecutor(1, 5, callback=__likes_callback__)
-                
-                @executor.threaded(__likes_executor__)
-                def go_like_own_stuff(runtime=0):
-                    service_runner.exec(twitter_verse, like_own_tweets, **plugins_handler.get_kwargs(api=api, environ=environ(), runtime=runtime, logger=logger))
-                go_like_own_stuff(runtime=(wait_per_choice - 60))
-                __likes_executor_running__ = True
+            if (__production__):
+                if (not __likes_executor_running__):
+                    __likes_executor__ = pooled.BoundedExecutor(1, 5, callback=__likes_callback__)
+                    
+                    @executor.threaded(__likes_executor__)
+                    def go_like_own_stuff(runtime=0):
+                        service_runner.exec(twitter_verse, like_own_tweets, **plugins_handler.get_kwargs(api=api, environ=environ(), runtime=runtime, logger=logger))
+                    go_like_own_stuff(runtime=(wait_per_choice - 60))
+                    __likes_executor_running__ = True
 
             the_real_list = service_runner.exec(articles_list, get_the_real_list, **plugins_handler.get_kwargs(the_list=the_list, logger=logger, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=wait_per_choice, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
 
+            the_twitter_plan.real_list = the_real_list
+            
             msg = '='*30
             logger.info(msg)
 
@@ -340,53 +369,39 @@ if (__name__ == '__main__'):
             required_velocity = len(the_real_list)
             msg = 'required_velocity: {}'.format(required_velocity)
             logger.info(msg)
+
+            the_twitter_plan.required_velocity = required_velocity
+            wait_per_choice = the_twitter_plan.secs_until_tomorrow_morning / required_velocity
+            if (not __production__):
+                wait_per_choice = wait_per_choice / 100
+            wait_per_choice = 60 if (wait_per_choice < 60) else wait_per_choice
+            the_twitter_plan.wait_per_choice = wait_per_choice
+            service_runner.exec(articles_list, update_the_plan, **plugins_handler.get_kwargs(the_plan=the_twitter_plan.as_json_serializable(), environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_plan_col_name, logger=logger, ts_current_time=ts_current_time))
             
-            the_chosen = []
-            random.seed(int(time.time()))
-            total_wait_for_choices = 0
-            for i in range(int(required_velocity)):
-                the_choice = service_runner.exec(articles_list, get_a_choice, **plugins_handler.get_kwargs(the_list=the_real_list, the_chosen=the_chosen, logger=logger))
+            @interval.timer(wait_per_choice, run_once=True, blocking=True, logger=logger)
+            def issue_tweet(aTimer, **kwargs):
+                random.seed(int(time.time()))
+                the_choice = service_runner.exec(articles_list, get_a_choice, **plugins_handler.get_kwargs(the_list=the_real_list, ts_current_time=ts_current_time, logger=logger))
                 assert the_choice, 'Nothing in the list?  Please check.'
-                msg = 'the_choice: {}'.format(the_choice)
-                logger.info(msg)
-                
-                if (the_choice):
-                
-                    the_chosen.append(the_choice)
-                    msg = 'the_chosen has {} items.'.format(len(the_chosen))
-                    logger.info(msg)
-
+                if (__production__):
                     item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=the_choice, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
-                    assert item, 'Did not retrieve an item for {}.'.format(the_choice)
-                    if (item):
-                        service_runner.exec(twitter_verse, do_the_tweet, **plugins_handler.get_kwargs(api=api, item=item, logger=logger))
-
-                        the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=the_choice, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
-                        
-                        msg = 'BEGIN: the_rotation'
+                    assert item, 'Did not retrieve an item for {}.'.format(item)
+                    the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=the_choice, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
+                    
+                    msg = 'BEGIN: the_rotation'
+                    logger.info(msg)
+                    
+                    for v in the_rotation:
+                        msg = '\t{}'.format(v)
                         logger.info(msg)
-                        
-                        for v in the_rotation:
-                            msg = '\t{}'.format(v)
-                            logger.info(msg)
-                        msg = 'END!!! the_rotation'
-                        logger.info(msg)
-                        print('\n'*2)
-                    msg = 'Sleeping for {} mins for choice. (Press any key to exit.)'.format(int(wait_per_choice / 60))
+                    msg = 'END!!! the_rotation'
                     logger.info(msg)
-                    total_wait_for_choices += wait_per_choice
-                    time.sleep(wait_per_choice)
-                else:
-                    msg = 'Processing complete. (No more choices)'
-                    logger.info(msg)
-
-                    msg = 'Choices reset. Start over.'
-                    logger.info(msg)
-
-                if (api.is_rate_limit_blown):
-                    if (logger):
-                        logger.warning('Twitter rate limit was blown. Halting to sleep then begin again.')
-                    break
+                    print('\n'*2)
+                    if (api.is_rate_limit_blown):
+                        if (logger):
+                            logger.warning('Twitter rate limit was blown. Halting to sleep then begin again.')
+            issue_tweet()
+            
         except KeyboardInterrupt:
             msg = 'KeyboardInterrupt.'
             logger.info(msg)
