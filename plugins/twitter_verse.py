@@ -3,6 +3,8 @@ import sys
 import time
 import tweepy
 
+import traceback
+
 from vyperlogix.misc import _utils
 from vyperlogix.decorators import args
 from vyperlogix.plugins import handler as plugins_handler
@@ -165,7 +167,14 @@ def __do_the_tweet(api=None, item=None, popular_hashtags=None, logger=None, sile
         logger.info(the_tweet)
         logger.info('END!!! TWEET')
     if (not silent):
-        api.update_status(the_tweet)
+        tweet = api.update_status(the_tweet)
+        try:
+            tweet.favorite()
+        except Exception as ex:
+            extype, ex, tb = sys.exc_info()
+            formatted = traceback.format_exception_only(extype, ex)[-1]
+            if (logger):
+                logger.error(formatted)
 
 
 @args.kwargs(__do_the_tweet)
