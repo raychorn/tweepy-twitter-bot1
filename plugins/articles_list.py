@@ -189,7 +189,7 @@ def __get_a_choice(the_list=None, ts_current_time=None, logger=None):
             msg = 'priorities2 has {} items.'.format(len(priorities2))
             logger.info(msg)
             if (len(priorities2) > 0):
-                choice = random.choice(priorities2).get('_id')
+                choice = random.choice(priorities2)
                 msg = 'priorities2 has choice {}.'.format(choice)
                 logger.info(msg)
             else:
@@ -208,7 +208,7 @@ def __get_a_choice(the_list=None, ts_current_time=None, logger=None):
                 logger.info(msg)
                 if (len(priorities3) > 0):
                     priorities3 = sorted(priorities3, key=lambda item: len(item.get(__rotation__, [])), reverse=False)
-                    choice = priorities3[0].get('_id')
+                    choice = priorities3[0]
                     msg = 'priorities3 has choice {}.'.format(choice)
                     logger.info(msg)
                 else:
@@ -216,7 +216,7 @@ def __get_a_choice(the_list=None, ts_current_time=None, logger=None):
                     msg = 'priorities4 has {} items.'.format(len(priorities4))
                     logger.info(msg)
                     priorities4 = sorted(priorities4, key=lambda item: len(item.get(__rotation__, [])), reverse=False)
-                    choice = priorities4[0].get('_id')
+                    choice = priorities4[0]
                     msg = 'priorities4 has choice {}.'.format(choice)
                     logger.info(msg)
     msg = 'choice is  {}.'.format(choice)

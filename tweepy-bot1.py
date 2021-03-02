@@ -190,6 +190,8 @@ class TwitterPlan():
         self.__ts_tweeted_time__ = None
         self.__required_velocity__ = -1
         self.__wait_per_choice__ = -1
+        self.__the_choice__ = None
+        self.__the_rotation__ = []
         
     @property
     def real_list(self):
@@ -227,6 +229,22 @@ class TwitterPlan():
     @wait_per_choice.setter
     def wait_per_choice(self, value):
         self.__wait_per_choice__ = value
+        
+    @property
+    def the_choice(self):
+        return self.__the_choice__
+        
+    @the_choice.setter
+    def the_choice(self, value):
+        self.__the_choice__ = value
+        
+    @property
+    def the_rotation(self):
+        return self.__the_rotation__
+        
+    @the_rotation.setter
+    def the_rotation(self, value):
+        self.__the_rotation__ = value
         
     def as_json_serializable(self):
         return self.__dict__
@@ -376,14 +394,15 @@ if (__name__ == '__main__'):
                 wait_per_choice = wait_per_choice / 100
             wait_per_choice = 60 if (wait_per_choice < 60) else wait_per_choice
             the_twitter_plan.wait_per_choice = wait_per_choice
-            service_runner.exec(articles_list, update_the_plan, **plugins_handler.get_kwargs(the_plan=the_twitter_plan.as_json_serializable(), environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_plan_col_name, logger=logger, ts_current_time=ts_current_time))
             
             @interval.timer(wait_per_choice, run_once=True, blocking=True, logger=logger)
             def issue_tweet(aTimer, **kwargs):
                 random.seed(int(time.time()))
                 the_choice = service_runner.exec(articles_list, get_a_choice, **plugins_handler.get_kwargs(the_list=the_real_list, ts_current_time=ts_current_time, logger=logger))
                 assert the_choice, 'Nothing in the list?  Please check.'
+                the_twitter_plan.the_choice = the_choice
                 if (__production__):
+                    the_choice = the_choice.get('_id') if (the_choice is not None) and (not isinstance(the_choice, str)) else the_choice
                     item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=the_choice, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
                     assert item, 'Did not retrieve an item for {}.'.format(item)
                     the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=the_choice, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
@@ -400,6 +419,10 @@ if (__name__ == '__main__'):
                     if (api.is_rate_limit_blown):
                         if (logger):
                             logger.warning('Twitter rate limit was blown. Halting to sleep then begin again.')
+                else:
+                    the_rotation = the_choice.get('__rotation__', []) if (the_choice is not None) and (not isinstance(the_choice, str)) else []
+                the_twitter_plan.the_rotation = the_rotation
+                service_runner.exec(articles_list, update_the_plan, **plugins_handler.get_kwargs(the_plan=the_twitter_plan.as_json_serializable(), environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_plan_col_name, logger=logger, ts_current_time=ts_current_time))
             issue_tweet()
             
         except KeyboardInterrupt:
