@@ -96,10 +96,11 @@ from vyperlogix.threads import pooled
 from vyperlogix.decorators import interval
 from vyperlogix.decorators import executor
 
-class TheOptions(Enum.Enum):
+class TheOptions(Enum.EnumMetaClass):
     use_local = 0
     master_list = 1
     use_cluster = 2
+    use_cosmos1 = 4
     
 def __escape(v):
     from urllib import parse
@@ -144,14 +145,17 @@ __env2__['MONGO_AUTH_MECHANISM'] = os.environ.get('MONGO_CLUSTER_AUTH_MECHANISM'
 
 __env3__ = dict([tuple([k,v]) for k,v in __env__.items()])
 
+__env3__['MONGO_URI'] = os.environ.get('COSMOS_URI')
+__env3__['MONGO_AUTH_MECHANISM'] = os.environ.get('COSMOS_AUTH_MECHANISM')
+
 for k in __env__.get('__ESCAPED__', '').split('|'):
     __env__[k] = __unescape(__env__.get(k, ''))
 
-explainOptions = lambda x:'use_local' if (x == TheOptions.use_local) else 'master_list' if (x == TheOptions.master_list) else 'use_cluster' if (x == TheOptions.use_cluster) else 'unknown'
+explainOptions = lambda x:'use_local' if (x == TheOptions.use_local) else 'master_list' if (x == TheOptions.master_list) else 'use_cluster' if (x == TheOptions.use_cluster) else 'use_cosmos1' if (x == TheOptions.use_cosmos1) else 'unknown'
 
-__the_options__ = TheOptions.use_local if (os.environ.get('OPTIONS') == 'use_local') else TheOptions.master_list if (os.environ.get('OPTIONS') == 'master_list') else TheOptions.use_cluster if (os.environ.get('OPTIONS') == 'use_cluster') else TheOptions.use_local
+__the_options__ = TheOptions.use_local if (os.environ.get('OPTIONS') == 'use_local') else TheOptions.master_list if (os.environ.get('OPTIONS') == 'master_list') else TheOptions.use_cluster if (os.environ.get('OPTIONS') == 'use_cluster') else TheOptions.use_cosmos1 if (os.environ.get('OPTIONS') == 'use_cosmos1') else TheOptions.use_local
 
-logger.info('__the_options__ -> {}'.format(explainOptions(__the_options__)))
+logger.info('__the_options__ -> {} -> {}'.format(__the_options__, explainOptions(__the_options__)))
 
 is_really_a_string = lambda s:s and len(s)
 
@@ -297,6 +301,16 @@ if (__name__ == '__main__'):
     def __likes_callback__(*args, **kwargs):
         global __likes_executor_running__
         __likes_executor_running__ = False
+        
+    if (__the_options__ == TheOptions.use_cosmos1):
+        ts_current_time = _utils.timeStamp(offset=0, use_iso=True)
+        the_master_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+        
+        for anId in the_master_list: # store the article from the master database into the cosmos1 database. Does nothing if the article exists.
+            item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=anId, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+            msg = 'Storing article in cosmos1: {}'.format(item.get('_id'))
+            logger.info(msg)
+            the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
     
     api = service_runner.exec(twitter_verse, get_api, **plugins_handler.get_kwargs(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger))
     
