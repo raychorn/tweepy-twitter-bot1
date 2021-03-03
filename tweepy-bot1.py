@@ -111,7 +111,7 @@ def __unescape(v):
 
 
 __env__ = {}
-env_literals = ['MONGO_INITDB_ROOT_PASSWORD']
+env_literals = __env__.get('__LITERALS__', '').split('|')
 def get_environ_keys(*args, **kwargs):
     from expandvars import expandvars
     
@@ -141,6 +141,8 @@ __env2__ = dict([tuple([k,v]) for k,v in __env__.items()])
 
 __env2__['MONGO_URI'] = os.environ.get('MONGO_CLUSTER')
 __env2__['MONGO_AUTH_MECHANISM'] = os.environ.get('MONGO_CLUSTER_AUTH_MECHANISM')
+
+__env3__ = dict([tuple([k,v]) for k,v in __env__.items()])
 
 for k in __env__.get('__ESCAPED__', '').split('|'):
     __env__[k] = __unescape(__env__.get(k, ''))

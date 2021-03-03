@@ -282,7 +282,8 @@ def __update_the_plan(the_plan=None, ts_current_time=None, logger=None, environ=
     plan = plan[0] if (isinstance(plan, list)) else plan
     the_update = { 'updated_time': ts_current_time}
 
-    bucket = plan.get(__plans__, {}) if (plan) else {}
+    logger.info('DEBUG: plan -> {}'.format(plan))
+    bucket = plan.get(__plans__, {}) if (plan and (not isinstance(plan, str))) else {}
     bucket[ts_current_time] = the_plan
     the_update[__plans__] = most_recent_30_days(bucket)
 

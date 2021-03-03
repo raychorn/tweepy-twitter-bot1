@@ -5,6 +5,7 @@ export $(xargs < .env)
 ARRAY=()
 ARRAY+=("MONGO_HOST")
 ARRAY+=("MONGO_CLUSTER")
+ARRAY+=("COSMOSDB1")
 
 PS3="Choose: "
 
@@ -23,5 +24,10 @@ fi
 if [[ $choice. == MONGO_CLUSTER. ]]
 then
     mongo "mongodb+srv://cluster0.as9re.mongodb.net/admin" --username root
+fi
+
+if [[ $choice. == COSMOSDB1. ]]
+then
+    mongo $COSMOSDB1
 fi
 
