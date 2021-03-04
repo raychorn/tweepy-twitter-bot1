@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import math
+import enum
 import random
 import mujson as json
 import tweepy
@@ -11,6 +12,8 @@ from logging.handlers import RotatingFileHandler
 import traceback
 
 from datetime import datetime
+
+from dotenv import load_dotenv, find_dotenv
 
 is_really_something = lambda s,t:s and t(s)
 something_greater_than_zero = lambda s:(s > 0)
@@ -87,7 +90,6 @@ if (not __production__):
         print('Adding {}'.format(pylib))
         sys.path.insert(0, pylib)
     
-from vyperlogix.enum import Enum
 from vyperlogix.misc import _utils
 from vyperlogix.env import environ
 from vyperlogix.plugins import handler as plugins_handler
@@ -96,7 +98,7 @@ from vyperlogix.threads import pooled
 from vyperlogix.decorators import interval
 from vyperlogix.decorators import executor
 
-class TheOptions(Enum.EnumMetaClass):
+class TheOptions(enum.Enum):
     use_local = 0
     master_list = 1
     use_cluster = 2
@@ -111,8 +113,10 @@ def __unescape(v):
     return parse.unquote_plus(v)
 
 
+load_dotenv(find_dotenv())
+
 __env__ = {}
-env_literals = __env__.get('__LITERALS__', '').split('|')
+env_literals = os.environ.get('__LITERALS__', '').split('|')
 def get_environ_keys(*args, **kwargs):
     from expandvars import expandvars
     
@@ -122,9 +126,10 @@ def get_environ_keys(*args, **kwargs):
     __logger__ = kwargs.get('logger')
     v = expandvars(v) if (k not in env_literals) else v
     v = __escape(v) if (k in __env__.get('__ESCAPED__', '').split('|')) else v
-    environ = kwargs.get('environ', {})
     ignoring = __env__.get('IGNORING', '').split('|')
-    environ[k] = str(v)
+    environ = kwargs.get('environ', None)
+    if (isinstance(environ, dict)):
+        environ[k] = str(v)
     if (k not in ignoring):
         __env__[k] = str(v)
     if (__logger__):
@@ -136,7 +141,9 @@ if (not __production__):
 else:
     env_path = '/tweepy-twitter-bot1/.env'
 
-environ.load_env(env_path=env_path, environ=os.environ, cwd=env_path, verbose=True, logger=logger, ignoring_re='.git|.venv|__pycache__', callback=lambda *args, **kwargs:get_environ_keys(args, **kwargs))
+for k,v in os.environ.items():
+    get_environ_keys(key=k, value=v)
+#environ.load_env(env_path=env_path, environ=os.environ, cwd=env_path, verbose=True, logger=logger, ignoring_re='.git|.venv|__pycache__', callback=lambda *args, **kwargs:get_environ_keys(args, **kwargs))
 
 __env2__ = dict([tuple([k,v]) for k,v in __env__.items()])
 
