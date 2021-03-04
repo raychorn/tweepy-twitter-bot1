@@ -142,8 +142,12 @@ else:
     env_path = '/tweepy-twitter-bot1/.env'
 
 for k,v in os.environ.items():
-    get_environ_keys(key=k, value=v)
+    k,v = environ.parse_line('{}={}'.format(k,v))
+    get_environ_keys(key=k, value=v, environ=os.environ)
 #environ.load_env(env_path=env_path, environ=os.environ, cwd=env_path, verbose=True, logger=logger, ignoring_re='.git|.venv|__pycache__', callback=lambda *args, **kwargs:get_environ_keys(args, **kwargs))
+
+for k in __env__.get('__ESCAPED__', '').split('|'):
+    __env__[k] = __unescape(__env__.get(k, ''))
 
 __env2__ = dict([tuple([k,v]) for k,v in __env__.items()])
 
@@ -154,9 +158,6 @@ __env3__ = dict([tuple([k,v]) for k,v in __env__.items()])
 
 __env3__['MONGO_URI'] = os.environ.get('COSMOS_URI')
 __env3__['MONGO_AUTH_MECHANISM'] = os.environ.get('COSMOS_AUTH_MECHANISM')
-
-for k in __env__.get('__ESCAPED__', '').split('|'):
-    __env__[k] = __unescape(__env__.get(k, ''))
 
 explainOptions = lambda x:'use_local' if (x == TheOptions.use_local) else 'master_list' if (x == TheOptions.master_list) else 'use_cluster' if (x == TheOptions.use_cluster) else 'use_cosmos1' if (x == TheOptions.use_cosmos1) else 'unknown'
 
