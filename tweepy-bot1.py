@@ -11,6 +11,8 @@ import logging
 from logging.handlers import RotatingFileHandler
 import traceback
 
+import traceback
+
 from datetime import datetime
 
 from dotenv import load_dotenv, find_dotenv
@@ -113,7 +115,44 @@ def __unescape(v):
     return parse.unquote_plus(v)
 
 
-load_dotenv(find_dotenv())
+from dotenv.main import DotEnv
+from dotenv.compat import to_env
+
+class MyDotEnv(DotEnv):
+    def __init__(self, dotenv_path, verbose=False, encoding=None, interpolate=True, override=True, callback=None, logger=None, environ=None):
+        self.override = override
+        self.callback = callback
+        self.logger = logger
+        self.environ = environ if (environ is not None) else os.environ
+        super().__init__(dotenv_path, verbose=verbose, encoding=encoding, interpolate=interpolate)
+    
+    def set_as_environment_variables(self):
+        # type: () -> bool
+        """
+        Load the current dotenv as system environment variable.
+        """
+        for k, v in self.dict().items():
+            if k in os.environ and not self.override:
+                continue
+            if v is not None:
+                if (callable(self.callback)):
+                    try:
+                        self.callback(key=to_env(k), value=to_env(v), logger=self.logger, environ=self.environ)
+                        continue
+                    except Exception as ex:
+                        if (self.verbose):
+                            extype, ex, tb = sys.exc_info()
+                            formatted = traceback.format_exception_only(extype, ex)[-1]
+                            if (self.logger):
+                                self.logger.error(formatted)
+                            else:
+                                print(formatted)
+                else:
+                    os.environ[to_env(k)] = to_env(v)
+
+        return True
+    
+#load_dotenv(find_dotenv())
 
 __env__ = {}
 env_literals = os.environ.get('__LITERALS__', '').split('|')
@@ -141,9 +180,14 @@ if (not __production__):
 else:
     env_path = '/tweepy-twitter-bot1/.env'
 
-for k,v in os.environ.items():
-    k,v = environ.parse_line('{}={}'.format(k,v))
-    get_environ_keys(key=k, value=v, environ=os.environ)
+if (0):
+    for k,v in os.environ.items():
+        k,v = environ.parse_line('{}={}'.format(k,v))
+        get_environ_keys(key=k, value=v, environ=os.environ)
+else:
+    dotenv = MyDotEnv(find_dotenv(), verbose=True, interpolate=True, override=True, logger=logger, callback=get_environ_keys)
+    dotenv.set_as_environment_variables()
+
 #environ.load_env(env_path=env_path, environ=os.environ, cwd=env_path, verbose=True, logger=logger, ignoring_re='.git|.venv|__pycache__', callback=lambda *args, **kwargs:get_environ_keys(args, **kwargs))
 
 for k in __env__.get('__ESCAPED__', '').split('|'):
