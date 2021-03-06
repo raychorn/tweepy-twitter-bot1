@@ -118,7 +118,7 @@ def __unescape(v):
 __env__ = {}
 env_literals = []
 def get_environ_keys(*args, **kwargs):
-    global env_literals
+    #global env_literals
     from expandvars import expandvars
     
     k = kwargs.get('key')
@@ -126,7 +126,8 @@ def get_environ_keys(*args, **kwargs):
     assert (k is not None) and (v is not None), 'Problem with kwargs -> {}, k={}, v={}'.format(kwargs,k,v)
     __logger__ = kwargs.get('logger')
     if (k == '__LITERALS__'):
-        env_literals = v
+        for item in v:
+            env_literals.append(item)
     if (isinstance(v, str)):
         v = expandvars(v) if (k not in env_literals) else v
         v = __escape(v) if (k in __env__.get('__ESCAPED__', [])) else v
@@ -155,6 +156,10 @@ __env3__ = dict([tuple([k,v]) for k,v in __env__.items()])
 
 __env3__['MONGO_URI'] = os.environ.get('COSMOS_URI')
 __env3__['MONGO_AUTH_MECHANISM'] = os.environ.get('COSMOS_AUTH_MECHANISM')
+
+__env3__ = dict([tuple([k,v]) for k,v in __env3__.items()])
+
+__env3__['MONGO_URI'] = os.environ.get('COSMOSDB0')
 
 explainOptions = lambda x:'use_local' if (x == TheOptions.use_local) else 'master_list' if (x == TheOptions.master_list) else 'use_cluster' if (x == TheOptions.use_cluster) else 'use_cosmos1' if (x == TheOptions.use_cosmos1) else 'unknown'
 
@@ -315,7 +320,7 @@ if (__name__ == '__main__'):
             item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=anId, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
             msg = 'Storing article in cosmos1: {}'.format(item.get('_id'))
             logger.info(msg)
-            the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
+            the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env3__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
     
     api = service_runner.exec(twitter_verse, get_api, **plugins_handler.get_kwargs(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger))
     
