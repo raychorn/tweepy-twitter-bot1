@@ -317,7 +317,7 @@ if (__name__ == '__main__'):
         __likes_executor_running__ = False
         
     # Replicate the data from the Mongo Clusdter to Cosmos DB #0
-    if (__the_options__ in [TheOptions.use_cosmos0]):
+    if (os.environ.get('COSMOSDB0') or os.environ.get('COSMOSDB1')):
         ts_current_time = _utils.timeStamp(offset=0, use_iso=True)
         the_master_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
         
@@ -325,7 +325,11 @@ if (__name__ == '__main__'):
             item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=anId, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
             msg = 'Storing article in {}: {}'.format(__the_options__, item.get('_id'))
             logger.info(msg)
-            the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env4__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
+            # Replicate the data with no actual update.
+            if (os.environ.get('COSMOSDB0')):
+                the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env3__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
+            if (os.environ.get('COSMOSDB1')):
+                the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env4__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
     
     api = service_runner.exec(twitter_verse, get_api, **plugins_handler.get_kwargs(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger))
     
