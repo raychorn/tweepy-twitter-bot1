@@ -9,9 +9,10 @@ import tweepy
 import pprint
 import logging
 from logging.handlers import RotatingFileHandler
-import traceback
 
 import traceback
+
+from queue import Queue
 
 from dotenv import find_dotenv
 
@@ -316,21 +317,37 @@ if (__name__ == '__main__'):
         global __likes_executor_running__
         __likes_executor_running__ = False
         
-    # Replicate the data from the Mongo Clusdter to Cosmos DB #0
-    if (os.environ.get('COSMOSDB0') or os.environ.get('COSMOSDB1')):
-        ts_current_time = _utils.timeStamp(offset=0, use_iso=True)
-        the_master_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
-        
-        for anId in the_master_list: # store the article from the master database into the cosmos1 database. Does nothing if the article exists.
-            item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=anId, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
-            msg = 'Storing article in {}: {}'.format(__the_options__, item.get('_id'))
-            logger.info(msg)
-            # Replicate the data with no actual update.
-            if (os.environ.get('COSMOSDB0')):
-                the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env3__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
-            if (os.environ.get('COSMOSDB1')):
-                the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env4__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
     
+    __backup_last_run__ = None # _utils.timeStamp(offset=0, use_iso=True) when it was last run.
+    def __backup_callback__(*args, **kwargs):
+        global __backup_last_run__
+        __backup_last_run__ = None
+    
+
+    __backup_executor__ = pooled.BoundedExecutor(1, 5, callback=__backup_callback__)
+
+    @executor.threaded(__backup_executor__)
+    def backup_master_list():
+        if (logger):
+            logger.info('backup_master_list BEGIN:')
+        if (os.environ.get('COSMOSDB0') or os.environ.get('COSMOSDB1')):
+            ts_current_time = _utils.timeStamp(offset=0, use_iso=True)
+            the_master_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+            
+            for anId in the_master_list: # store the article from the master database into the cosmos1 database. Does nothing if the article exists.
+                item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=anId, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+                msg = 'Storing article in {}: {}'.format(__the_options__, item.get('_id'))
+                logger.info(msg)
+                # Replicate the data with no actual update.
+                if (os.environ.get('COSMOSDB0')):
+                    the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env3__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
+                if (os.environ.get('COSMOSDB1')):
+                    the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env4__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
+        if (logger):
+            logger.info('backup_master_list END!!!')
+        
+        
+    # Replicate the data from the Mongo Clusdter to Cosmos DB #0
     api = service_runner.exec(twitter_verse, get_api, **plugins_handler.get_kwargs(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger))
     
     if (0):
@@ -459,6 +476,21 @@ if (__name__ == '__main__'):
                     the_rotation = the_choice.get('__rotation__', []) if (the_choice is not None) and (not isinstance(the_choice, str)) else []
                 the_twitter_plan.the_rotation = the_rotation
                 service_runner.exec(articles_list, update_the_plan, **plugins_handler.get_kwargs(the_plan=the_twitter_plan.as_json_serializable(), environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_plan_col_name, logger=logger, ts_current_time=ts_current_time))
+                
+                if (logger):
+                    logger.info('__backup_last_run__ -> {}'.format(__backup_last_run__))
+                if (not __backup_last_run__):
+                    __backup_last_run__ = _utils.timeStamp(offset=0, use_iso=True)
+                    backup_master_list()
+                else:
+                    dt = datetime.fromisoformat(__backup_last_run__)
+                    period_secs = 60*60
+                    one_hour_ago = datetime.fromisoformat(_utils.timeStamp(offset=-period_secs, use_iso=True))
+                    delta = dt - one_hour_ago
+                    __is__ = delta.total_seconds() > period_secs
+                    if (__is__):
+                        __backup_last_run__ = _utils.timeStamp(offset=0, use_iso=True)
+                        backup_master_list()
             issue_tweet()
             
         except KeyboardInterrupt:
