@@ -10,6 +10,9 @@ import pprint
 import logging
 from logging.handlers import RotatingFileHandler
 
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 import traceback
 
 from queue import Queue

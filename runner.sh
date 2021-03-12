@@ -11,4 +11,7 @@ export PYTHONPATH=$basedir/lib3/vyperlogix39.zip:$lib
 pip --version
 pip install -r requirements.txt
 
+update-ca-certificates --fresh
+export SSL_CERT_DIR=/etc/ssl/certs
+
 python $basedir/tweepy-bot1.py "production"
