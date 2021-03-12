@@ -15,6 +15,7 @@ from vyperlogix.decorators import args
 __rotation__ = '__rotation__'
 __plans__ = '__plans__'
 
+normalize_int_from_str = lambda s:int(str(s))
 
 def __get_the_plan(environ=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None):
     @__with.database(environ=environ)
@@ -255,7 +256,7 @@ def most_recent_number_of_days(bucket, num_days=30):
     '''
     To Do: Do some analysis to see if there are any articles that have not been tweeted recently? (Whatever thay means.)
     '''
-    period_secs = int(str(num_days))*24*60*60
+    period_secs = normalize_int_from_str(num_days)*24*60*60
     thirty_days_ago = datetime.fromisoformat(_utils.timeStamp(offset=-period_secs, use_iso=True))
     new_bucket = [] if (isinstance(bucket, list)) else {} if (isinstance(bucket, dict)) else None
     if (new_bucket is not None):
@@ -281,7 +282,7 @@ def __update_the_article(item=None, the_choice=None, ts_current_time=None, logge
 
         bucket = item.get(__rotation__, [])
         bucket.append(ts_current_time)
-        the_update[__rotation__] = most_recent_number_of_days(bucket, num_days=5)
+        the_update[__rotation__] = most_recent_number_of_days(bucket, num_days=normalize_int_from_str(os.environ.get('max_days_in_rotations', 5)))
 
         msg = 'Updating: id: {}, {}'.format(the_choice, the_update)
         if (logger):
@@ -311,9 +312,9 @@ def __update_the_plan(the_plan=None, ts_current_time=None, logger=None, environ=
     bucket = plan.get(__plans__, {}) if (plan and (not isinstance(plan, str))) else {}
     bucket[ts_current_time] = the_plan
     while (1):
-        the_update[__plans__] = most_recent_number_of_days(bucket, num_days=os.environ.get('max_days_in_rotations', 15))
+        the_update[__plans__] = most_recent_number_of_days(bucket, num_days=os.environ.get('max_days_in_rotations', 5))
         __json__ = dictutils.bson_cleaner(the_update.get(__plans__, []), returns_json=True)
-        if (len(__json__) > os.environ.get('max_json_content', 5*1024*1024)):
+        if (len(__json__) > normalize_int_from_str(os.environ.get('max_json_content', 5*1024*1024))):
             os.environ['max_days_in_rotations'] = os.environ.get('max_days_in_rotations', 15) - 1
             if (os.environ.get('max_days_in_rotations', 15) < 1):
                 os.environ['max_days_in_rotations'] = 1
