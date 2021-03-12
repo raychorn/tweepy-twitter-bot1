@@ -15,7 +15,7 @@ from vyperlogix.decorators import args
 __rotation__ = '__rotation__'
 __plans__ = '__plans__'
 
-normalize_int_from_str = lambda s:int(str(s))
+normalize_int_from_str = lambda s:int(eval(str(s)))
 
 def __get_the_plan(environ=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None):
     @__with.database(environ=environ)
