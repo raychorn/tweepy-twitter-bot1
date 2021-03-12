@@ -255,7 +255,7 @@ def most_recent_number_of_days(bucket, num_days=30):
     '''
     To Do: Do some analysis to see if there are any articles that have not been tweeted recently? (Whatever thay means.)
     '''
-    period_secs = num_days*24*60*60
+    period_secs = int(str(num_days))*24*60*60
     thirty_days_ago = datetime.fromisoformat(_utils.timeStamp(offset=-period_secs, use_iso=True))
     new_bucket = [] if (isinstance(bucket, list)) else {} if (isinstance(bucket, dict)) else None
     if (new_bucket is not None):
