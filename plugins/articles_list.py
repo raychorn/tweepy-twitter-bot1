@@ -301,16 +301,18 @@ def __update_the_plan(the_plan=None, ts_current_time=None, logger=None, environ=
     assert the_plan, 'Missing the_plan.'
     assert ts_current_time, 'Missing ts_current_time.'
     
+    from vyperlogix.dict import dictutils
+    
     plan = __get_the_plan(mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, environ=environ)
     plan = plan[0] if (isinstance(plan, list)) else plan
     the_update = { 'updated_time': ts_current_time}
 
-    logger.info('DEBUG: plan size -> {}'.format(json.dumps(plan)))
+    logger.info('DEBUG: plan size -> {}'.format(len(dictutils.bson_cleaner(plan, returns_json=True))))
     bucket = plan.get(__plans__, {}) if (plan and (not isinstance(plan, str))) else {}
     bucket[ts_current_time] = the_plan
     while (1):
         the_update[__plans__] = most_recent_number_of_days(bucket, num_days=os.environ.get('max_days_in_rotations', 15))
-        __json__ = json.dumps(the_update.get(__plans__, []))
+        __json__ = dictutils.bson_cleaner(the_update.get(__plans__, []), returns_json=True)
         if (len(__json__) > os.environ.get('max_json_content', 5*1024*1024)):
             os.environ['max_days_in_rotations'] = os.environ.get('max_days_in_rotations', 15) - 1
             if (os.environ.get('max_days_in_rotations', 15) < 1):
