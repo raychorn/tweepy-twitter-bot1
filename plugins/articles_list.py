@@ -1,6 +1,9 @@
+import os
 import sys
 import random
 import traceback
+import mujson as json
+
 from datetime import datetime
 
 from vyperlogix.misc import _utils
@@ -248,11 +251,11 @@ def get_a_choice(*args, **kwargs):
     pass
 
 
-def most_recent_30_days(bucket):
+def most_recent_number_of_days(bucket, num_days=30):
     '''
     To Do: Do some analysis to see if there are any articles that have not been tweeted recently? (Whatever thay means.)
     '''
-    period_secs = 30*24*60*60
+    period_secs = num_days*24*60*60
     thirty_days_ago = datetime.fromisoformat(_utils.timeStamp(offset=-period_secs, use_iso=True))
     new_bucket = [] if (isinstance(bucket, list)) else {} if (isinstance(bucket, dict)) else None
     if (new_bucket is not None):
@@ -278,7 +281,7 @@ def __update_the_article(item=None, the_choice=None, ts_current_time=None, logge
 
         bucket = item.get(__rotation__, [])
         bucket.append(ts_current_time)
-        the_update[__rotation__] = most_recent_30_days(bucket)
+        the_update[__rotation__] = most_recent_number_of_days(bucket, num_days=5)
 
         msg = 'Updating: id: {}, {}'.format(the_choice, the_update)
         if (logger):
@@ -302,10 +305,26 @@ def __update_the_plan(the_plan=None, ts_current_time=None, logger=None, environ=
     plan = plan[0] if (isinstance(plan, list)) else plan
     the_update = { 'updated_time': ts_current_time}
 
-    logger.info('DEBUG: plan -> {}'.format(plan))
+    logger.info('DEBUG: plan size -> {}'.format(json.dumps(plan)))
     bucket = plan.get(__plans__, {}) if (plan and (not isinstance(plan, str))) else {}
     bucket[ts_current_time] = the_plan
-    the_update[__plans__] = most_recent_30_days(bucket)
+    while (1):
+        the_update[__plans__] = most_recent_number_of_days(bucket, num_days=os.environ.get('max_days_in_rotations', 15))
+        __json__ = json.dumps(the_update.get(__plans__, []))
+        if (len(__json__) > os.environ.get('max_json_content', 5*1024*1024)):
+            os.environ['max_days_in_rotations'] = os.environ.get('max_days_in_rotations', 15) - 1
+            if (os.environ.get('max_days_in_rotations', 15) < 1):
+                os.environ['max_days_in_rotations'] = 1
+            if (os.environ.get('max_days_in_rotations', 15) == 1):
+                if (logger):
+                    logger.info('size of the json content is too large for the update, cannot reduce the number of days to maintain which is now: {}'.format(os.environ.get('max_days_in_rotations', 15)))
+                break
+            else:
+                if (logger):
+                    logger.info('size of the json content is too large for the update, reducing the number of days to maintain which is now: {}'.format(os.environ.get('max_days_in_rotations', 15)))
+                continue
+        else:
+            break
 
     msg = 'Updating: id: {}, {}'.format(the_plan, the_update)
     if (logger):
