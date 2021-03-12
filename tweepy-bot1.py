@@ -44,6 +44,7 @@ def setup_rotating_file_handler(logname, logfile, max_bytes, backup_count):
 production_token = 'production'
 
 __production__ = any([arg == production_token for arg in sys.argv])
+#__production__ = True # remove this for production.
 
 production_token = production_token if (__production__) else 'development'
 
@@ -87,7 +88,9 @@ word_cloud = 'word_cloud'
 get_final_word_cloud = 'get_final_word_cloud'
 store_one_hashtag = 'store_one_hashtag'
 
-if (not __production__):
+try:
+    from vyperlogix.misc import _utils
+except ImportError:
     pylib = '/home/raychorn/projects/python-projects/private_vyperlogix_lib3'
     if (not any([f == pylib for f in sys.path])):
         print('Adding {}'.format(pylib))
@@ -332,10 +335,10 @@ if (__name__ == '__main__'):
             logger.info('backup_master_list BEGIN:')
         if (os.environ.get('COSMOSDB0') or os.environ.get('COSMOSDB1')):
             ts_current_time = _utils.timeStamp(offset=0, use_iso=True)
-            the_master_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+            the_master_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
             
             for anId in the_master_list: # store the article from the master database into the cosmos1 database. Does nothing if the article exists.
-                item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=anId, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+                item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=anId, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
                 msg = 'Storing article in {}: {}'.format(__the_options__, item.get('_id'))
                 logger.info(msg)
                 # Replicate the data with no actual update.
@@ -372,15 +375,15 @@ if (__name__ == '__main__'):
             print('\n'*2)
 
             if (__the_options__ == TheOptions.master_list):
-                the_master_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+                the_master_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
                 
                 for anId in the_master_list: # store the article from the master database into the local database. Does nothing if the article exists.
-                    item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=anId, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+                    item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=anId, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
                     msg = 'Storing article locally: {}'.format(item.get('url'))
                     logger.info(msg)
                     the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
 
-            the_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+            the_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
             assert len(the_list) > 0, 'Nothing in the list.'
             
             wait_per_choice = secs_until_tomorrow_morning / len(the_list)
@@ -426,7 +429,7 @@ if (__name__ == '__main__'):
                     go_like_own_stuff(runtime=(wait_per_choice - 60))
                     __likes_executor_running__ = True
 
-            the_real_list = service_runner.exec(articles_list, get_the_real_list, **plugins_handler.get_kwargs(the_list=the_list, logger=logger, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=wait_per_choice, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+            the_real_list = service_runner.exec(articles_list, get_the_real_list, **plugins_handler.get_kwargs(the_list=the_list, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=wait_per_choice, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
 
             the_twitter_plan.real_list = the_real_list
             
@@ -455,7 +458,7 @@ if (__name__ == '__main__'):
                 the_twitter_plan.the_choice = the_choice
                 if (__production__):
                     the_choice = the_choice.get('_id') if (the_choice is not None) and (not isinstance(the_choice, str)) else the_choice
-                    item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=the_choice, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name))
+                    item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=the_choice, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
                     assert item, 'Did not retrieve an item for {}.'.format(item)
                     service_runner.exec(twitter_verse, do_the_tweet, **plugins_handler.get_kwargs(api=api, item=item, logger=logger))
                     the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=the_choice, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))

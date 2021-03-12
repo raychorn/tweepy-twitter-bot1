@@ -43,7 +43,7 @@ class TwitterAPIProxy(MagicObject2):
             self.auth = tweepy.OAuthHandler(self.consumer_key, self.consumer_secret)
             self.auth.set_access_token(self.access_token, self.access_token_secret)
             self.api = tweepy.API(self.auth, wait_on_rate_limit=True)
-            self.ingest_rate_limit_stats(self.api.rate_limit_status())
+            #self.ingest_rate_limit_stats(self.api.rate_limit_status())
         except:
             msg = 'Problem connecting to the twitter?'
             if (logger):

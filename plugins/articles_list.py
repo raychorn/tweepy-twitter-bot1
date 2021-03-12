@@ -1,4 +1,6 @@
+import sys
 import random
+import traceback
 from datetime import datetime
 
 from vyperlogix.misc import _utils
@@ -59,7 +61,7 @@ def __store_the_plan(data, environ=None, mongo_db_name=None, mongo_articles_col_
     return db_store_the_plan(data=data)
 
 
-def __get_articles(_id=None, environ=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None):
+def __get_articles(_id=None, environ=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None, logger=None):
     @__with.database(environ=environ)
     def db_get_articles(db=None, _id=None):
         mongo_db_name = environ.get('mongo_db_name')
@@ -75,10 +77,26 @@ def __get_articles(_id=None, environ=None, mongo_db_name=None, mongo_articles_co
 
         find_in_collection = lambda c,criteria=criteria:c.find() if (not criteria) else c.find(criteria)
         recs = []
+        print('DEBUG: logger -> {}'.format(logger))
+        if (logger):
+            logger.info('DEBUG: (1) _id -> {}'.format(_id))
         _id = _id[0] if (isinstance(_id, tuple)) else _id
+        if (logger):
+            logger.info('DEBUG: (2) _id -> {}'.format(_id))
         if (not _id) or (_id == tuple([])):
-            recs = [str(doc.get('_id')) for doc in find_in_collection(coll, criteria=criteria)]
+            if (logger):
+                logger.info('DEBUG: (3) criteria -> {}'.format(criteria))
+            try:
+                recs = [str(doc.get('_id')) for doc in find_in_collection(coll, criteria=criteria)]
+            except Exception as ex:
+                extype, ex, tb = sys.exc_info()
+                for l in traceback.format_exception(extype, ex, tb):
+                    if (logger):
+                        logger.error(l.rstrip())
+                recs = []
         else:
+            if (logger):
+                logger.info('DEBUG: (4) _id -> {}'.format(_id))
             recs = coll.find_one({"_id": ObjectId(_id)})
         if (callable(callback)):
             callback(coll=coll, recs=recs, _id=_id)
@@ -134,10 +152,12 @@ def __store_article_data(data, environ=None, mongo_db_name=None, mongo_articles_
 
 
 
-def __get_the_real_list(the_list=None, logger=None, ts_tweeted_time=None, tweet_period_secs=None, environ=None, mongo_db_name=None, mongo_articles_col_name=None):
+def __get_the_real_list(the_list=None, ts_tweeted_time=None, tweet_period_secs=None, environ=None, mongo_db_name=None, mongo_articles_col_name=None, logger=None):
     the_real_list = []
     for anId in the_list:
-        item = __get_articles(_id=anId, environ=environ, mongo_db_name=mongo_db_name,  mongo_articles_col_name=mongo_articles_col_name)
+        if (logger):
+            logger.info('DEBUG: (***) anId -> {}'.format(anId))
+        item = __get_articles(_id=anId, environ=environ, mongo_db_name=mongo_db_name,  mongo_articles_col_name=mongo_articles_col_name, logger=logger)
         if (item):
             sz = item.get('friends_link')
             tt = item.get('tweeted_time')
