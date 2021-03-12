@@ -450,7 +450,7 @@ if (__name__ == '__main__'):
             wait_per_choice = 60 if (wait_per_choice < 60) else wait_per_choice
             the_twitter_plan.wait_per_choice = wait_per_choice
             
-            @interval.timer(wait_per_choice, run_once=True, blocking=True, logger=logger)
+            @interval.timer(wait_per_choice, no_initial_wait=True, run_once=True, blocking=True, logger=logger)
             def issue_tweet(aTimer, **kwargs):
                 random.seed(int(time.time()))
                 the_choice = service_runner.exec(articles_list, get_a_choice, **plugins_handler.get_kwargs(the_list=the_real_list, ts_current_time=ts_current_time, logger=logger))
