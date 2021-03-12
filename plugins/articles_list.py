@@ -301,7 +301,7 @@ def __update_the_plan(the_plan=None, ts_current_time=None, logger=None, environ=
     assert the_plan, 'Missing the_plan.'
     assert ts_current_time, 'Missing ts_current_time.'
     
-    from vyperlogix.dict import dictutils
+    from vyperlogix.iterators.dict import dictutils
     
     plan = __get_the_plan(mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, environ=environ)
     plan = plan[0] if (isinstance(plan, list)) else plan
