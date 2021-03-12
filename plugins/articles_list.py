@@ -311,31 +311,10 @@ def __update_the_plan(the_plan=None, ts_current_time=None, logger=None, environ=
     logger.info('DEBUG: plan size -> {}'.format(len(dictutils.bson_cleaner(plan, returns_json=True))))
     bucket = plan.get(__plans__, {}) if (plan and (not isinstance(plan, str))) else {}
     bucket[ts_current_time] = the_plan
-    while (1):
-        the_update[__plans__] = most_recent_number_of_days(bucket, num_days=os.environ.get('max_days_in_rotations', 5))
-        __json__ = dictutils.bson_cleaner(the_update.get(__plans__, []), returns_json=True)
-        if (len(__json__) > normalize_int_from_str(os.environ.get('max_json_content', 5*1024*1024))):
-            max_days_in_rotations = normalize_int_from_str(os.environ.get('max_days_in_rotations', 15)) - 1
-            os.environ['max_days_in_rotations'] = '{}'.format(max_days_in_rotations)
-            if (max_days_in_rotations < 1):
-                os.environ['max_days_in_rotations'] = '1'
-            if (max_days_in_rotations == 1):
-                if (logger):
-                    logger.info('size of the json content is too large for the update, cannot reduce the number of days to maintain which is now: {}'.format(os.environ.get('max_days_in_rotations', 15)))
-                break
-            else:
-                if (logger):
-                    logger.info('size of the json content is too large for the update, reducing the number of days to maintain which is now: {}'.format(os.environ.get('max_days_in_rotations', 15)))
-                continue
-        else:
-            break
+    if (0):
+        resp = __store_the_plan(plan, update=the_update, environ=environ, mongo_db_name=mongo_db_name,  mongo_articles_col_name=mongo_articles_col_name)
+        assert isinstance(resp, int), 'Problem with the response? Expected int value but got {}'.format(resp)
 
-    msg = 'Updating: id: {}, {}'.format(the_plan, the_update)
-    if (logger):
-        logger.info(msg)
-    resp = __store_the_plan(plan, update=the_update, environ=environ, mongo_db_name=mongo_db_name,  mongo_articles_col_name=mongo_articles_col_name)
-    assert isinstance(resp, int), 'Problem with the response? Expected int value but got {}'.format(resp)
-    
     return the_update.get(__plans__, [])
 
 @args.kwargs(__update_the_plan)

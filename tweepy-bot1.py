@@ -308,6 +308,8 @@ def get_top_trending_hashtags(api):
     
 environ = lambda : __env__ if (__the_options__ is not TheOptions.use_cluster) else __env2__
 
+__vector__ = {}
+
 if (__name__ == '__main__'):
     plugins_manager = plugins_handler.PluginManager(plugins, debug=True, logger=logger)
     service_runner = plugins_manager.get_runner()
@@ -324,10 +326,8 @@ if (__name__ == '__main__'):
         __likes_executor_running__ = False
         
     
-    __backup_last_run__ = None # _utils.timeStamp(offset=0, use_iso=True) when it was last run.
     def __backup_callback__(*args, **kwargs):
-        global __backup_last_run__
-        __backup_last_run__ = None
+        logger.info('Backup done.')
     
 
     __backup_executor__ = pooled.BoundedExecutor(1, 5, callback=__backup_callback__)
@@ -483,19 +483,24 @@ if (__name__ == '__main__'):
                 the_twitter_plan.the_rotation = the_rotation
                 service_runner.exec(articles_list, update_the_plan, **plugins_handler.get_kwargs(the_plan=the_twitter_plan.as_json_serializable(), environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_plan_col_name, logger=logger, ts_current_time=ts_current_time))
                 
+                backup_last_run = __vector__.get('backup_last_run')
                 if (logger):
-                    logger.info('__backup_last_run__ -> {}'.format(__backup_last_run__))
-                if (not __backup_last_run__):
-                    __backup_last_run__ = _utils.timeStamp(offset=0, use_iso=True)
+                    logger.info('(1) backup_last_run -> {}'.format(backup_last_run))
+                if (not backup_last_run):
+                    __vector__['backup_last_run'] = _utils.timeStamp(offset=0, use_iso=True)
+                    if (logger):
+                        logger.info('(2) backup_last_run -> {}'.format(backup_last_run))
                     backup_master_list()
                 else:
-                    dt = datetime.fromisoformat(__backup_last_run__)
+                    dt = datetime.fromisoformat(backup_last_run)
                     period_secs = 60*60
                     one_hour_ago = datetime.fromisoformat(_utils.timeStamp(offset=-period_secs, use_iso=True))
                     delta = dt - one_hour_ago
                     __is__ = delta.total_seconds() > period_secs
                     if (__is__):
-                        __backup_last_run__ = _utils.timeStamp(offset=0, use_iso=True)
+                        __vector__['backup_last_run'] = _utils.timeStamp(offset=0, use_iso=True)
+                    if (logger):
+                        logger.info('(3) backup_last_run -> {}'.format(backup_last_run))
                         backup_master_list()
             issue_tweet()
             
