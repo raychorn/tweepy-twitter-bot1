@@ -315,9 +315,10 @@ def __update_the_plan(the_plan=None, ts_current_time=None, logger=None, environ=
         the_update[__plans__] = most_recent_number_of_days(bucket, num_days=os.environ.get('max_days_in_rotations', 5))
         __json__ = dictutils.bson_cleaner(the_update.get(__plans__, []), returns_json=True)
         if (len(__json__) > normalize_int_from_str(os.environ.get('max_json_content', 5*1024*1024))):
-            os.environ['max_days_in_rotations'] = max_days_in_rotations = normalize_int_from_str(os.environ.get('max_days_in_rotations', 15)) - 1
+            max_days_in_rotations = normalize_int_from_str(os.environ.get('max_days_in_rotations', 15)) - 1
+            os.environ['max_days_in_rotations'] = '{}'.format(max_days_in_rotations)
             if (max_days_in_rotations < 1):
-                os.environ['max_days_in_rotations'] = 1
+                os.environ['max_days_in_rotations'] = '1'
             if (max_days_in_rotations == 1):
                 if (logger):
                     logger.info('size of the json content is too large for the update, cannot reduce the number of days to maintain which is now: {}'.format(os.environ.get('max_days_in_rotations', 15)))
