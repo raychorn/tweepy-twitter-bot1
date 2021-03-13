@@ -5,12 +5,14 @@ import tweepy
 
 import traceback
 
+from _tweepy.api import TweepyAPI
+
 from vyperlogix.misc import _utils
 from vyperlogix.decorators import args
 from vyperlogix.plugins import handler as plugins_handler
+from vyperlogix.misc import normalize_int_from_str, normalize_float_from_str
 
 from vyperlogix.classes.MagicObject import MagicObject2
-
 
 word_cloud = 'word_cloud'
 get_final_word_cloud = 'get_final_word_cloud'
@@ -23,7 +25,6 @@ reset_all_hashtags = 'reset_all_hashtags'
 
 last_followers = 'last_followers'
 
-
 class TwitterAPIProxy(MagicObject2):
     def __init__(self, consumer_key=None, consumer_secret=None, access_token=None, access_token_secret=None, logger=None):
         self.consumer_key = consumer_key
@@ -33,17 +34,16 @@ class TwitterAPIProxy(MagicObject2):
         self.logger = logger
         self.calls_count = 0
         self.start_time = time.time()
-        self.rate_limit = os.environ.get('twitter_rate_limit', 0.25)
-        assert self.rate_limit and (isinstance(self.rate_limit, str)) and (len(self.rate_limit) > 0), 'Missing rate_limit.'
-        self.rate_limit = float(self.rate_limit)
+        self.rate_limit = normalize_float_from_str(os.environ.get('twitter_rate_limit', 0.25))
+        assert self.rate_limit and (isinstance(self.rate_limit, float)) and (self.rate_limit > 0.0), 'Missing rate_limit.'
         self.rate_limit_stats = {}
         self.is_rate_limit_blown = False
         
         try:
             self.auth = tweepy.OAuthHandler(self.consumer_key, self.consumer_secret)
             self.auth.set_access_token(self.access_token, self.access_token_secret)
-            self.api = tweepy.API(self.auth, wait_on_rate_limit=True)
-            #self.ingest_rate_limit_stats(self.api.rate_limit_status())
+            self.api = TweepyAPI(self.auth, wait_on_rate_limit=True)
+            self.ingest_rate_limit_stats(self.api.rate_limit_status())
         except:
             msg = 'Problem connecting to the twitter?'
             if (logger):

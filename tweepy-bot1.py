@@ -5,8 +5,8 @@ import math
 import enum
 import random
 import mujson as json
-import tweepy
 import pprint
+import socket
 import logging
 from logging.handlers import RotatingFileHandler
 
@@ -44,12 +44,26 @@ def setup_rotating_file_handler(logname, logfile, max_bytes, backup_count):
     l.addHandler(ch)
     return l
 
+
+class TheRunMode(enum.Enum):
+    development = 0
+    production = 1
+    prod_dev = 2
+
+
 production_token = 'production'
 
 __production__ = any([arg == production_token for arg in sys.argv])
-#__production__ = True # remove this for production.
 
-production_token = production_token if (__production__) else 'development'
+__run_mode__ = TheRunMode.production if (__production__) else TheRunMode.development
+
+is_production = lambda : __run_mode__ in [TheRunMode.production, TheRunMode.prod_dev]
+
+__run_mode__ = TheRunMode.prod_dev if (socket.gethostname() == 'DESKTOP-JJ95ENL') else __run_mode__ # Comment this out for production deployment.
+
+production_token = production_token if (is_production()) else 'development'
+
+assert (TheRunMode.production if (any([arg == production_token for arg in [production_token]])) else TheRunMode.development) == TheRunMode.production, 'Something wrong with production mode detection.'
 
 base_filename = os.path.splitext(os.path.basename(__file__))[0]
 
@@ -207,6 +221,13 @@ assert is_really_a_string(mongo_cloud_col_name), 'Missing mongo_cloud_col_name.'
 plugins = __env__.get('plugins')
 assert is_really_a_string(plugins) and os.path.exists(plugins), 'Missing plugins.'
 
+if (0):
+    from tweepy import binder
+    m = sys.modules.get('tweepy.binder')
+    assert m is not None, 'Problems with tweepy.binder.'
+    def my_bind_api(*args, **kwargs):
+        print()
+    setattr(m, 'bind_api', my_bind_api)
 
 class TwitterPlan():
     def __init__(self, num_items=-1, secs_until_tomorrow_morning=-1):
@@ -228,7 +249,7 @@ class TwitterPlan():
     def real_list(self, items):
         ts = _utils.timeStamp(offset=0, use_iso=True)
         keys = sorted(self.__real_list__.keys(), key=lambda k:datetime.fromisoformat(k), reverse=True)
-        n = 100 if (__production__) else 5
+        n = 100 if (__run_mode__ == TheRunMode.production) else 5
         if (len(keys) > n):
             del self.__real_list__[keys[0]]
         self.__real_list__[ts] = items
@@ -328,8 +349,31 @@ if (__name__ == '__main__'):
     
     def __backup_callback__(*args, **kwargs):
         logger.info('Backup done.')
-    
 
+
+    if (0):
+        #from vyperlogix.hash.dict import SmartDict
+        
+        def compress_the_rotation(rot):
+            d = {}
+            for r in rot:
+                yyyy_mm_dd = r.split('T')[0]
+                d[yyyy_mm_dd] = d.get(yyyy_mm_dd, 0) + 1
+            return d
+            
+        def compress_the_plans(data):
+            for k,v in data.get('__plans__', {}).items():
+                real_list = v.get('__real_list__', [])
+                v['__the_rotation__'] = compress_the_rotation(v.get('__the_rotation__', []))
+                for doc in real_list:
+                    doc['__the_rotation__'] = compress_the_rotation(doc.get('__the_rotation__', []))
+                print(k)
+        
+        with open('/home/raychorn/projects/python-projects/tweepy-twitter-bot1/json/the_update.json', 'r') as fIn:
+            __json = fIn.read()
+        d1 = json.loads(__json)
+        d2 = compress_the_plans(d1)
+    
     __backup_executor__ = pooled.BoundedExecutor(1, 5, callback=__backup_callback__)
 
     @executor.threaded(__backup_executor__)
@@ -401,7 +445,7 @@ if (__name__ == '__main__'):
             
             the_twitter_plan.ts_tweeted_time = ts_tweeted_time
 
-            if (__production__):
+            if (is_production()):
                 if (not __followers_executor_running__):
                     __followers_executor__ = pooled.BoundedExecutor(1, 5, callback=__followers_callback__)
                     
@@ -418,11 +462,11 @@ if (__name__ == '__main__'):
                             for k,v in words.get('word-cloud', {}).items():
                                 if ( (len(k) > min_hashtag_length) and (v > threshold) ) or (criteria(k)):
                                     hashtags.append(k)
-                        service_runner.exec(twitter_verse, get_more_followers, **plugins_handler.get_kwargs(api=api, environ=environ(), service_runner=service_runner, hashtags=hashtags, silent=False, runtime=runtime, logger=logger))
-                    go_get_more_followers(runtime=(wait_per_choice - 60))
-                    __executor_running__ = True
+                            service_runner.exec(twitter_verse, get_more_followers, **plugins_handler.get_kwargs(api=api, environ=environ(), service_runner=service_runner, hashtags=hashtags, silent=False, runtime=runtime, logger=logger))
+                    #go_get_more_followers(runtime=(wait_per_choice - 60))
+                    #__executor_running__ = True
 
-            if (__production__):
+            if (is_production()):
                 if (not __likes_executor_running__):
                     __likes_executor__ = pooled.BoundedExecutor(1, 5, callback=__likes_callback__)
                     
@@ -448,18 +492,18 @@ if (__name__ == '__main__'):
 
             the_twitter_plan.required_velocity = required_velocity
             wait_per_choice = the_twitter_plan.secs_until_tomorrow_morning / required_velocity
-            if (not __production__):
+            if (not (__run_mode__ == TheRunMode.production)):
                 wait_per_choice = wait_per_choice / 100
             wait_per_choice = 60 if (wait_per_choice < 60) else wait_per_choice
             the_twitter_plan.wait_per_choice = wait_per_choice
             
-            @interval.timer(wait_per_choice, no_initial_wait=True, run_once=True, blocking=True, logger=logger)
+            @interval.timer(wait_per_choice, no_initial_wait=False, run_once=True, blocking=True, logger=logger)
             def issue_tweet(aTimer, **kwargs):
                 random.seed(int(time.time()))
                 the_choice = service_runner.exec(articles_list, get_a_choice, **plugins_handler.get_kwargs(the_list=the_real_list, ts_current_time=ts_current_time, logger=logger))
                 assert the_choice, 'Nothing in the list?  Please check.'
                 the_twitter_plan.the_choice = the_choice
-                if (__production__):
+                if (is_production()):
                     the_choice = the_choice.get('_id') if (the_choice is not None) and (not isinstance(the_choice, str)) else the_choice
                     item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=the_choice, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
                     assert item, 'Did not retrieve an item for {}.'.format(item)
@@ -490,7 +534,7 @@ if (__name__ == '__main__'):
                     __vector__['backup_last_run'] = _utils.timeStamp(offset=0, use_iso=True)
                     if (logger):
                         logger.info('(2) backup_last_run -> {}'.format(backup_last_run))
-                    backup_master_list()
+                    #backup_master_list()
                 else:
                     dt = datetime.fromisoformat(backup_last_run)
                     period_secs = 60*60
@@ -501,7 +545,7 @@ if (__name__ == '__main__'):
                         __vector__['backup_last_run'] = _utils.timeStamp(offset=0, use_iso=True)
                     if (logger):
                         logger.info('(3) backup_last_run -> {}'.format(backup_last_run))
-                        backup_master_list()
+                        #backup_master_list()
             issue_tweet()
             
         except KeyboardInterrupt:

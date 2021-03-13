@@ -11,6 +11,7 @@
       - [.env](#env)
     - [Installing](#installing)
   - [Usage <a name = "usage"></a>](#usage-)
+  - [Poor Man's Crontab Monitor](#poor-mans-crontab-monitor)
 
 ## About
 
@@ -103,3 +104,11 @@ twitter_follow_followers=0 # 1 for production
 ## Usage <a name = "usage"></a>
 
 Run the code.  Supply your own database.  I used Mongo.
+
+## Poor Man's Crontab Monitor
+
+```
+crontab -e
+0 0 * * * /home/ubuntu/tweepy-twitter-bot1/scripts/cron-job.sh >> /home/ubuntu/tweepy-twitter-bot1/scripts/cron-job.log 2>&1
+0 1 * * * /home/ubuntu/tweepy-twitter-bot1/scripts/truncate-cron-log.sh
+```

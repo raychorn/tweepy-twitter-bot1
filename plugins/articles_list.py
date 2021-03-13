@@ -7,6 +7,7 @@ import mujson as json
 from datetime import datetime
 
 from vyperlogix.misc import _utils
+from vyperlogix.misc import normalize_int_from_str
 from bson.objectid import ObjectId
 from vyperlogix.mongo import vyperapi
 from vyperlogix.decorators import __with
@@ -14,8 +15,6 @@ from vyperlogix.decorators import args
 
 __rotation__ = '__rotation__'
 __plans__ = '__plans__'
-
-normalize_int_from_str = lambda s:int(eval(str(s)))
 
 def __get_the_plan(environ=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None):
     @__with.database(environ=environ)
