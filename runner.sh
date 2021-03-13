@@ -11,6 +11,9 @@ export PYTHONPATH=$basedir/lib3/vyperlogix39.zip:$lib
 pip --version
 pip install -r requirements.txt
 
+#apt remove ca-certificates
+#apt install ca-certificates -y
+
 update-ca-certificates --fresh
 export SSL_CERT_DIR=/etc/ssl/certs
 
