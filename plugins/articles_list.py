@@ -255,8 +255,9 @@ def most_recent_number_of_days(bucket, num_days=30):
     '''
     To Do: Do some analysis to see if there are any articles that have not been tweeted recently? (Whatever thay means.)
     '''
-    period_secs = normalize_int_from_str(num_days)*24*60*60
+    period_secs = (normalize_int_from_str(num_days)*24*60*60)
     thirty_days_ago = datetime.fromisoformat(_utils.timeStamp(offset=-period_secs, use_iso=True))
+    period_secs += 3600  # Daylight Savings Time issue? Or typical translation bias?
     new_bucket = [] if (isinstance(bucket, list)) else {} if (isinstance(bucket, dict)) else None
     if (new_bucket is not None):
         for ts in bucket if (isinstance(bucket, list)) else bucket.keys() if (isinstance(bucket, dict)) else []:
@@ -268,6 +269,7 @@ def most_recent_number_of_days(bucket, num_days=30):
                     new_bucket.append(ts)
                 elif (isinstance(bucket, dict)):
                     new_bucket[ts] = bucket.get(ts)
+    assert len(new_bucket) > 0, 'There cannot be less than one item after an update.'
     return new_bucket
 
 
