@@ -194,15 +194,19 @@ def __get_the_real_list(the_list=None, ts_tweeted_time=None, tweet_period_secs=N
 def get_the_real_list(*args, **kwargs):
     pass
 
-def __get_a_choice(the_list=None, ts_current_time=None, logger=None):
+def __get_a_choice(the_list=None, ts_current_time=None, this_process={}, logger=None):
     choice = None
+    the_process = []
     assert isinstance(the_list, list), 'Wheres the list?'
     msg = 'the_list - the_list has {} items.'.format(len(the_list))
+    assert isinstance(ts_current_time, str), 'Missing a usable ts_current_time.'
+    assert isinstance(this_process, dict), 'Missing a usable this_process.'
     logger.info(msg)
     if (len(the_list) > 0):
         priorities1 = [item for item in the_list if (isinstance(item, str))]
         msg = 'priorities1 has {} items.'.format(len(priorities1))
         logger.info(msg)
+        the_process.append('1={}'.format(len(priorities1)))
         if (len(priorities1) > 0):
             choice = random.choice(priorities1)
             msg = 'priorities1 has choice {}.'.format(choice)
@@ -211,6 +215,7 @@ def __get_a_choice(the_list=None, ts_current_time=None, logger=None):
             priorities2 = [item for item in the_list if (not isinstance(item, str)) and (not item.get(__rotation__))]
             msg = 'priorities2 has {} items.'.format(len(priorities2))
             logger.info(msg)
+            the_process.append('2={}'.format(len(priorities2)))
             if (len(priorities2) > 0):
                 choice = random.choice(priorities2)
                 msg = 'priorities2 has choice {}.'.format(choice)
@@ -229,6 +234,7 @@ def __get_a_choice(the_list=None, ts_current_time=None, logger=None):
                 priorities3 = [item for item in the_list if (not isinstance(item, str)) and (pick_from_list(item.get(__rotation__, [])))]
                 msg = 'priorities3 has {} items.'.format(len(priorities3))
                 logger.info(msg)
+                the_process.append('3={}'.format(len(priorities3)))
                 if (len(priorities3) > 0):
                     priorities3 = sorted(priorities3, key=lambda item: len(item.get(__rotation__, [])), reverse=False)
                     choice = priorities3[0]
@@ -239,11 +245,14 @@ def __get_a_choice(the_list=None, ts_current_time=None, logger=None):
                     msg = 'priorities4 has {} items.'.format(len(priorities4))
                     logger.info(msg)
                     priorities4 = sorted(priorities4, key=lambda item: len(item.get(__rotation__, [])), reverse=False)
+                    the_process.append('4={}'.format(len(priorities4)))
                     choice = priorities4[0]
                     msg = 'priorities4 has choice {}.'.format(choice)
                     logger.info(msg)
     msg = 'choice is  {}.'.format(choice)
     logger.info(msg)
+    the_process.append(choice)
+    this_process[ts_current_time] = the_process
     return choice
 
 @args.kwargs(__get_a_choice)
