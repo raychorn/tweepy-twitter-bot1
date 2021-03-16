@@ -15,6 +15,9 @@ from vyperlogix.decorators import args
 
 from vyperlogix.hash.dict import SmartDict
 
+__doy__ = lambda args:date(args[0],args[1],args[2]).timetuple().tm_yday if (len(args) == 3) else None
+doy_from_ts = lambda ts:__doy__([int(s) for s in ts.split('T')[0].split('-')])
+    
 class RotationProcessor(dict):
     def __setitem__(self, k, v):
         '''
@@ -214,13 +217,16 @@ def __get_the_real_list(the_list=None, ts_tweeted_time=None, tweet_period_secs=N
 def get_the_real_list(*args, **kwargs):
     pass
 
-def __get_a_choice(the_list=None, ts_current_time=None, this_process={}, logger=None):
+def __get_a_choice(the_list=None, ts_current_time=None, this_process={}, environ=None, mongo_db_name=None, mongo_articles_col_name=None, logger=None):
     choice = None
     the_process = []
     assert isinstance(the_list, list), 'Wheres the list?'
     msg = 'the_list - the_list has {} items.'.format(len(the_list))
     assert isinstance(ts_current_time, str), 'Missing a usable ts_current_time.'
     assert isinstance(this_process, dict), 'Missing a usable this_process.'
+    assert environ is not None, 'Missing the environ.'
+    assert isinstance(mongo_db_name, str), 'Missing the mongo_db_name.'
+    assert isinstance(mongo_articles_col_name, str), 'Missing the mongo_articles_col_name.'
     logger.info(msg)
     if (len(the_list) > 0):
         priorities1 = [item for item in the_list if (isinstance(item, str))]
@@ -232,7 +238,25 @@ def __get_a_choice(the_list=None, ts_current_time=None, this_process={}, logger=
             msg = 'priorities1 has choice {}.'.format(choice)
             logger.info(msg)
         else:
-            priorities2 = [item for item in the_list if (not isinstance(item, str)) and (not item.get(__rotation__))]
+            the_plan = __get_the_plan(mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, environ=environ)
+
+            if (the_plan):
+                doy = '{}'.format(doy_from_ts(ts_current_time))
+                def has_rotations_now(obj, p=None):
+                    if (p is not None):
+                        plans = p.get('__plans__', {})
+                        if (isinstance(plans, dict)):
+                            specific = plans.get(obj.get('_id'), {})
+                            if (isinstance(specific, dict)):
+                                process = specific.get('__the_rotation__', {})
+                                if (isinstance(process, dict)):
+                                    rotations = process.get(doy, {})
+                                    if (isinstance(rotations, dict)):
+                                        return len(rotations) > 0
+                    return False
+                priorities2 = [item for item in the_list if (not isinstance(item, str)) and (not has_rotations_now(item, p=the_plan))]
+            else:
+                priorities2 = [item for item in the_list if (not isinstance(item, str))]
             msg = 'priorities2 has {} items.'.format(len(priorities2))
             logger.info(msg)
             the_process.append('2={}'.format(len(priorities2)))
@@ -240,35 +264,6 @@ def __get_a_choice(the_list=None, ts_current_time=None, this_process={}, logger=
                 choice = random.choice(priorities2)
                 msg = 'priorities2 has choice {}.'.format(choice)
                 logger.info(msg)
-            else:
-                today_ymd = ts_current_time.split('T')[0]+'T' if (ts_current_time is not None) and (ts_current_time.find('T') > -1) else None
-                def pick_from_list(l_ts):
-                    '''
-                    return True or False. True if no times in list for last 24 hours else False.
-                    '''
-                    for t in l_ts:
-                        if (t.find(today_ymd) > -1):
-                            return False
-                    return True
-                
-                priorities3 = [item for item in the_list if (not isinstance(item, str)) and (pick_from_list(item.get(__rotation__, [])))]
-                msg = 'priorities3 has {} items.'.format(len(priorities3))
-                logger.info(msg)
-                the_process.append('3={}'.format(len(priorities3)))
-                if (len(priorities3) > 0):
-                    priorities3 = sorted(priorities3, key=lambda item: len(item.get(__rotation__, [])), reverse=False)
-                    choice = priorities3[0]
-                    msg = 'priorities3 has choice {}.'.format(choice)
-                    logger.info(msg)
-                else:
-                    priorities4 = [item for item in the_list if (not isinstance(item, str)) and (not pick_from_list(item.get(__rotation__, [])))]
-                    msg = 'priorities4 has {} items.'.format(len(priorities4))
-                    logger.info(msg)
-                    priorities4 = sorted(priorities4, key=lambda item: len(item.get(__rotation__, [])), reverse=False)
-                    the_process.append('4={}'.format(len(priorities4)))
-                    choice = priorities4[0]
-                    msg = 'priorities4 has choice {}.'.format(choice)
-                    logger.info(msg)
     msg = 'choice is  {}.'.format(choice)
     logger.info(msg)
     the_process.append(choice)
@@ -319,7 +314,8 @@ def __update_the_article(item=None, the_choice=None, ts_current_time=None, logge
         the_processor = item.get(__rotation_processor__, RotationProcessor())
         while (len(the_update[__rotation__]) > 0):
             rot = the_update[__rotation__].pop()
-            the_processor[rot] = 1
+            if (len(rot.split('T')) > 1):
+                the_processor[rot] = 1
         the_update[__rotation_processor__] = the_processor
 
         msg = 'Updating: id: {}, {}'.format(the_choice, the_update)
