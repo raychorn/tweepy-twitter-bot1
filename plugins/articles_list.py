@@ -274,6 +274,49 @@ def __get_a_choice(the_list=None, ts_current_time=None, this_process={}, environ
 def get_a_choice(*args, **kwargs):
     pass
 
+#######################################################################
+def __reset_plans_for_choices(the_list=None, ts_current_time=None, environ=None, mongo_db_name=None, mongo_articles_col_name=None, logger=None):
+    choice = None
+    assert isinstance(the_list, list), 'Wheres the list?'
+    msg = 'the_list - the_list has {} items.'.format(len(the_list))
+    assert isinstance(ts_current_time, str), 'Missing a usable ts_current_time.'
+    assert environ is not None, 'Missing the environ.'
+    assert isinstance(mongo_db_name, str), 'Missing the mongo_db_name.'
+    assert isinstance(mongo_articles_col_name, str), 'Missing the mongo_articles_col_name.'
+    logger.info(msg)
+    if (len(the_list) > 0):
+        the_plan = __get_the_plan(mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, environ=environ)
+        if (the_plan):
+            doy = '{}'.format(doy_from_ts(ts_current_time))
+            def has_rotations_now(obj, p=None, reset=False):
+                if (p is not None):
+                    plans = p.get('__plans__', {})
+                    if (isinstance(plans, dict)):
+                        specific = plans.get(obj.get('_id'), {})
+                        if (isinstance(specific, dict)):
+                            process = specific.get('__the_rotation__', {})
+                            if (isinstance(process, dict)):
+                                if (reset):
+                                    process[doy] = {}
+                                else:
+                                    rotations = process.get(doy, {})
+                                    if (isinstance(rotations, dict)):
+                                        return len(rotations) > 0
+                return False
+            choices = [item for item in the_list if (not isinstance(item, str)) and (not has_rotations_now(item, p=the_plan))]
+            if (len(choices) == 0):
+                for item in the_list:
+                    if (not isinstance(item, str)):
+                        has_rotations_now(item, p=the_plan, reset=True)
+                resp = __store_the_plan(the_plan, update=the_plan, environ=environ, mongo_db_name=mongo_db_name,  mongo_articles_col_name=mongo_articles_col_name)
+                assert isinstance(resp, int), 'Problem with the response? Expected int value but got {}'.format(resp)
+    return choice
+
+@args.kwargs(__reset_plans_for_choices)
+def reset_plans_for_choices(*args, **kwargs):
+    pass
+#######################################################################
+
 
 def most_recent_number_of_days(bucket, num_days=30):
     '''
@@ -285,14 +328,17 @@ def most_recent_number_of_days(bucket, num_days=30):
     new_bucket = [] if (isinstance(bucket, list)) else {} if (isinstance(bucket, dict)) else None
     if (new_bucket is not None):
         for ts in bucket if (isinstance(bucket, list)) else bucket.keys() if (isinstance(bucket, dict)) else []:
-            dt = datetime.fromisoformat(ts)
-            delta = dt - thirty_days_ago
-            __is__ = delta.total_seconds() < period_secs
-            if (__is__):
-                if (isinstance(bucket, list)):
-                    new_bucket.append(ts)
-                elif (isinstance(bucket, dict)):
-                    new_bucket[ts] = bucket.get(ts)
+            if (len(ts.split('T')) > 1):
+                dt = datetime.fromisoformat(ts)
+                delta = dt - thirty_days_ago
+                __is__ = delta.total_seconds() < period_secs
+                if (__is__):
+                    if (isinstance(bucket, list)):
+                        new_bucket.append(ts)
+                    elif (isinstance(bucket, dict)):
+                        new_bucket[ts] = bucket.get(ts)
+            else:
+                new_bucket[ts] = bucket.get(ts)
     assert len(new_bucket) > 0, 'There cannot be less than one item after an update.'
     return new_bucket
 
@@ -311,11 +357,17 @@ def __update_the_article(item=None, the_choice=None, ts_current_time=None, logge
         bucket.append(ts_current_time)
         the_update[__rotation__] = most_recent_number_of_days(bucket, num_days=normalize_int_from_str(os.environ.get('max_days_in_rotations', 5)))
         
-        the_processor = item.get(__rotation_processor__, RotationProcessor())
-        while (len(the_update[__rotation__]) > 0):
-            rot = the_update[__rotation__].pop()
-            if (len(rot.split('T')) > 1):
-                the_processor[rot] = 1
+        doy = '{}'.format(doy_from_ts(ts_current_time))
+        
+        the_processor = RotationProcessor(item.get(__rotation_processor__, {}))
+        retirees = []
+        for item in the_update[__rotation__]:
+            if (len(item.split('T')) > 1):
+                the_processor[item] = 1
+                retirees.append(item)
+        for r in retirees:
+            i = the_update[__rotation__].index(r)
+            del the_update[__rotation__][i]
         the_update[__rotation_processor__] = the_processor
 
         msg = 'Updating: id: {}, {}'.format(the_choice, the_update)
@@ -343,7 +395,6 @@ def __update_the_plan(the_plan=None, ts_current_time=None, the_choice=None, logg
     plan = plan[0] if (isinstance(plan, list)) else plan
     the_update = { 'updated_time': ts_current_time}
 
-    logger.info('DEBUG: plan size -> {}'.format(len(dictutils.bson_cleaner(plan, returns_json=True))))
     bucket = plan.get(__plans__, {}) if (plan and (not isinstance(plan, str))) else {}
     bucket[the_choice.get('_id') if (not isinstance(the_choice, str)) else the_choice] = the_plan
     if (1):

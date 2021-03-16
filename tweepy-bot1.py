@@ -99,6 +99,7 @@ update_the_plan = 'update_the_plan'
 get_articles = 'get_articles'
 get_a_choice = 'get_a_choice'
 get_more_followers = 'get_more_followers'
+reset_plans_for_choices = 'reset_plans_for_choices'
 
 
 word_cloud = 'word_cloud'
@@ -509,6 +510,9 @@ if (__name__ == '__main__'):
             @interval.timer(wait_per_choice, no_initial_wait=False, run_once=True, blocking=True, logger=logger)
             def issue_tweet(aTimer, **kwargs):
                 random.seed(int(time.time()))
+                the_choice = service_runner.exec(articles_list, get_a_choice, **plugins_handler.get_kwargs(the_list=the_real_list, ts_current_time=ts_current_time, this_process=the_twitter_plan.the_process, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_plan_col_name, logger=logger))
+                if (the_choice is None):
+                    service_runner.exec(articles_list, reset_plans_for_choices, **plugins_handler.get_kwargs(the_list=the_real_list, ts_current_time=ts_current_time, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
                 the_choice = service_runner.exec(articles_list, get_a_choice, **plugins_handler.get_kwargs(the_list=the_real_list, ts_current_time=ts_current_time, this_process=the_twitter_plan.the_process, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_plan_col_name, logger=logger))
                 assert the_choice, 'Nothing in the list?  Please check.'
                 the_twitter_plan.the_choice = the_choice
