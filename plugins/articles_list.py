@@ -28,7 +28,7 @@ class RotationProcessor(dict):
         yy,mm,dd = tuple([int(s) for s in toks[0].split('-')])
         day_of_year = date(yy,mm,dd).timetuple().tm_yday
         d = self.get(day_of_year, SmartDict())
-        d[int(toks[-1].split(':')[0])] = v
+        d['{}'.format(int(toks[-1].split(':')[0]))] = v
         return super().__setitem__(day_of_year, d)
 
 
@@ -305,6 +305,8 @@ def most_recent_number_of_days(bucket, num_days=30):
 def __update_the_article(item=None, the_choice=None, ts_current_time=None, logger=None, environ={}, mongo_db_name=None, mongo_articles_col_name=None):
     assert item, 'Missing item.'
     assert ts_current_time, 'Missing ts_current_time.'
+
+    from vyperlogix.iterators.dict import dictutils
     
     the_update = the_choice
     if (the_choice is not None):
@@ -323,6 +325,7 @@ def __update_the_article(item=None, the_choice=None, ts_current_time=None, logge
         msg = 'Updating: id: {}, {}'.format(the_choice, the_update)
         if (logger):
             logger.info(msg)
+    the_update = dictutils.bson_cleaner(the_update, returns_json=False)
     resp = __store_article_data(item, update=the_update, environ=environ, mongo_db_name=mongo_db_name,  mongo_articles_col_name=mongo_articles_col_name)
     assert isinstance(resp, int), 'Problem with the response? Expected int value but got {}'.format(resp)
     print('Update was done.')
@@ -346,7 +349,7 @@ def __update_the_plan(the_plan=None, ts_current_time=None, the_choice=None, logg
 
     logger.info('DEBUG: plan size -> {}'.format(len(dictutils.bson_cleaner(plan, returns_json=True))))
     bucket = plan.get(__plans__, {}) if (plan and (not isinstance(plan, str))) else {}
-    bucket[the_choice.get('_id')] = the_plan
+    bucket[the_choice.get('_id') if (not isinstance(the_choice, str)) else the_choice] = the_plan
     if (1):
         the_update[__plans__] = bucket
         resp = __store_the_plan(plan, update=the_update, environ=environ, mongo_db_name=mongo_db_name,  mongo_articles_col_name=mongo_articles_col_name)

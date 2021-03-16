@@ -487,7 +487,7 @@ if (__name__ == '__main__'):
 
             the_real_list = service_runner.exec(articles_list, get_the_real_list, **plugins_handler.get_kwargs(the_list=the_list, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=wait_per_choice, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
 
-            the_twitter_plan.real_list = the_real_list
+            #the_twitter_plan.real_list = the_real_list
             
             msg = '='*30
             logger.info(msg)
