@@ -361,10 +361,10 @@ def __update_the_article(item=None, the_choice=None, ts_current_time=None, logge
         
         the_processor = RotationProcessor(item.get(__rotation_processor__, {}))
         retirees = []
-        for item in the_update[__rotation__]:
-            if (len(item.split('T')) > 1):
-                the_processor[item] = 1
-                retirees.append(item)
+        for __item in the_update[__rotation__]:
+            if (len(__item.split('T')) > 1):
+                the_processor[__item] = 1
+                retirees.append(__item)
         for r in retirees:
             i = the_update[__rotation__].index(r)
             del the_update[__rotation__][i]
