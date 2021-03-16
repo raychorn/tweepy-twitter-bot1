@@ -13,8 +13,27 @@ from vyperlogix.mongo import vyperapi
 from vyperlogix.decorators import __with
 from vyperlogix.decorators import args
 
+
+class RotationProcessor(dict):
+    def __setitem__(self, k, v):
+        '''
+        key is the timestamp and value is a number > 0
+        
+        ts -> day_of_year -> key
+        
+        value is dict where key is the hour number and value is the count for that hour
+        '''
+        toks = k.split('T')
+        yy,mm,dd = tuple([int(s) for s in toks[0].split('-')])
+        day_of_year = date(yy,mm,dd).timetuple().tm_yday
+        d = self.get(day_of_year, SmartDict())
+        d[int(toks[-1].split(':')[0])] = v
+        return super().__setitem__(day_of_year, d)
+
+
 __rotation__ = '__rotation__'
 __plans__ = '__plans__'
+__rotation_processor__ = '__rotation_processor__'
 
 def __get_the_plan(environ=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None):
     @__with.database(environ=environ)
@@ -293,6 +312,12 @@ def __update_the_article(item=None, the_choice=None, ts_current_time=None, logge
         bucket = item.get(__rotation__, [])
         bucket.append(ts_current_time)
         the_update[__rotation__] = most_recent_number_of_days(bucket, num_days=normalize_int_from_str(os.environ.get('max_days_in_rotations', 5)))
+        
+        the_processor = item.get(__rotation_processor__, RotationProcessor())
+        while (len(the_update[__rotation__]) > 0):
+            rot = the_update[__rotation__].pop()
+            the_processor[rot] = 1
+        the_update[__rotation_processor__] = the_processor
 
         msg = 'Updating: id: {}, {}'.format(the_choice, the_update)
         if (logger):
@@ -301,14 +326,14 @@ def __update_the_article(item=None, the_choice=None, ts_current_time=None, logge
     assert isinstance(resp, int), 'Problem with the response? Expected int value but got {}'.format(resp)
     print('Update was done.')
     
-    return the_update.get(__rotation__, []) if (the_choice is not None) else []
+    return the_update.get(__rotation_processor__, []) if (the_choice is not None) else []
 
 @args.kwargs(__update_the_article)
 def update_the_article(*args, **kwargs):
     pass
 
 
-def __update_the_plan(the_plan=None, ts_current_time=None, logger=None, environ={}, mongo_db_name=None, mongo_articles_col_name=None):
+def __update_the_plan(the_plan=None, ts_current_time=None, the_choice=None, logger=None, environ={}, mongo_db_name=None, mongo_articles_col_name=None):
     assert the_plan, 'Missing the_plan.'
     assert ts_current_time, 'Missing ts_current_time.'
     
@@ -320,8 +345,9 @@ def __update_the_plan(the_plan=None, ts_current_time=None, logger=None, environ=
 
     logger.info('DEBUG: plan size -> {}'.format(len(dictutils.bson_cleaner(plan, returns_json=True))))
     bucket = plan.get(__plans__, {}) if (plan and (not isinstance(plan, str))) else {}
-    bucket[ts_current_time] = the_plan
-    if (0):
+    bucket[the_choice.get('_id')] = the_plan
+    if (1):
+        the_update[__plans__] = bucket
         resp = __store_the_plan(plan, update=the_update, environ=environ, mongo_db_name=mongo_db_name,  mongo_articles_col_name=mongo_articles_col_name)
         assert isinstance(resp, int), 'Problem with the response? Expected int value but got {}'.format(resp)
 

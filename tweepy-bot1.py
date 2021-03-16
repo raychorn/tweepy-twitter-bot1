@@ -535,7 +535,7 @@ if (__name__ == '__main__'):
                 else:
                     the_rotation = the_choice.get('__rotation__', []) if (the_choice is not None) and (not isinstance(the_choice, str)) else []
                 the_twitter_plan.the_rotation = the_rotation
-                service_runner.exec(articles_list, update_the_plan, **plugins_handler.get_kwargs(the_plan=the_twitter_plan.as_json_serializable(), environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_plan_col_name, logger=logger, ts_current_time=ts_current_time))
+                service_runner.exec(articles_list, update_the_plan, **plugins_handler.get_kwargs(the_plan=the_twitter_plan.as_json_serializable(), environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_plan_col_name, logger=logger, ts_current_time=ts_current_time, the_choice=the_choice))
                 
                 backup_last_run = __vector__.get('backup_last_run')
                 if (logger):
