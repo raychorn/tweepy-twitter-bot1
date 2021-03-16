@@ -17,7 +17,9 @@ from vyperlogix.hash.dict import SmartDict
 
 __doy__ = lambda args:date(args[0],args[1],args[2]).timetuple().tm_yday if (len(args) == 3) else None
 doy_from_ts = lambda ts:__doy__([int(s) for s in ts.split('T')[0].split('-')])
-    
+
+get_rotations_from = lambda item:item.get(__rotation__, []) if (isinstance(item.get(__rotation__, []), list)) else []
+        
 class RotationProcessor(dict):
     def __setitem__(self, k, v):
         '''
@@ -201,12 +203,12 @@ def __get_the_real_list(the_list=None, ts_tweeted_time=None, tweet_period_secs=N
             dt_target = datetime.fromisoformat(ts_tweeted_time)
             dt_item = datetime.fromisoformat(tt)
             delta = max(dt_target, dt_item) - min(dt_target, dt_item)
-            __is__ = (delta.total_seconds() < tweet_period_secs) or (not item.get(__rotation__))
+            __is__ = (delta.total_seconds() < tweet_period_secs) or (get_rotations_from(item) is not None)
             msg = 'delta: {}, dt_target: {}, dt_item: {}, delta.total_seconds(): {}, tweet_period_secs: {}, __is__: {}'.format(delta, dt_target, dt_item, delta.total_seconds(), tweet_period_secs, __is__)
             if (logger):
                 logger.info(msg)
             
-            the_real_list.append({'_id':anId, __rotation__:item.get(__rotation__, []), 'secs': delta.total_seconds(), '__is__': __is__})
+            the_real_list.append({'_id':anId, __rotation__:get_rotations_from(item), 'secs': delta.total_seconds(), '__is__': __is__})
             msg = 'Added to the_real_list: {}\n'.format(anId)
             if (logger):
                 logger.info(msg)
@@ -353,7 +355,7 @@ def __update_the_article(item=None, the_choice=None, ts_current_time=None, logge
     if (the_choice is not None):
         the_update = { 'tweeted_time': ts_current_time}
 
-        bucket = item.get(__rotation__, [])
+        bucket = get_rotations_from(item)
         bucket.append(ts_current_time)
         the_update[__rotation__] = most_recent_number_of_days(bucket, num_days=normalize_int_from_str(os.environ.get('max_days_in_rotations', 5)))
         
