@@ -4,7 +4,7 @@ import random
 import traceback
 import mujson as json
 
-from datetime import datetime
+from datetime import datetime, date
 
 from vyperlogix.misc import _utils
 from vyperlogix.misc import normalize_int_from_str
@@ -13,6 +13,7 @@ from vyperlogix.mongo import vyperapi
 from vyperlogix.decorators import __with
 from vyperlogix.decorators import args
 
+from vyperlogix.hash.dict import SmartDict
 
 class RotationProcessor(dict):
     def __setitem__(self, k, v):
