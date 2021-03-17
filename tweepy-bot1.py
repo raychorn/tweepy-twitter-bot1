@@ -191,9 +191,12 @@ explainOptions = lambda x:str(x)
 
 __the_options__ = TheOptions.use_local if (os.environ.get('OPTIONS') == 'use_local') else TheOptions.master_list if (os.environ.get('OPTIONS') == 'master_list') else TheOptions.use_cluster if (os.environ.get('OPTIONS') == 'use_cluster') else TheOptions.use_cosmos0 if (os.environ.get('OPTIONS') == 'use_cosmos0') else TheOptions.use_cosmos1 if (os.environ.get('OPTIONS') == 'use_cosmos1') else TheOptions.use_local
 
+if (__run_mode__ == TheRunMode.prod_dev):
+    __the_options__ = TheOptions.use_local
+
 logger.info('__the_options__ -> {} -> {}'.format(__the_options__, explainOptions(__the_options__)))
 
-is_really_a_string = lambda s:s and len(s)
+is_really_a_string = lambda s:(s is not None) and (len(s) > 0)
 
 access_token = os.environ.get('access_token', __env__.get('access_token'))
 access_token_secret = os.environ.get('access_token_secret', __env__.get('access_token_secret'))
@@ -217,6 +220,16 @@ assert is_really_a_string(mongo_articles_col_name), 'Missing mongo_articles_col_
 assert is_really_a_string(mongo_article_text_col_name), 'Missing mongo_article_text_col_name.'
 assert is_really_a_string(mongo_words_col_name), 'Missing mongo_words_col_name.'
 assert is_really_a_string(mongo_cloud_col_name), 'Missing mongo_cloud_col_name.'
+
+
+mongo_twitterbot_db_name = os.environ.get('mongo_twitterbot_db_name', __env__.get('mongo_twitterbot_db_name'))
+mongo_articles_list_col_name = os.environ.get('mongo_articles_list_col_name', __env__.get('mongo_articles_list_col_name'))
+mongo_articles_plans_col_name = os.environ.get('mongo_articles_plans_col_name', __env__.get('mongo_articles_plans_col_name'))
+
+assert is_really_a_string(mongo_twitterbot_db_name), 'Missing mongo_twitterbot_db_name.'
+
+assert is_really_a_string(mongo_articles_list_col_name), 'Missing mongo_articles_list_col_name.'
+assert is_really_a_string(mongo_articles_plans_col_name), 'Missing mongo_articles_plans_col_name.'
 
 
 plugins = __env__.get('plugins')
@@ -308,6 +321,28 @@ class TwitterPlan():
         return self.__dict__
 
 
+class TwitterBotAccount():
+    def __init__(self, tenant_id=None):
+        self.__tenant_id__ = tenant_id
+        
+    @property
+    def tenant_id(self):
+        return self.__tenant_id__
+    
+    @property
+    def mongo_db_name(self):
+        return mongo_twitterbot_db_name if (is_really_a_string(self.__tenant_id__)) else mongo_db_name
+    
+    @property
+    def mongo_articles_col_name(self):
+        return mongo_articles_list_col_name if (is_really_a_string(self.__tenant_id__)) else mongo_articles_col_name
+    
+    @property
+    def mongo_articles_plan_col_name(self):
+        return mongo_articles_plans_col_name if (is_really_a_string(self.__tenant_id__)) else mongo_articles_plan_col_name
+    
+    
+
 def get_hashtags_for(api, screen_name, count=200, verbose=False, hashtags_dict={}):
     tweets = api.user_timeline(screen_name=screen_name,count=count)
     for tweet in tweets:
@@ -341,6 +376,10 @@ environ = lambda : __env__ if (__the_options__ is not TheOptions.use_cluster) el
 
 __vector__ = {}
 
+twitter_bot_account = TwitterBotAccount(os.environ.get('__tenant__'))
+assert is_really_a_string(twitter_bot_account.tenant_id), 'Missing the twitter_bot_account.tenant_id.'
+
+
 if (__name__ == '__main__'):
     plugins_manager = plugins_handler.PluginManager(plugins, debug=True, logger=logger)
     service_runner = plugins_manager.get_runner()
@@ -361,29 +400,18 @@ if (__name__ == '__main__'):
         logger.info('Backup done.')
 
 
-    if (0):
-        #from vyperlogix.hash.dict import SmartDict
-        
-        def compress_the_rotation(rot):
-            d = {}
-            for r in rot:
-                yyyy_mm_dd = r.split('T')[0]
-                d[yyyy_mm_dd] = d.get(yyyy_mm_dd, 0) + 1
-            return d
-            
-        def compress_the_plans(data):
-            for k,v in data.get('__plans__', {}).items():
-                real_list = v.get('__real_list__', [])
-                v['__the_rotation__'] = compress_the_rotation(v.get('__the_rotation__', []))
-                for doc in real_list:
-                    doc['__the_rotation__'] = compress_the_rotation(doc.get('__the_rotation__', []))
-                print(k)
-        
-        with open('/home/raychorn/projects/python-projects/tweepy-twitter-bot1/json/the_update.json', 'r') as fIn:
-            __json = fIn.read()
-        d1 = json.loads(__json)
-        d2 = compress_the_plans(d1)
-    
+    if (0): # copy articles into the new tenant structure.
+        the_master_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
+
+        removes = ['__rotation__', '__rotation_processor__', 'debug']
+        for anId in the_master_list: # store the article from the master database into the local database. Does nothing if the article exists.
+            item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=anId, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
+            for r in removes:
+                if (r in item.keys()):
+                    del item[r]
+            the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env__, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger, item=item, ts_current_time=None))
+
+
     __backup_executor__ = pooled.BoundedExecutor(1, 5, callback=__backup_callback__)
 
     @executor.threaded(__backup_executor__)
@@ -440,7 +468,7 @@ if (__name__ == '__main__'):
                     logger.info(msg)
                     the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
 
-            the_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
+            the_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger))
             assert len(the_list) > 0, 'Nothing in the list.'
             
             wait_per_choice = secs_until_tomorrow_morning / len(the_list)
@@ -486,7 +514,7 @@ if (__name__ == '__main__'):
                     go_like_own_stuff(runtime=(wait_per_choice - 60))
                     __likes_executor_running__ = True
 
-            the_real_list = service_runner.exec(articles_list, get_the_real_list, **plugins_handler.get_kwargs(the_list=the_list, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=wait_per_choice, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
+            the_real_list = the_list # service_runner.exec(articles_list, get_the_real_list, **plugins_handler.get_kwargs(the_list=the_list, ts_tweeted_time=ts_tweeted_time, tweet_period_secs=wait_per_choice, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
 
             #the_twitter_plan.real_list = the_real_list
             
@@ -502,26 +530,28 @@ if (__name__ == '__main__'):
 
             the_twitter_plan.required_velocity = required_velocity
             wait_per_choice = the_twitter_plan.secs_until_tomorrow_morning / required_velocity
-            if (not (__run_mode__ == TheRunMode.production)):
+            if (__run_mode__ != TheRunMode.production):
                 wait_per_choice = wait_per_choice / 100
-            wait_per_choice = 60 if (wait_per_choice < 60) else wait_per_choice
+            else:
+                wait_per_choice = 60 if (wait_per_choice < 60) else wait_per_choice
             the_twitter_plan.wait_per_choice = wait_per_choice
             
             @interval.timer(wait_per_choice, no_initial_wait=False, run_once=True, blocking=True, logger=logger)
             def issue_tweet(aTimer, **kwargs):
                 random.seed(int(time.time()))
-                the_choice = service_runner.exec(articles_list, get_a_choice, **plugins_handler.get_kwargs(the_list=the_real_list, ts_current_time=ts_current_time, this_process=the_twitter_plan.the_process, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_plan_col_name, logger=logger))
+                the_choice = service_runner.exec(articles_list, get_a_choice, **plugins_handler.get_kwargs(the_list=the_real_list, ts_current_time=ts_current_time, this_process=the_twitter_plan.the_process, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_plan_col_name, logger=logger))
                 if (the_choice is None):
-                    service_runner.exec(articles_list, reset_plans_for_choices, **plugins_handler.get_kwargs(the_list=the_real_list, ts_current_time=ts_current_time, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
-                the_choice = service_runner.exec(articles_list, get_a_choice, **plugins_handler.get_kwargs(the_list=the_real_list, ts_current_time=ts_current_time, this_process=the_twitter_plan.the_process, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_plan_col_name, logger=logger))
+                    service_runner.exec(articles_list, reset_plans_for_choices, **plugins_handler.get_kwargs(the_list=the_real_list, ts_current_time=ts_current_time, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger))
+                the_choice = service_runner.exec(articles_list, get_a_choice, **plugins_handler.get_kwargs(the_list=the_real_list, ts_current_time=ts_current_time, this_process=the_twitter_plan.the_process, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_plan_col_name, logger=logger))
                 assert the_choice, 'Nothing in the list?  Please check.'
                 the_twitter_plan.the_choice = the_choice
                 if (is_production()):
                     the_choice = the_choice.get('_id') if (the_choice is not None) and (not isinstance(the_choice, str)) else the_choice
-                    item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=the_choice, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
+                    item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=the_choice, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger))
                     assert item, 'Did not retrieve an item for {}.'.format(item)
-                    service_runner.exec(twitter_verse, do_the_tweet, **plugins_handler.get_kwargs(api=api, item=item, logger=logger))
-                    the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=the_choice, environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
+                    if (__run_mode__ != TheRunMode.production):
+                        service_runner.exec(twitter_verse, do_the_tweet, **plugins_handler.get_kwargs(api=api, item=item, logger=logger))
+                    the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=the_choice, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
 
                     if (0):
                         msg = 'BEGIN: the_rotation'
@@ -539,7 +569,7 @@ if (__name__ == '__main__'):
                 else:
                     the_rotation = the_choice.get('__rotation__', []) if (the_choice is not None) and (not isinstance(the_choice, str)) else []
                 the_twitter_plan.the_rotation = the_rotation
-                service_runner.exec(articles_list, update_the_plan, **plugins_handler.get_kwargs(the_plan=the_twitter_plan.as_json_serializable(), environ=environ(), mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_plan_col_name, logger=logger, ts_current_time=ts_current_time, the_choice=the_choice))
+                service_runner.exec(articles_list, update_the_plan, **plugins_handler.get_kwargs(the_plan=the_twitter_plan.as_json_serializable(), environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_plan_col_name, logger=logger, ts_current_time=ts_current_time, the_choice=the_choice))
                 
                 backup_last_run = __vector__.get('backup_last_run')
                 if (logger):

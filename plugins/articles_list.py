@@ -15,10 +15,15 @@ from vyperlogix.decorators import args
 
 from vyperlogix.hash.dict import SmartDict
 
+is_really_a_string = lambda s:(s is not None) and (len(s) > 0)
+
 __doy__ = lambda args:date(args[0],args[1],args[2]).timetuple().tm_yday if (len(args) == 3) else None
 doy_from_ts = lambda ts:__doy__([int(s) for s in ts.split('T')[0].split('-')])
 
 get_rotations_from = lambda item:item.get(__rotation__, []) if (isinstance(item.get(__rotation__, []), list)) else []
+
+collection_name = lambda c,t:'{}{}{}'.format(c,'+' if (is_really_a_string(t)) else '', t if (is_really_a_string(t)) else '')
+database_name = lambda db,t:'{}{}{}'.format(db,'+' if (is_really_a_string(t)) else '', t if (is_really_a_string(t)) else '')
         
 class RotationProcessor(dict):
     def __setitem__(self, k, v):
@@ -41,7 +46,7 @@ __rotation__ = '__rotation__'
 __plans__ = '__plans__'
 __rotation_processor__ = '__rotation_processor__'
 
-def __get_the_plan(environ=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None):
+def __get_the_plan(environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None):
     @__with.database(environ=environ)
     def db_get_the_plan(db=None):
         assert vyperapi.is_not_none(db), 'There is no db.'
@@ -50,7 +55,7 @@ def __get_the_plan(environ=None, mongo_db_name=None, mongo_articles_col_name=Non
 
         tb_name = mongo_db_name
         col_name = mongo_articles_col_name
-        table = db[tb_name]
+        table = db[database_name(tb_name, tenant_id)]
         coll = table[col_name]
 
         find_in_collection = lambda c,criteria=criteria:c.find_one() if (not criteria) else c.find_one(criteria)
@@ -61,7 +66,7 @@ def __get_the_plan(environ=None, mongo_db_name=None, mongo_articles_col_name=Non
     return db_get_the_plan()
 
 
-def __store_the_plan(data, environ=None, mongo_db_name=None, mongo_articles_col_name=None, update=None):
+def __store_the_plan(data, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, update=None):
     @__with.database(environ=environ)
     def db_store_the_plan(db=None, data=None):
         assert vyperapi.is_not_none(db), 'There is no db.'
@@ -70,7 +75,7 @@ def __store_the_plan(data, environ=None, mongo_db_name=None, mongo_articles_col_
 
         tb_name = mongo_db_name
         col_name = mongo_articles_col_name
-        table = db[tb_name]
+        table = db[database_name(tb_name, tenant_id)]
         coll = table[col_name]
 
         count = -1
@@ -89,7 +94,7 @@ def __store_the_plan(data, environ=None, mongo_db_name=None, mongo_articles_col_
     return db_store_the_plan(data=data)
 
 
-def __get_articles(_id=None, environ=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None, logger=None):
+def __get_articles(_id=None, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None, logger=None):
     @__with.database(environ=environ)
     def db_get_articles(db=None, _id=None):
         mongo_db_name = environ.get('mongo_db_name')
@@ -100,7 +105,7 @@ def __get_articles(_id=None, environ=None, mongo_db_name=None, mongo_articles_co
 
         tb_name = mongo_db_name
         col_name = mongo_articles_col_name
-        table = db[tb_name]
+        table = db[database_name(tb_name, tenant_id)]
         coll = table[col_name]
 
         find_in_collection = lambda c,criteria=criteria:c.find() if (not criteria) else c.find(criteria)
@@ -136,7 +141,8 @@ def __get_articles(_id=None, environ=None, mongo_db_name=None, mongo_articles_co
 def get_articles(*args, **kwargs):
     pass
 
-def __store_article_data(data, environ=None, mongo_db_name=None, mongo_articles_col_name=None, update=None):
+
+def __store_article_data(data, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, update=None):
     @__with.database(environ=environ)
     def db_store_article_data(db=None, data=None):
         mongo_db_name = environ.get('mongo_db_name')
@@ -147,7 +153,7 @@ def __store_article_data(data, environ=None, mongo_db_name=None, mongo_articles_
 
         tb_name = mongo_db_name
         col_name = mongo_articles_col_name
-        table = db[tb_name]
+        table = db[database_name(tb_name, tenant_id)]
         coll = table[col_name]
 
         count = -1
@@ -219,7 +225,7 @@ def __get_the_real_list(the_list=None, ts_tweeted_time=None, tweet_period_secs=N
 def get_the_real_list(*args, **kwargs):
     pass
 
-def __get_a_choice(the_list=None, ts_current_time=None, this_process={}, environ=None, mongo_db_name=None, mongo_articles_col_name=None, logger=None):
+def __get_a_choice(the_list=None, ts_current_time=None, this_process={}, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, logger=None):
     choice = None
     the_process = []
     assert isinstance(the_list, list), 'Wheres the list?'
@@ -240,7 +246,7 @@ def __get_a_choice(the_list=None, ts_current_time=None, this_process={}, environ
             msg = 'priorities1 has choice {}.'.format(choice)
             logger.info(msg)
         else:
-            the_plan = __get_the_plan(mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, environ=environ)
+            the_plan = __get_the_plan(mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, environ=environ, tenant_id=tenant_id)
 
             if (the_plan):
                 doy = '{}'.format(doy_from_ts(ts_current_time))
@@ -278,8 +284,7 @@ def __get_a_choice(the_list=None, ts_current_time=None, this_process={}, environ
 def get_a_choice(*args, **kwargs):
     pass
 
-#######################################################################
-def __reset_plans_for_choices(the_list=None, ts_current_time=None, environ=None, mongo_db_name=None, mongo_articles_col_name=None, logger=None):
+def __reset_plans_for_choices(the_list=None, ts_current_time=None, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, logger=None):
     choice = None
     assert isinstance(the_list, list), 'Wheres the list?'
     msg = 'the_list - the_list has {} items.'.format(len(the_list))
@@ -289,7 +294,7 @@ def __reset_plans_for_choices(the_list=None, ts_current_time=None, environ=None,
     assert isinstance(mongo_articles_col_name, str), 'Missing the mongo_articles_col_name.'
     logger.info(msg)
     if (len(the_list) > 0):
-        the_plan = __get_the_plan(mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, environ=environ)
+        the_plan = __get_the_plan(mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, environ=environ, tenant_id=tenant_id)
         if (the_plan):
             doy = '{}'.format(doy_from_ts(ts_current_time))
             def has_rotations_now(obj, p=None, reset=False):
@@ -312,14 +317,13 @@ def __reset_plans_for_choices(the_list=None, ts_current_time=None, environ=None,
                 for item in the_list:
                     if (not isinstance(item, str)):
                         has_rotations_now(item, p=the_plan, reset=True)
-                resp = __store_the_plan(the_plan, update=the_plan, environ=environ, mongo_db_name=mongo_db_name,  mongo_articles_col_name=mongo_articles_col_name)
+                resp = __store_the_plan(the_plan, update=the_plan, environ=environ, tenant_id=tenant_id, mongo_db_name=mongo_db_name,  mongo_articles_col_name=mongo_articles_col_name)
                 assert isinstance(resp, int), 'Problem with the response? Expected int value but got {}'.format(resp)
     return choice
 
 @args.kwargs(__reset_plans_for_choices)
 def reset_plans_for_choices(*args, **kwargs):
     pass
-#######################################################################
 
 
 def most_recent_number_of_days(bucket, num_days=30):
@@ -347,38 +351,40 @@ def most_recent_number_of_days(bucket, num_days=30):
     return new_bucket
 
 
-def __update_the_article(item=None, the_choice=None, ts_current_time=None, logger=None, environ={}, mongo_db_name=None, mongo_articles_col_name=None):
+def __update_the_article(item=None, the_choice=None, tenant_id=None, ts_current_time=None, logger=None, environ={}, mongo_db_name=None, mongo_articles_col_name=None):
     assert item, 'Missing item.'
-    assert ts_current_time, 'Missing ts_current_time.'
 
     from vyperlogix.iterators.dict import dictutils
     
     the_update = the_choice
     if (the_choice is not None):
-        the_update = { 'tweeted_time': ts_current_time}
+        the_update = {}
 
-        bucket = get_rotations_from(item)
-        bucket.append(ts_current_time)
-        the_update[__rotation__] = most_recent_number_of_days(bucket, num_days=normalize_int_from_str(os.environ.get('max_days_in_rotations', 5)))
+        if (is_really_a_string(ts_current_time)):
+            the_update = { 'tweeted_time': ts_current_time}
+
+            bucket = get_rotations_from(item)
+            bucket.append(ts_current_time)
+            the_update[__rotation__] = most_recent_number_of_days(bucket, num_days=normalize_int_from_str(os.environ.get('max_days_in_rotations', 5)))
         
-        doy = '{}'.format(doy_from_ts(ts_current_time))
-        
-        the_processor = RotationProcessor(item.get(__rotation_processor__, {}))
-        retirees = []
-        for __item in the_update[__rotation__]:
-            if (len(__item.split('T')) > 1):
-                the_processor[__item] = 1
-                retirees.append(__item)
-        for r in retirees:
-            i = the_update[__rotation__].index(r)
-            del the_update[__rotation__][i]
-        the_update[__rotation_processor__] = the_processor
+            doy = '{}'.format(doy_from_ts(ts_current_time))
+            
+            the_processor = RotationProcessor(item.get(__rotation_processor__, {}))
+            retirees = []
+            for __item in the_update[__rotation__]:
+                if (len(__item.split('T')) > 1):
+                    the_processor[__item] = 1
+                    retirees.append(__item)
+            for r in retirees:
+                i = the_update[__rotation__].index(r)
+                del the_update[__rotation__][i]
+            the_update[__rotation_processor__] = the_processor
 
         msg = 'Updating: id: {}, {}'.format(the_choice, the_update)
         if (logger):
             logger.info(msg)
     the_update = dictutils.bson_cleaner(the_update, returns_json=False)
-    resp = __store_article_data(item, update=the_update, environ=environ, mongo_db_name=mongo_db_name,  mongo_articles_col_name=mongo_articles_col_name)
+    resp = __store_article_data(item, update=the_update, tenant_id=tenant_id, environ=environ, mongo_db_name=mongo_db_name,  mongo_articles_col_name=mongo_articles_col_name)
     assert isinstance(resp, int), 'Problem with the response? Expected int value but got {}'.format(resp)
     print('Update was done.')
     
@@ -389,13 +395,13 @@ def update_the_article(*args, **kwargs):
     pass
 
 
-def __update_the_plan(the_plan=None, ts_current_time=None, the_choice=None, logger=None, environ={}, mongo_db_name=None, mongo_articles_col_name=None):
+def __update_the_plan(the_plan=None, ts_current_time=None, the_choice=None, logger=None, environ={}, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None):
     assert the_plan, 'Missing the_plan.'
     assert ts_current_time, 'Missing ts_current_time.'
     
     from vyperlogix.iterators.dict import dictutils
     
-    plan = __get_the_plan(mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, environ=environ)
+    plan = __get_the_plan(mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, environ=environ, tenant_id=tenant_id)
     plan = plan[0] if (isinstance(plan, list)) else plan
     the_update = { 'updated_time': ts_current_time}
 
@@ -403,7 +409,7 @@ def __update_the_plan(the_plan=None, ts_current_time=None, the_choice=None, logg
     bucket[the_choice.get('_id') if (not isinstance(the_choice, str)) else the_choice] = the_plan
     if (1):
         the_update[__plans__] = bucket
-        resp = __store_the_plan(plan, update=the_update, environ=environ, mongo_db_name=mongo_db_name,  mongo_articles_col_name=mongo_articles_col_name)
+        resp = __store_the_plan(plan, update=the_update, environ=environ, tenant_id=tenant_id, mongo_db_name=mongo_db_name,  mongo_articles_col_name=mongo_articles_col_name)
         assert isinstance(resp, int), 'Problem with the response? Expected int value but got {}'.format(resp)
 
     return the_update.get(__plans__, [])
@@ -411,4 +417,9 @@ def __update_the_plan(the_plan=None, ts_current_time=None, the_choice=None, logg
 @args.kwargs(__update_the_plan)
 def update_the_plan(*args, **kwargs):
     pass
+
+
+#######################################################################
+#######################################################################
+
 
