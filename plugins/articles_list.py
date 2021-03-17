@@ -251,6 +251,8 @@ def __get_a_choice(the_list=None, ts_current_time=None, this_process={}, environ
                             specific = plans.get(obj.get('_id'), {})
                             if (isinstance(specific, dict)):
                                 process = specific.get('__the_rotation__', {})
+                                if (not isinstance(process, dict)):
+                                    process = {}
                                 if (isinstance(process, dict)):
                                     rotations = process.get(doy, {})
                                     if (isinstance(rotations, dict)):
