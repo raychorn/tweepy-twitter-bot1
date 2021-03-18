@@ -29,9 +29,32 @@ default_timestamp = lambda t:t.isoformat().replace(':', '').replace('-','').spli
 is_uppercase = lambda ch:''.join([c for c in str(ch) if c.isupper()])
 
 
+class TheRunMode(enum.Enum):
+    development = 0
+    production = 1
+    prod_dev = 2
+
+
+production_token = 'production'
+development_token = 'development'
+
+__production__ = any([arg == production_token for arg in sys.argv])
+
+__run_mode__ = TheRunMode.production if (__production__) else TheRunMode.development
+
+is_production = lambda : __run_mode__ in [TheRunMode.production, TheRunMode.prod_dev]
+is_simulated_production = lambda : __run_mode__ in [TheRunMode.prod_dev]
+
+__run_mode__ = TheRunMode.prod_dev if (socket.gethostname() == 'DESKTOP-JJ95ENL') else __run_mode__ # Comment this out for production deployment.
+
+production_token = production_token if (is_production()) else development_token
+
+assert (TheRunMode.production if (any([arg == production_token for arg in [production_token]])) else TheRunMode.development) == TheRunMode.production, 'Something wrong with production mode detection.'
+
+
 def get_stream_handler(streamformat="%(asctime)s:%(levelname)s:%(message)s"):
     stream = logging.StreamHandler()
-    stream.setLevel(logging.INFO)
+    stream.setLevel(logging.INFO if (not is_simulated_production()) else logging.DEBUG)
     stream.setFormatter(logging.Formatter(streamformat))
     return stream
 
@@ -45,30 +68,11 @@ def setup_rotating_file_handler(logname, logfile, max_bytes, backup_count):
     return l
 
 
-class TheRunMode(enum.Enum):
-    development = 0
-    production = 1
-    prod_dev = 2
-
-
-production_token = 'production'
-
-__production__ = any([arg == production_token for arg in sys.argv])
-
-__run_mode__ = TheRunMode.production if (__production__) else TheRunMode.development
-
-is_production = lambda : __run_mode__ in [TheRunMode.production, TheRunMode.prod_dev]
-is_simulated_production = lambda : __run_mode__ in [TheRunMode.prod_dev]
-
-__run_mode__ = TheRunMode.prod_dev if (socket.gethostname() == 'DESKTOP-JJ95ENL') else __run_mode__ # Comment this out for production deployment.
-
-production_token = production_token if (is_production()) else 'development'
-
-assert (TheRunMode.production if (any([arg == production_token for arg in [production_token]])) else TheRunMode.development) == TheRunMode.production, 'Something wrong with production mode detection.'
 
 base_filename = os.path.splitext(os.path.basename(__file__))[0]
 
-log_filename = '{}{}{}{}{}{}{}_{}.log'.format('logs', os.sep, base_filename, os.sep, production_token, os.sep, base_filename, default_timestamp(datetime.utcnow()))
+log_filename = '{}{}{}{}{}{}{}_{}.log'.format('logs', os.sep, base_filename, os.sep, production_token if (not is_simulated_production()) else development_token, os.sep, base_filename, default_timestamp(datetime.utcnow()))
+log_filename = os.sep.join([os.path.dirname(__file__), log_filename])
 
 if not os.path.exists(os.path.dirname(log_filename)):
     os.makedirs(os.path.dirname(log_filename))
@@ -78,7 +82,7 @@ if (os.path.exists(log_filename)):
 
 log_format = ('[%(asctime)s] %(levelname)-8s %(name)-12s %(message)s')
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.DEBUG if (is_simulated_production()) else logging.INFO,
     format=log_format,
     filename=(log_filename),
 )
@@ -86,6 +90,12 @@ logging.basicConfig(
 logger = setup_rotating_file_handler(base_filename, log_filename, (1024*1024*1024), 10)
 logger.addHandler(get_stream_handler())
 
+if (is_simulated_production()):
+    import shutil
+    log_root = os.path.dirname(os.path.dirname(log_filename))
+    for p in [production_token, development_token]:
+        fp = os.sep.join([log_root, p])
+        shutil.rmtree(fp)
 
 twitter_verse = 'twitter_verse'
 get_api = 'get_api'
@@ -532,7 +542,7 @@ if (__name__ == '__main__'):
             the_twitter_plan.required_velocity = required_velocity
             wait_per_choice = the_twitter_plan.secs_until_tomorrow_morning / required_velocity
             if (is_simulated_production()):
-                wait_per_choice = wait_per_choice / 100
+                wait_per_choice = 1
             else:
                 wait_per_choice = 60 if (wait_per_choice < 60) else wait_per_choice
             the_twitter_plan.wait_per_choice = wait_per_choice
@@ -552,6 +562,9 @@ if (__name__ == '__main__'):
                     assert item, 'Did not retrieve an item for {}.'.format(item)
                     if (not is_simulated_production()):
                         service_runner.exec(twitter_verse, do_the_tweet, **plugins_handler.get_kwargs(api=api, item=item, logger=logger))
+                    else:
+                        if (logger):
+                            logger.debug('Simulated Tweet: {}'.format(item.get('_id'), item.get('description')))
                     the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=the_choice, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
                 else:
                     the_rotation = the_choice.get('__rotation__', []) if (the_choice is not None) and (not isinstance(the_choice, str)) else []
