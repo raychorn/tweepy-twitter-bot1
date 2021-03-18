@@ -58,6 +58,7 @@ __production__ = any([arg == production_token for arg in sys.argv])
 __run_mode__ = TheRunMode.production if (__production__) else TheRunMode.development
 
 is_production = lambda : __run_mode__ in [TheRunMode.production, TheRunMode.prod_dev]
+is_simulated_production = lambda : __run_mode__ in [TheRunMode.prod_dev]
 
 __run_mode__ = TheRunMode.prod_dev if (socket.gethostname() == 'DESKTOP-JJ95ENL') else __run_mode__ # Comment this out for production deployment.
 
@@ -264,7 +265,7 @@ class TwitterPlan():
     def real_list(self, items):
         ts = _utils.timeStamp(offset=0, use_iso=True)
         keys = sorted(self.__real_list__.keys(), key=lambda k:datetime.fromisoformat(k), reverse=True)
-        n = 100 if (__run_mode__ == TheRunMode.production) else 5
+        n = 100 if (is_production()) else 5
         if (len(keys) > n):
             del self.__real_list__[keys[0]]
         self.__real_list__[ts] = items
@@ -530,7 +531,7 @@ if (__name__ == '__main__'):
 
             the_twitter_plan.required_velocity = required_velocity
             wait_per_choice = the_twitter_plan.secs_until_tomorrow_morning / required_velocity
-            if (__run_mode__ != TheRunMode.production):
+            if (is_simulated_production()):
                 wait_per_choice = wait_per_choice / 100
             else:
                 wait_per_choice = 60 if (wait_per_choice < 60) else wait_per_choice
@@ -549,23 +550,9 @@ if (__name__ == '__main__'):
                     the_choice = the_choice.get('_id') if (the_choice is not None) and (not isinstance(the_choice, str)) else the_choice
                     item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=the_choice, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger))
                     assert item, 'Did not retrieve an item for {}.'.format(item)
-                    if (__run_mode__ != TheRunMode.production):
+                    if (not is_simulated_production()):
                         service_runner.exec(twitter_verse, do_the_tweet, **plugins_handler.get_kwargs(api=api, item=item, logger=logger))
                     the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=the_choice, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
-
-                    if (0):
-                        msg = 'BEGIN: the_rotation'
-                        logger.info(msg)
-                        
-                        for v in the_rotation:
-                            msg = '\t{}'.format(v)
-                            logger.info(msg)
-                        msg = 'END!!! the_rotation'
-                        logger.info(msg)
-                        print('\n'*2)
-                        if (api.is_rate_limit_blown):
-                            if (logger):
-                                logger.warning('Twitter rate limit was blown. Halting to sleep then begin again.')
                 else:
                     the_rotation = the_choice.get('__rotation__', []) if (the_choice is not None) and (not isinstance(the_choice, str)) else []
                 the_twitter_plan.the_rotation = the_rotation
