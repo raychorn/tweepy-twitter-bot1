@@ -95,7 +95,8 @@ if (is_simulated_production()):
     log_root = os.path.dirname(os.path.dirname(log_filename))
     for p in [production_token, development_token]:
         fp = os.sep.join([log_root, p])
-        shutil.rmtree(fp)
+        if (os.path.exists(fp)):
+            shutil.rmtree(fp)
 
 twitter_verse = 'twitter_verse'
 get_api = 'get_api'
