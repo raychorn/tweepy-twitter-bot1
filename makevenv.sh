@@ -9,27 +9,6 @@ DIR0="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 ARRAY=()
 
-qsort() {
-    local pivot i smaller=() larger=()
-    qsort_ret=()
-    (($#==0)) && return 0
-    pivot=$1
-    shift
-    for i; do
-        # This sorts strings lexicographically.
-        if [[ $i < $pivot ]]; then
-            smaller+=( "$i" )
-        else
-            larger+=( "$i" )
-        fi
-    done
-    qsort "${smaller[@]}"
-    smaller=( "${qsort_ret[@]}" )
-    qsort "${larger[@]}"
-    larger=( "${qsort_ret[@]}" )
-    qsort_ret=( "${smaller[@]}" "$pivot" "${larger[@]}" )
-}
-
 find_python(){
     pythons=$1
     PYTHONS=$(whereis $pythons)
@@ -43,31 +22,53 @@ find_python(){
 }
 
 python39=$(which python3.9)
+
+if [[ -f $python39 ]]
+then
+    echo "Found $python39"
+else
+    echo "Installing python3.9"
+    apt update -y
+    apt install software-properties-common -y
+    echo -ne '\n' | add-apt-repository ppa:deadsnakes/ppa
+    apt install python3.9 -y
+	apt install python3.9-distutils -y
+fi
+
+python39=$(which python3.9)
 pip3=.
 
 if [[ -f $python39 ]]
 then
-    GETPIP=$DIR0/get-pip.py
-
-    if [[ -f $GETPIP ]]
+    pip_local=$LOCAL_BIN/pip3
+    if [[ -f $pip_local ]]
     then
-        $python39 $GETPIP
+        echo "Found $pip_local"
         export PATH=$LOCAL_BIN:$PATH
-        pip3=$(which pip3)
+    else
+        GETPIP=$DIR0/get-pip.py
+
+        if [[ -f $GETPIP ]]
+        then
+            $python39 $GETPIP
+            export PATH=$LOCAL_BIN:$PATH
+            pip3=$(which pip3)
+            if [[ -f $pip3 ]]
+            then
+                $pip3 install --upgrade setuptools
+            fi
+        fi
+
         if [[ -f $pip3 ]]
         then
             $pip3 install --upgrade setuptools
+            $pip3 install --upgrade pip
         fi
-    fi
-
-    if [[ -f $pip3 ]]
-    then
-        $pip3 install --upgrade setuptools
-        $pip3 install --upgrade pip
     fi
 fi
 
 pip3=$(which pip3)
+echo "pip3 is $pip3"
 
 if [[ -f $pip3 ]]
 then
@@ -76,23 +77,41 @@ fi
 
 find_python python
 
-apt-get install wget -y
-wget https://github.com/pyston/pyston/releases/download/v2.1/pyston_2.1_20.04.deb
+pyston="/usr/bin/pyston3.8"
 
-pyston_deb="$DIR0/pyston_2.1_20.04.deb"
-if [[ -f $pyston_deb ]]
+if [[ -f $pyston ]]
 then
-    apt install $pyston_deb -y
-    rm -f $pyston_deb
+    echo "Found $pyston"
+else
+    apt-get install wget -y
+    wget https://github.com/pyston/pyston/releases/download/v2.1/pyston_2.1_20.04.deb
+
+    pyston_deb="$DIR0/pyston_2.1_20.04.deb"
+    if [[ -f $pyston_deb ]]
+    then
+        apt install $pyston_deb -y
+        rm -f $pyston_deb
+    fi
 fi
 
 find_python pyston
 
-qsort "${ARRAY[@]}"
+echo ${ARRAY[@]}
+v=$($python39 sort.py "${ARRAY[@]}")
+echo "Use this -> $v"
+ARRAY=()
+ARRAY2=()
+for val in $v; do
+    ARRAY+=($val)
+    x=$($val -c 'import sys; i=sys.version_info; print("{}.{}.{}".format(i.major,i.minor,i.micro))')
+    ARRAY2+=("$val $x")
+done
+echo ${ARRAY[@]}
+echo ${ARRAY2[@]}
 
 PS3="Choose: "
 
-select option in "${ARRAY[@]}";
+select option in "${ARRAY2[@]}";
 do
     echo "Selected number: $REPLY"
     choice=${ARRAY[$REPLY-1]}
