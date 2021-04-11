@@ -1,0 +1,2 @@
+0 0 * * * /home/ubuntu/tweepy-twitter-bot1/scripts/cron-job.sh >> /home/ubuntu/tweepy-twitter-bot1/scripts/cron-job.log 2>&1
+0 1 * * * /home/ubuntu/tweepy-twitter-bot1/scripts/truncate-cron-log.sh
