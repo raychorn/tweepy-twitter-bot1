@@ -68,11 +68,18 @@ def setup_rotating_file_handler(logname, logfile, max_bytes, backup_count):
     return l
 
 
-
 base_filename = os.path.splitext(os.path.basename(__file__))[0]
 
 log_filename = '{}{}{}{}{}{}{}_{}.log'.format('logs', os.sep, base_filename, os.sep, production_token if (not is_simulated_production()) else development_token, os.sep, base_filename, default_timestamp(datetime.utcnow()))
 log_filename = os.sep.join([os.path.dirname(__file__), log_filename])
+
+if (is_simulated_production()):
+    import shutil
+    log_root = os.path.dirname(os.path.dirname(log_filename))
+    for p in [production_token, development_token]:
+        fp = os.sep.join([log_root, p])
+        if (os.path.exists(fp)):
+            shutil.rmtree(fp)
 
 if not os.path.exists(os.path.dirname(log_filename)):
     os.makedirs(os.path.dirname(log_filename))
@@ -91,15 +98,6 @@ logger = setup_rotating_file_handler(base_filename, log_filename, (1024*1024*102
 logger.addHandler(get_stream_handler())
 
 json_path = os.sep.join([os.path.dirname(__file__), 'json', '{}_tweet-stats.json'.format(base_filename)])
-
-if (0):
-    if (is_simulated_production()):
-        import shutil
-        log_root = os.path.dirname(os.path.dirname(log_filename))
-        for p in [production_token, development_token]:
-            fp = os.sep.join([log_root, p])
-            if (os.path.exists(fp)):
-                shutil.rmtree(fp)
 
 twitter_verse = 'twitter_verse'
 get_api = 'get_api'
@@ -398,7 +396,7 @@ __tweet_stats__ = {}
 
 def save_tweet_stats(fp, data):
     with open(fp, 'w') as fOut:
-        json.dump(fOut, data, indent=3)
+        print(json.dumps(data, indent=3), file=fOut)
 
 
 if (__name__ == '__main__'):
@@ -573,11 +571,11 @@ if (__name__ == '__main__'):
                     if (not is_simulated_production()):
                         service_runner.exec(twitter_verse, do_the_tweet, **plugins_handler.get_kwargs(api=api, item=item, logger=logger))
                     else:
-                        __tweet_stats__[item.get('_id')] = __tweet_stats__.get(item.get('_id'), {})
-                        __tweet_stats__[item.get('_id')][ts_current_time] = __tweet_stats__[item.get('_id')].get(ts_current_time, 0) + 1
+                        __tweet_stats__[the_choice] = __tweet_stats__.get(the_choice, {})
+                        __tweet_stats__[the_choice][ts_current_time] = __tweet_stats__[the_choice].get(ts_current_time, 0) + 1
                         save_tweet_stats(json_path, __tweet_stats__)
                         if (logger):
-                            logger.debug('Simulated Tweet: {} -> {}'.format(item.get('_id'), item.get('name')))
+                            logger.debug('Simulated Tweet: {} -> {}'.format(the_choice, item.get('name')))
                     the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=the_choice, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
                 else:
                     the_rotation = the_choice.get('__rotation__', []) if (the_choice is not None) and (not isinstance(the_choice, str)) else []
@@ -615,8 +613,9 @@ if (__name__ == '__main__'):
             for l in traceback.format_exception(extype, ex, tb):
                 logger.error(l.rstrip())
             sys.exit()
-        if (api.is_rate_limit_blown):
-            if (logger):
-                logger.warning('Twitter rate limit was blown. Restarting after sleeping...')
-            time.sleep(3600)
-            api = service_runner.exec(twitter_verse, get_api, **plugins_handler.get_kwargs(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger))
+        if (not is_simulated_production()):
+            if (api.is_rate_limit_blown):
+                if (logger):
+                    logger.warning('Twitter rate limit was blown. Restarting after sleeping...')
+                time.sleep(3600)
+                api = service_runner.exec(twitter_verse, get_api, **plugins_handler.get_kwargs(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger))
