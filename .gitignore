@@ -133,3 +133,5 @@ tweepy-bot1.py
 #specific json files
 plan.json
 the_update.json
+
+*.deb

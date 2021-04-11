@@ -3,7 +3,32 @@
 VENV=.venv
 REQS=./requirements.txt
 
+LOCAL_BIN=~/.local/bin
+
+DIR0="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
 ARRAY=()
+
+qsort() {
+    local pivot i smaller=() larger=()
+    qsort_ret=()
+    (($#==0)) && return 0
+    pivot=$1
+    shift
+    for i; do
+        # This sorts strings lexicographically.
+        if [[ $i < $pivot ]]; then
+            smaller+=( "$i" )
+        else
+            larger+=( "$i" )
+        fi
+    done
+    qsort "${smaller[@]}"
+    smaller=( "${qsort_ret[@]}" )
+    qsort "${larger[@]}"
+    larger=( "${qsort_ret[@]}" )
+    qsort_ret=( "${smaller[@]}" "$pivot" "${larger[@]}" )
+}
 
 find_python(){
     pythons=$1
@@ -17,8 +42,52 @@ find_python(){
     done
 }
 
+python39=$(which python3.9)
+pip3=.
+
+if [[ -f $python39 ]]
+then
+    GETPIP=$DIR0/get-pip.py
+
+    if [[ -f $GETPIP ]]
+    then
+        $python39 $GETPIP
+        export PATH=$LOCAL_BIN:$PATH
+        pip3=$(which pip3)
+        if [[ -f $pip3 ]]
+        then
+            $pip3 install --upgrade setuptools
+        fi
+    fi
+
+    if [[ -f $pip3 ]]
+    then
+        $pip3 install --upgrade setuptools
+        $pip3 install --upgrade pip
+    fi
+fi
+
+pip3=$(which pip3)
+
+if [[ -f $pip3 ]]
+then
+    $pip3 install --upgrade setuptools
+fi
+
 find_python python
+
+apt-get install wget -y
+wget https://github.com/pyston/pyston/releases/download/v2.1/pyston_2.1_20.04.deb
+
+pyston_deb="pyston_2.1_20.04.deb"
+if [[ -f $pyston_deb ]]
+then
+    apt install $pyston_deb -y
+fi
+
 find_python pyston
+
+qsort "${ARRAY[@]}"
 
 PS3="Choose: "
 
@@ -51,6 +120,7 @@ fi
 if [[ -d $VENV ]]
 then
     . ./$VENV/bin/activate
+    pip install --upgrade setuptools
     pip install --upgrade pip
 
     if [[ -f $REQS ]]
