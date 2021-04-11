@@ -73,6 +73,8 @@ echo "pip3 is $pip3"
 if [[ -f $pip3 ]]
 then
     $pip3 install --upgrade setuptools
+    $pip3 install virtualenv
+    $pip3 install --upgrade virtualenv
 fi
 
 find_python python
