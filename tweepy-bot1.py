@@ -90,13 +90,16 @@ logging.basicConfig(
 logger = setup_rotating_file_handler(base_filename, log_filename, (1024*1024*1024), 10)
 logger.addHandler(get_stream_handler())
 
-if (is_simulated_production()):
-    import shutil
-    log_root = os.path.dirname(os.path.dirname(log_filename))
-    for p in [production_token, development_token]:
-        fp = os.sep.join([log_root, p])
-        if (os.path.exists(fp)):
-            shutil.rmtree(fp)
+json_path = os.sep.join([os.path.dirname(__file__), 'json', '{}_tweet-stats.json'.format(base_filename)])
+
+if (0):
+    if (is_simulated_production()):
+        import shutil
+        log_root = os.path.dirname(os.path.dirname(log_filename))
+        for p in [production_token, development_token]:
+            fp = os.sep.join([log_root, p])
+            if (os.path.exists(fp)):
+                shutil.rmtree(fp)
 
 twitter_verse = 'twitter_verse'
 get_api = 'get_api'
@@ -391,6 +394,12 @@ __vector__ = {}
 twitter_bot_account = TwitterBotAccount(os.environ.get('__tenant__'))
 assert is_really_a_string(twitter_bot_account.tenant_id), 'Missing the twitter_bot_account.tenant_id.'
 
+__tweet_stats__ = {}
+
+def save_tweet_stats(fp, data):
+    with open(fp, 'w') as fOut:
+        json.dump(fOut, data, indent=3)
+
 
 if (__name__ == '__main__'):
     plugins_manager = plugins_handler.PluginManager(plugins, debug=True, logger=logger)
@@ -564,6 +573,9 @@ if (__name__ == '__main__'):
                     if (not is_simulated_production()):
                         service_runner.exec(twitter_verse, do_the_tweet, **plugins_handler.get_kwargs(api=api, item=item, logger=logger))
                     else:
+                        __tweet_stats__[item.get('_id')] = __tweet_stats__.get(item.get('_id'), {})
+                        __tweet_stats__[item.get('_id')][ts_current_time] = __tweet_stats__[item.get('_id')].get(ts_current_time, 0) + 1
+                        save_tweet_stats(json_path, __tweet_stats__)
                         if (logger):
                             logger.debug('Simulated Tweet: {} -> {}'.format(item.get('_id'), item.get('name')))
                     the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=the_choice, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
