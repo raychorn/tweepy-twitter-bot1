@@ -79,10 +79,11 @@ find_python python
 apt-get install wget -y
 wget https://github.com/pyston/pyston/releases/download/v2.1/pyston_2.1_20.04.deb
 
-pyston_deb="pyston_2.1_20.04.deb"
+pyston_deb="$DIR0/pyston_2.1_20.04.deb"
 if [[ -f $pyston_deb ]]
 then
     apt install $pyston_deb -y
+    rm -f $pyston_deb
 fi
 
 find_python pyston
