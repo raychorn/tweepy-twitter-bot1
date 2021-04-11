@@ -565,7 +565,7 @@ if (__name__ == '__main__'):
                         service_runner.exec(twitter_verse, do_the_tweet, **plugins_handler.get_kwargs(api=api, item=item, logger=logger))
                     else:
                         if (logger):
-                            logger.debug('Simulated Tweet: {}'.format(item.get('_id'), item.get('description')))
+                            logger.debug('Simulated Tweet: {} -> {}'.format(item.get('_id'), item.get('name')))
                     the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=the_choice, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
                 else:
                     the_rotation = the_choice.get('__rotation__', []) if (the_choice is not None) and (not isinstance(the_choice, str)) else []
