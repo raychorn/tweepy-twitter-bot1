@@ -113,6 +113,9 @@ get_articles = 'get_articles'
 get_a_choice = 'get_a_choice'
 get_more_followers = 'get_more_followers'
 reset_plans_for_choices = 'reset_plans_for_choices'
+reset_article_plans = 'reset_article_plans'
+twitterbot_accounts = 'twitterbot_accounts'
+get_account_id = 'get_account_id'
 
 
 word_cloud = 'word_cloud'
@@ -238,6 +241,7 @@ assert is_really_a_string(mongo_cloud_col_name), 'Missing mongo_cloud_col_name.'
 mongo_twitterbot_db_name = os.environ.get('mongo_twitterbot_db_name', __env__.get('mongo_twitterbot_db_name'))
 mongo_articles_list_col_name = os.environ.get('mongo_articles_list_col_name', __env__.get('mongo_articles_list_col_name'))
 mongo_articles_plans_col_name = os.environ.get('mongo_articles_plans_col_name', __env__.get('mongo_articles_plans_col_name'))
+mongo_twitterbot_account_col_name = os.environ.get('mongo_twitterbot_account_col_name', __env__.get('mongo_twitterbot_account_col_name'))
 
 assert is_really_a_string(mongo_twitterbot_db_name), 'Missing mongo_twitterbot_db_name.'
 
@@ -335,11 +339,47 @@ class TwitterPlan():
 
 
 class TwitterBotAccount():
-    def __init__(self, tenant_id=None):
+    def __init__(self, tenant_id=None, service_runner=None, environ=None, logger=None):
+        self.__logger__ = logger
         self.__tenant_id__ = tenant_id
+        self.__environ__ = environ
+        self.__service_runner__ = service_runner
+        self.__account_cache__ = {}
         
     @property
+    def account_cache(self):
+        return self.__account_cache__
+    
+    @property
+    def logger(self):
+        return self.__logger__
+    
+    @logger.setter
+    def logger(self, value):
+        self.__logger__ = value
+
+    @property
+    def service_runner(self):
+        return self.__service_runner__
+    
+    @service_runner.setter
+    def service_runner(self, value):
+        self.__service_runner__ = value
+
+    @property
+    def environ(self):
+        return self.__environ__
+    
+    @environ.setter
+    def environ(self, value):
+        self.__environ__ = value
+
+    @property
     def tenant_id(self):
+        __id = self.account_cache.get(self.__tenant_id__)
+        if (not is_really_something(__id, str)):
+            the_id = self.service_runner.exec(twitterbot_accounts, get_account_id, **plugins_handler.get_kwargs(environ=self.environ, tenant_id=self.__tenant_id__, mongo_db_name=self.mongo_db_name, mongo_col_name=mongo_twitterbot_account_col_name, logger=logger))
+            print('the_id -> {}'.format(the_id))
         return self.__tenant_id__
     
     @property
@@ -389,19 +429,39 @@ environ = lambda : __env__ if (__the_options__ is not TheOptions.use_cluster) el
 
 __vector__ = {}
 
-twitter_bot_account = TwitterBotAccount(os.environ.get('__tenant__'))
-assert is_really_a_string(twitter_bot_account.tenant_id), 'Missing the twitter_bot_account.tenant_id.'
+twitter_bot_account = TwitterBotAccount(tenant_id=os.environ.get('__tenant__'), logger=logger)
 
 __tweet_stats__ = {}
 
-def save_tweet_stats(fp, data):
-    with open(fp, 'w') as fOut:
-        print(json.dumps(data, indent=3), file=fOut)
+def save_tweet_stats(fp, data, logger=None):
+    try:
+        with open(fp, 'w') as fOut:
+            print(json.dumps(data, indent=3), file=fOut)
+        file_tags = [''] + [int(n+1) for n in range(0,5)]
+        file_parts = os.path.splitext(fp)
+        new_filename = file_parts[0]+str(file_tags[-1]) + file_parts[-1]
+        if (os.path.exists(new_filename)):
+            os.remove(new_filename)
+        for ft in file_tags:
+            old_filename = file_parts[0]+str(ft) + file_parts[-1]
+            new_filename = file_parts[0]+str(ft+1 if (isinstance(ft, int)) else 1) + file_parts[-1]
+            if (os.path.exists(old_filename)):
+                os.rename(old_filename, new_filename)
+    except Exception as ex:
+        extype, ex, tb = sys.exc_info()
+        for l in traceback.format_exception(extype, ex, tb):
+            logger.error(l.rstrip())
+    return
 
 
 if (__name__ == '__main__'):
     plugins_manager = plugins_handler.PluginManager(plugins, debug=True, logger=logger)
     service_runner = plugins_manager.get_runner()
+    
+    twitter_bot_account.service_runner = service_runner
+    twitter_bot_account.environ = __env__ if (is_simulated_production() or (__the_options__ == TheOptions.use_local)) else __env2__ if (__the_options__ == TheOptions.use_cluster) else __env3__ if (__the_options__ == TheOptions.use_cosmos0) else None
+
+    assert is_really_a_string(twitter_bot_account.tenant_id), 'Missing the twitter_bot_account.tenant_id.'
     
     __followers_executor_running__ = True #not __production__
     __likes_executor_running__ = True #not __production__
@@ -417,6 +477,10 @@ if (__name__ == '__main__'):
     
     def __backup_callback__(*args, **kwargs):
         logger.info('Backup done.')
+
+
+    if (is_simulated_production()):
+        the_plan = service_runner.exec(articles_list, reset_article_plans, **plugins_handler.get_kwargs(environ=__env__, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_plan_col_name, logger=logger))
 
 
     if (0): # copy articles into the new tenant structure.
@@ -573,7 +637,7 @@ if (__name__ == '__main__'):
                     else:
                         __tweet_stats__[the_choice] = __tweet_stats__.get(the_choice, {})
                         __tweet_stats__[the_choice][ts_current_time] = __tweet_stats__[the_choice].get(ts_current_time, 0) + 1
-                        save_tweet_stats(json_path, __tweet_stats__)
+                        save_tweet_stats(json_path, __tweet_stats__, logger=logger)
                         if (logger):
                             logger.debug('Simulated Tweet: {} -> {}'.format(the_choice, item.get('name')))
                     the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=the_choice, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))

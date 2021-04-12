@@ -46,6 +46,7 @@ __rotation__ = '__rotation__'
 __plans__ = '__plans__'
 __rotation_processor__ = '__rotation_processor__'
 
+
 def __get_the_plan(environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None):
     @__with.database(environ=environ)
     def db_get_the_plan(db=None):
@@ -64,6 +65,22 @@ def __get_the_plan(environ=None, tenant_id=None, mongo_db_name=None, mongo_artic
             callback(coll=coll, doc=doc)
         return doc
     return db_get_the_plan()
+
+
+
+def __reset_the_plans(environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, callback=None, logger=None):
+    def handle_the_doc(coll=None, doc=None):
+        print('{} -> {}'.format(coll, doc))
+    the_plan = __get_the_plan(mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, environ=environ, tenant_id=tenant_id, callback=handle_the_doc)
+
+    return the_plan
+
+
+
+@args.kwargs(__reset_the_plans)
+def reset_article_plans(*args, **kwargs):
+    pass
+
 
 
 def __store_the_plan(data, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, update=None):
