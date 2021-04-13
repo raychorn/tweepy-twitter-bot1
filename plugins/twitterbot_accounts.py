@@ -7,6 +7,33 @@ from vyperlogix.decorators import __with
 from vyperlogix.decorators import args
 
 
+def __store_the_account(data, environ=None, tenant_id=None, mongo_db_name=None, mongo_col_name=None, update=None):
+    @__with.database(environ=environ)
+    def db_store_the_account(db=None, data=None):
+        assert vyperapi.is_not_none(db), 'There is no db.'
+        assert vyperapi.is_not_none(mongo_db_name), 'There is no mongo_db_name.'
+        assert vyperapi.is_not_none(mongo_col_name), 'There is no mongo_col_name.'
+
+        tb_name = mongo_db_name
+        col_name = mongo_col_name
+        table = db[tb_name]
+        coll = table[col_name]
+
+        count = -1
+        if (data):
+            _id = data.get('_id')
+            if (_id) and (update is not None):
+                update['updated_time'] = datetime.utcnow()
+                newvalue = { "$set": update }
+                coll.update_one({'_id': _id}, newvalue)
+        else:
+            update['created_time'] = datetime.utcnow()
+            coll.insert_one(update)
+
+        count = coll.count_documents({})
+        return count
+    return db_store_the_account(data=data)
+
 
 def __get_account_id(environ=None, tenant_id=None, mongo_db_name=None, mongo_col_name=None, criteria=None, callback=None, logger=None):
     @__with.database(environ=environ)
