@@ -47,10 +47,13 @@ def __get_account_id(environ=None, tenant_id=None, mongo_db_name=None, mongo_col
         table = db[tb_name]
         coll = table[col_name]
 
+        __data__ = {'uuid': tenant_id}
         find_in_collection = lambda c,criteria=criteria:c.find_one() if (not criteria) else c.find_one(criteria)
-        doc = find_in_collection(coll, criteria={'uuid': tenant_id})
+        doc = find_in_collection(coll, criteria=__data__)
         if (callable(callback)):
             callback(coll=coll, doc=doc)
+        elif (doc is None):
+            cnt = __store_the_account(__data__, environ=environ, tenant_id=tenant_id, mongo_db_name=mongo_db_name, mongo_col_name=mongo_col_name)
         return doc
     return db_get_account_id()
 
