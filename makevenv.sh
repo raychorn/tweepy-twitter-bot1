@@ -62,6 +62,7 @@ then
             vers=$(echo "$TARGET_PY.$i")
             echo "6. Installing $vers"
             pyenv install $vers
+            pyenv local $vers
             break
         fi
         echo "";
@@ -132,7 +133,8 @@ then
     fi
 fi
 
-virtualenv=$(which virtualenv)
+#virtualenv=$(which virtualenv)
+virtualenv=/usr/local/bin/virtualenv
 echo "15. virtualenv is $virtualenv"
 
 if [[ -f $virtualenv ]]
@@ -188,7 +190,10 @@ version=$($choice --version)
 echo "Use this -> $choice --> $version"
 
 v=$($choice -c 'import sys; i=sys.version_info; print("{}{}{}".format(i.major,i.minor,i.micro))')
-echo "Use this -> $choice --> $v"
+vv=$($choice -c 'import sys; i=sys.version_info; print("{}.{}.{}".format(i.major,i.minor,i.micro))')
+echo "Use this -> $choice --> $v -> $vv"
+
+pyenv local $vv > /dev/null 2>&1
 
 VENV=$VENV$v
 echo "VENV -> $VENV"
