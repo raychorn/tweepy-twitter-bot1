@@ -376,10 +376,16 @@ class TwitterBotAccount():
 
     @property
     def tenant_id(self):
+        from bson.objectid import ObjectId
+        
         __id = self.account_cache.get(self.__tenant_id__)
         if (not is_really_something(__id, str)):
-            the_id = self.service_runner.exec(twitterbot_accounts, get_account_id, **plugins_handler.get_kwargs(environ=self.environ, tenant_id=self.__tenant_id__, mongo_db_name=self.mongo_db_name, mongo_col_name=mongo_twitterbot_account_col_name, logger=logger))
-            print('the_id -> {}'.format(the_id))
+            doc = self.service_runner.exec(twitterbot_accounts, get_account_id, **plugins_handler.get_kwargs(environ=self.environ, tenant_id=self.__tenant_id__, mongo_db_name=self.mongo_db_name, mongo_col_name=mongo_twitterbot_account_col_name, logger=logger))
+            __id = doc.get("_id")
+            if (isinstance(__id, ObjectId)):
+                self.account_cache[self.__tenant_id__] = doc
+            else:
+                return None
         return self.__tenant_id__
     
     @property

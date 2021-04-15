@@ -26,7 +26,13 @@ def __store_the_account(data, environ=None, tenant_id=None, mongo_db_name=None, 
                 update['updated_time'] = datetime.utcnow()
                 newvalue = { "$set": update }
                 coll.update_one({'_id': _id}, newvalue)
-        else:
+            elif (update is not None):
+                update['created_time'] = datetime.utcnow()
+                coll.insert_one(update)
+            elif (data is not None):
+                data['created_time'] = datetime.utcnow()
+                coll.insert_one(data)
+        elif (update is not None):
             update['created_time'] = datetime.utcnow()
             coll.insert_one(update)
 
@@ -54,6 +60,8 @@ def __get_account_id(environ=None, tenant_id=None, mongo_db_name=None, mongo_col
             callback(coll=coll, doc=doc)
         elif (doc is None):
             cnt = __store_the_account(__data__, environ=environ, tenant_id=tenant_id, mongo_db_name=mongo_db_name, mongo_col_name=mongo_col_name)
+            if (cnt > 0):
+                doc = find_in_collection(coll, criteria=__data__)
         return doc
     return db_get_account_id()
 
