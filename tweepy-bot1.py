@@ -378,15 +378,26 @@ class TwitterBotAccount():
     def tenant_id(self):
         from bson.objectid import ObjectId
         
-        __id = self.account_cache.get(self.__tenant_id__)
-        if (not is_really_something(__id, str)):
+        doc = self.account_cache.get(self.__tenant_id__)
+        __id = doc.get("_id") if (doc) else None
+        if (not isinstance(__id, ObjectId)):
             doc = self.service_runner.exec(twitterbot_accounts, get_account_id, **plugins_handler.get_kwargs(environ=self.environ, tenant_id=self.__tenant_id__, mongo_db_name=self.mongo_db_name, mongo_col_name=mongo_twitterbot_account_col_name, logger=logger))
-            __id = doc.get("_id")
+            __id = doc.get("_id") if (doc) else None
             if (isinstance(__id, ObjectId)):
                 self.account_cache[self.__tenant_id__] = doc
             else:
                 return None
         return self.__tenant_id__
+    
+    @property
+    def account(self):
+        from bson.objectid import ObjectId
+        
+        doc = self.account_cache.get(self.__tenant_id__, {})
+        __id = doc.get("_id") if (doc) else None
+        if (isinstance(__id, ObjectId)):
+            return doc
+        return None
     
     @property
     def mongo_db_name(self):
@@ -395,6 +406,10 @@ class TwitterBotAccount():
     @property
     def mongo_articles_col_name(self):
         return mongo_articles_list_col_name if (is_really_a_string(self.__tenant_id__)) else mongo_articles_col_name
+    
+    @property
+    def mongo_twitterbot_account_col_name(self):
+        return mongo_twitterbot_account_col_name if (is_really_a_string(self.__tenant_id__)) else mongo_twitterbot_account_col_name
     
     @property
     def mongo_articles_plan_col_name(self):
@@ -448,8 +463,18 @@ def save_tweet_stats(fp, data, logger=None):
         new_filename = file_parts[0]+str(file_tags[-1]) + file_parts[-1]
         if (os.path.exists(new_filename)):
             os.remove(new_filename)
+        __files = []
         for ft in file_tags:
             old_filename = file_parts[0]+str(ft) + file_parts[-1]
+            if (os.path.exists(old_filename)):
+                __files.append(old_filename)
+        for fp in __files:
+            ft = None
+            old_filename = fp
+            file_parts = os.path.splitext(old_filename)
+            ch = str(file_parts[0][-1])
+            if (ch.isdigit()):
+                ft = int(ch)
             new_filename = file_parts[0]+str(ft+1 if (isinstance(ft, int)) else 1) + file_parts[-1]
             if (os.path.exists(old_filename)):
                 os.rename(old_filename, new_filename)
@@ -486,7 +511,7 @@ if (__name__ == '__main__'):
 
 
     if (is_simulated_production()):
-        the_plan = service_runner.exec(articles_list, reset_article_plans, **plugins_handler.get_kwargs(environ=__env__, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_plan_col_name, logger=logger))
+        the_plan = service_runner.exec(articles_list, reset_article_plans, **plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, logger=logger))
 
 
     if (0): # copy articles into the new tenant structure.

@@ -68,10 +68,12 @@ def __get_the_plan(environ=None, tenant_id=None, mongo_db_name=None, mongo_artic
 
 
 
-def __reset_the_plans(environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, callback=None, logger=None):
+def __reset_the_plans(environ=None, twitter_bot_account=None, callback=None, logger=None): # , tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None
     def handle_the_doc(coll=None, doc=None):
-        print('{} -> {}'.format(coll, doc))
-    the_plan = __get_the_plan(mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, environ=environ, tenant_id=tenant_id, callback=handle_the_doc)
+        print('DEBUG: (__reset_the_plans.1) {} -> {}'.format(coll, doc))
+
+    assert (twitter_bot_account is not None), 'Missing the twitter_bot_account. Cannot proceed.'
+    the_plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=handle_the_doc)
 
     return the_plan
 
