@@ -454,15 +454,23 @@ twitter_bot_account = TwitterBotAccount(tenant_id=os.environ.get('__tenant__'), 
 
 __tweet_stats__ = {}
 
-def save_tweet_stats(fp, data, logger=None):
+def save_tweet_stats(fpath, data, logger=None):
+    def eat_numbers_from_end(value):
+        while(1):
+            if (len(value) > 0) and (value[-1].isdigit()):
+                value = value[0:-1]
+            else:
+                break
+        return value
     try:
-        with open(fp, 'w') as fOut:
+        with open(fpath, 'w') as fOut:
             print(json.dumps(data, indent=3), file=fOut)
         file_tags = [''] + [int(n+1) for n in range(0,5)]
-        file_parts = os.path.splitext(fp)
+        file_parts = os.path.splitext(fpath)
         new_filename = file_parts[0]+str(file_tags[-1]) + file_parts[-1]
         if (os.path.exists(new_filename)):
             os.remove(new_filename)
+        file_tags.reverse()
         __files = []
         for ft in file_tags:
             old_filename = file_parts[0]+str(ft) + file_parts[-1]
@@ -475,7 +483,7 @@ def save_tweet_stats(fp, data, logger=None):
             ch = str(file_parts[0][-1])
             if (ch.isdigit()):
                 ft = int(ch)
-            new_filename = file_parts[0]+str(ft+1 if (isinstance(ft, int)) else 1) + file_parts[-1]
+            new_filename = eat_numbers_from_end(file_parts[0])+str(ft+1 if (isinstance(ft, int)) else 1) + file_parts[-1]
             if (os.path.exists(old_filename)):
                 os.rename(old_filename, new_filename)
     except Exception as ex:

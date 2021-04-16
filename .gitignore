@@ -137,4 +137,4 @@ the_update.json
 *.deb
 
 None
-tweepy-bot1_tweet-stats.json
+json/*.json
