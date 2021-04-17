@@ -371,6 +371,9 @@ def most_recent_number_of_days(bucket, num_days=30):
 
 
 def __update_the_article(item=None, the_choice=None, tenant_id=None, ts_current_time=None, logger=None, environ={}, mongo_db_name=None, mongo_articles_col_name=None):
+    '''
+    deprecated. The rotations are now stored on the Account and not the Article(s). 04-15-2021
+    '''
     assert item, 'Missing item.'
 
     from vyperlogix.iterators.dict import dictutils
