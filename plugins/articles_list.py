@@ -6,6 +6,8 @@ import mujson as json
 
 from datetime import datetime, date
 
+from vyperlogix.iterators.dict import dictutils
+
 from vyperlogix.misc import _utils
 from vyperlogix.misc import normalize_int_from_str
 from bson.objectid import ObjectId
@@ -376,8 +378,6 @@ def __update_the_article(item=None, the_choice=None, tenant_id=None, ts_current_
     '''
     assert item, 'Missing item.'
 
-    from vyperlogix.iterators.dict import dictutils
-    
     the_update = the_choice
     if (the_choice is not None):
         the_update = {}
@@ -417,13 +417,14 @@ def update_the_article(*args, **kwargs):
     pass
 
 
-def __update_the_plan(the_plan=None, ts_current_time=None, the_choice=None, logger=None, environ={}, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None):
+def __update_the_plan(the_plan=None, ts_current_time=None, the_choice=None, logger=None, environ={}, twitter_bot_account=None):
     assert the_plan, 'Missing the_plan.'
     assert ts_current_time, 'Missing ts_current_time.'
+
+    #the_plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=handle_the_doc)
+
     
-    from vyperlogix.iterators.dict import dictutils
-    
-    plan = __get_the_plan(mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, environ=environ, tenant_id=tenant_id)
+    plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id)
     plan = plan[0] if (isinstance(plan, list)) else plan
     the_update = { 'updated_time': ts_current_time}
 
@@ -431,7 +432,7 @@ def __update_the_plan(the_plan=None, ts_current_time=None, the_choice=None, logg
     bucket[the_choice.get('_id') if (not isinstance(the_choice, str)) else the_choice] = the_plan
     if (1):
         the_update[__plans__] = bucket
-        resp = __store_the_plan(plan, update=the_update, environ=environ, tenant_id=tenant_id, mongo_db_name=mongo_db_name,  mongo_articles_col_name=mongo_articles_col_name)
+        resp = __store_the_plan(plan, update=the_update, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name,  mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name)
         assert isinstance(resp, int), 'Problem with the response? Expected int value but got {}'.format(resp)
 
     return the_update.get(__plans__, [])
