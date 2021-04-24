@@ -17,6 +17,8 @@ from vyperlogix.decorators import args
 
 from vyperlogix.hash.dict import SmartDict
 
+find_in_collection = lambda c,criteria:c.find() if (not criteria) else c.find(criteria)
+
 is_really_a_string = lambda s:(s is not None) and (len(s) > 0)
 
 __doy__ = lambda args:date(args[0],args[1],args[2]).timetuple().tm_yday if (len(args) == 3) else None
@@ -58,11 +60,15 @@ def __get_the_plan(environ=None, tenant_id=None, mongo_db_name=None, mongo_artic
 
         tb_name = mongo_db_name
         col_name = mongo_articles_col_name
-        table = db[database_name(tb_name, tenant_id)]
+        table = db[tb_name]
         coll = table[col_name]
+        
+        accounts = find_in_collection(coll, criteria={'uuid': tenant_id})
+        assert accounts.count() == 1, 'Cannot find the account for tenant #{}.'.format(tenant_id)
+        
+        account = accounts[0]
 
-        find_in_collection = lambda c,criteria=criteria:c.find_one() if (not criteria) else c.find_one(criteria)
-        doc = find_in_collection(coll, criteria=criteria)
+        doc = accounts[0].get('__plans__')
         if (callable(callback)):
             callback(coll=coll, doc=doc)
         return doc
@@ -96,21 +102,29 @@ def __store_the_plan(data, environ=None, tenant_id=None, mongo_db_name=None, mon
 
         tb_name = mongo_db_name
         col_name = mongo_articles_col_name
-        table = db[database_name(tb_name, tenant_id)]
+        table = db[tb_name]
         coll = table[col_name]
 
+        accounts = find_in_collection(coll, criteria={'uuid': tenant_id})
+        assert accounts.count() == 1, 'Cannot find the account for tenant #{}.'.format(tenant_id)
+        
+        account = accounts[0]
+
+        doc = accounts[0].get('__plans__')
+        _id = accounts[0].get('_id')
+        
         count = -1
         if (data):
-            _id = data.get('_id')
             if (_id) and (update is not None):
                 update['updated_time'] = datetime.utcnow()
                 newvalue = { "$set": update }
                 coll.update_one({'_id': _id}, newvalue)
         else:
             update['created_time'] = datetime.utcnow()
-            coll.insert_one(update)
+            newvalue = { "$set": update }
+            coll.update_one({'_id': _id}, newvalue)
 
-        count = coll.count_documents({})
+        count = accounts.count()
         return count
     return db_store_the_plan(data=data)
 
@@ -129,7 +143,6 @@ def __get_articles(_id=None, environ=None, tenant_id=None, mongo_db_name=None, m
         table = db[database_name(tb_name, tenant_id)]
         coll = table[col_name]
 
-        find_in_collection = lambda c,criteria=criteria:c.find() if (not criteria) else c.find(criteria)
         recs = []
         print('DEBUG: logger -> {}'.format(logger))
         if (logger):
@@ -425,7 +438,7 @@ def __update_the_plan(the_plan=None, ts_current_time=None, the_choice=None, logg
 
     
     plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id)
-    plan = plan[0] if (isinstance(plan, list)) else plan
+    plan = plan[0] if (isinstance(plan, list) and (len(plan) > 0)) else plan
     the_update = { 'updated_time': ts_current_time}
 
     bucket = plan.get(__plans__, {}) if (plan and (not isinstance(plan, str))) else {}
