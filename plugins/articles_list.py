@@ -117,6 +117,8 @@ def __store_the_plan(data, environ=None, tenant_id=None, mongo_db_name=None, mon
         if (data):
             if (_id) and (update is not None):
                 update['updated_time'] = datetime.utcnow()
+                for k,v in doc.items():
+                    update[k] = v
                 newvalue = { "$set": update }
                 coll.update_one({'_id': _id}, newvalue)
         else:
