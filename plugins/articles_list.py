@@ -142,7 +142,7 @@ def __get_articles(_id=None, environ=None, tenant_id=None, mongo_db_name=None, m
 
         tb_name = mongo_db_name
         col_name = mongo_articles_col_name
-        table = db[database_name(tb_name, tenant_id)]
+        table = db[tb_name]
         coll = table[col_name]
 
         recs = []
@@ -189,7 +189,7 @@ def __store_article_data(data, environ=None, tenant_id=None, mongo_db_name=None,
 
         tb_name = mongo_db_name
         col_name = mongo_articles_col_name
-        table = db[database_name(tb_name, tenant_id)]
+        table = db[tb_name]
         coll = table[col_name]
 
         count = -1
@@ -400,23 +400,6 @@ def __update_the_article(item=None, the_choice=None, tenant_id=None, ts_current_
         if (is_really_a_string(ts_current_time)):
             the_update = { 'tweeted_time': ts_current_time}
 
-            bucket = get_rotations_from(item)
-            bucket.append(ts_current_time)
-            the_update[__rotation__] = most_recent_number_of_days(bucket, num_days=normalize_int_from_str(os.environ.get('max_days_in_rotations', 5)))
-        
-            doy = '{}'.format(doy_from_ts(ts_current_time))
-            
-            the_processor = RotationProcessor(item.get(__rotation_processor__, {}))
-            retirees = []
-            for __item in the_update[__rotation__]:
-                if (len(__item.split('T')) > 1):
-                    the_processor[__item] = 1
-                    retirees.append(__item)
-            for r in retirees:
-                i = the_update[__rotation__].index(r)
-                del the_update[__rotation__][i]
-            the_update[__rotation_processor__] = the_processor
-
         msg = 'Updating: id: {}, {}'.format(the_choice, the_update)
         if (logger):
             logger.info(msg)
@@ -432,25 +415,15 @@ def update_the_article(*args, **kwargs):
     pass
 
 
-def __update_the_plan(the_plan=None, ts_current_time=None, the_choice=None, logger=None, environ={}, twitter_bot_account=None):
-    assert the_plan, 'Missing the_plan.'
-    assert ts_current_time, 'Missing ts_current_time.'
+def __update_the_plan(tweet_stats=None, logger=None, environ={}, twitter_bot_account=None):
 
-    #the_plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=handle_the_doc)
-
-    
     plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id)
     plan = plan[0] if (isinstance(plan, list) and (len(plan) > 0)) else plan
-    the_update = { 'updated_time': ts_current_time}
 
-    bucket = plan.get(__plans__, {}) if (plan and (not isinstance(plan, str))) else {}
-    bucket[the_choice.get('_id') if (not isinstance(the_choice, str)) else the_choice] = the_plan
-    if (1):
-        the_update[__plans__] = bucket
-        resp = __store_the_plan(plan, update=the_update, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name,  mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name)
-        assert isinstance(resp, int), 'Problem with the response? Expected int value but got {}'.format(resp)
+    resp = __store_the_plan(tweet_stats=tweet_stats, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name,  mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name)
+    assert isinstance(resp, int), 'Problem with the response? Expected int value but got {}'.format(resp)
 
-    return the_update.get(__plans__, [])
+    return
 
 @args.kwargs(__update_the_plan)
 def update_the_plan(*args, **kwargs):
@@ -458,6 +431,22 @@ def update_the_plan(*args, **kwargs):
 
 
 #######################################################################
+def __analyse_the_plans(twitter_bot_account=None, environ={}, logger=None):
+    assert twitter_bot_account, 'Missing twitter_bot_account.'
+    assert environ, 'Missing environ.'
+
+    plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id)
+    plan = plan[0] if (isinstance(plan, list) and (len(plan) > 0)) else plan
+    
+    for _,details in plan.items():
+        for k,v in details.items():
+            print()
+
+    return
+
+@args.kwargs(__analyse_the_plans)
+def analyse_the_plans(*args, **kwargs):
+    pass
 #######################################################################
 
 

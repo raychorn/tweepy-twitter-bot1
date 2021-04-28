@@ -109,6 +109,7 @@ articles_list = 'articles_list'
 get_the_real_list = 'get_the_real_list'
 update_the_article = 'update_the_article'
 update_the_plan = 'update_the_plan'
+analyse_the_plans = 'analyse_the_plans'
 get_articles = 'get_articles'
 get_a_choice = 'get_a_choice'
 get_more_followers = 'get_more_followers'
@@ -520,11 +521,14 @@ if (__name__ == '__main__'):
 
     if (is_simulated_production()):
         # Perform analysis to determine usage stats
+        if (0):
+            service_runner.allow(articles_list, analyse_the_plans)
+            service_runner.articles_list.analyse_the_plans(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, logger=logger))
         
-        service_runner.allow(articles_list, reset_article_plans)
-        the_plan = service_runner.articles_list.reset_article_plans(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, logger=logger))
+        #service_runner.allow(articles_list, reset_article_plans)
+        #the_plan = service_runner.articles_list.reset_article_plans(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, logger=logger))
 
-    if (0): # copy articles into the new tenant structure.
+    if (1): # copy articles into the new tenant structure.
         the_master_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
 
         removes = ['__rotation__', '__rotation_processor__', 'debug']
@@ -533,7 +537,8 @@ if (__name__ == '__main__'):
             for r in removes:
                 if (r in item.keys()):
                     del item[r]
-            the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env__, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger, item=item, ts_current_time=None))
+            service_runner.allow(articles_list, update_the_article)
+            service_runner.articles_list.update_the_article(**plugins_handler.get_kwargs(the_choice=None, environ=__env__, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, logger=logger, item=item, ts_current_time=None))
 
 
     __backup_executor__ = pooled.BoundedExecutor(1, 5, callback=__backup_callback__)
@@ -686,15 +691,9 @@ if (__name__ == '__main__'):
                         save_tweet_stats(json_path, __tweet_stats__, logger=logger)
                         if (logger):
                             logger.debug('Simulated Tweet: {} -> {}'.format(the_choice, item.get('name')))
-                    #the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=the_choice, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
-                #else:
-                    #the_rotation = the_choice.get('__rotation__', []) if (the_choice is not None) and (not isinstance(the_choice, str)) else []
-                #the_twitter_plan.the_rotation = the_rotation
-                if (0):
-                    service_runner.exec(articles_list, update_the_plan, **plugins_handler.get_kwargs(the_plan=the_twitter_plan.as_json_serializable(), environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_plan_col_name, logger=logger, ts_current_time=ts_current_time, the_choice=the_choice))
-                else:
-                    service_runner.allow(articles_list, update_the_plan)
-                    service_runner.articles_list.update_the_plan(**plugins_handler.get_kwargs(the_plan=the_twitter_plan.as_json_serializable(), environ=environ(), twitter_bot_account=twitter_bot_account, logger=logger, ts_current_time=ts_current_time, the_choice=the_choice))
+
+                service_runner.allow(articles_list, update_the_plan)
+                service_runner.articles_list.update_the_plan(**plugins_handler.get_kwargs(tweet_stats=__tweet_stats__, environ=environ(), twitter_bot_account=twitter_bot_account, logger=logger))
                 
                 backup_last_run = __vector__.get('backup_last_run')
                 if (logger):
