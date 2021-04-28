@@ -519,6 +519,8 @@ if (__name__ == '__main__'):
 
 
     if (is_simulated_production()):
+        # Perform analysis to determine usage stats
+        
         service_runner.allow(articles_list, reset_article_plans)
         the_plan = service_runner.articles_list.reset_article_plans(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, logger=logger))
 
