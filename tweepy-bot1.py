@@ -528,7 +528,7 @@ if (__name__ == '__main__'):
         #service_runner.allow(articles_list, reset_article_plans)
         #the_plan = service_runner.articles_list.reset_article_plans(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, logger=logger))
 
-    if (1): # copy articles into the new tenant structure.
+    if (0): # copy articles into the new tenant structure.
         the_master_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
 
         service_runner.allow(articles_list, update_the_article)
