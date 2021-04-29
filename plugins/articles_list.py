@@ -17,6 +17,8 @@ from vyperlogix.decorators import args
 
 from vyperlogix.hash.dict import SmartDict
 
+normalize_collection_name = lambda t,c:'{}+{}'.format(c, t)
+
 find_in_collection = lambda c,criteria:c.find() if (not criteria) else c.find(criteria)
 
 is_really_a_string = lambda s:(s is not None) and (len(s) > 0)
@@ -134,14 +136,10 @@ def __store_the_plan(data, environ=None, tenant_id=None, mongo_db_name=None, mon
 def __get_articles(_id=None, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None, logger=None):
     @__with.database(environ=environ)
     def db_get_articles(db=None, _id=None):
-        mongo_db_name = environ.get('mongo_db_name')
-        mongo_articles_col_name = environ.get('mongo_articles_col_name')
         assert vyperapi.is_not_none(db), 'There is no db.'
-        assert vyperapi.is_not_none(mongo_db_name), 'There is no mongo_db_name.'
-        assert vyperapi.is_not_none(mongo_articles_col_name), 'There is no mongo_articles_col_name.'
 
         tb_name = mongo_db_name
-        col_name = mongo_articles_col_name
+        col_name = normalize_collection_name(tenant_id, mongo_articles_col_name)
         table = db[tb_name]
         coll = table[col_name]
 
@@ -184,7 +182,7 @@ def __store_article_data(data, environ=None, tenant_id=None, mongo_db_name=None,
         assert vyperapi.is_not_none(db), 'There is no db.'
 
         tb_name = mongo_db_name
-        col_name = '{}+{}'.format(mongo_articles_col_name, tenant_id)
+        col_name = normalize_collection_name(tenant_id, mongo_articles_col_name)
         table = db[tb_name]
         coll = table[col_name]
 

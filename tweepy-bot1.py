@@ -528,10 +528,11 @@ if (__name__ == '__main__'):
         #service_runner.allow(articles_list, reset_article_plans)
         #the_plan = service_runner.articles_list.reset_article_plans(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, logger=logger))
 
+    service_runner.allow(articles_list, get_articles)
+    service_runner.allow(articles_list, update_the_article)
+
     if (0): # copy articles into the new tenant structure.
         the_master_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
-
-        service_runner.allow(articles_list, update_the_article)
 
         removes = ['__rotation__', '__rotation_processor__', 'debug']
         for anId in the_master_list: # store the article from the master database into the local database. Does nothing if the article exists.
@@ -603,7 +604,10 @@ if (__name__ == '__main__'):
                     logger.info(msg)
                     the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
 
-            the_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger))
+            if (0):
+                the_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger))
+            else:
+                the_list = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=None, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger))
             assert len(the_list) > 0, 'Nothing in the list.'
             
             wait_per_choice = secs_until_tomorrow_morning / len(the_list)
