@@ -531,14 +531,15 @@ if (__name__ == '__main__'):
     if (1): # copy articles into the new tenant structure.
         the_master_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
 
+        service_runner.allow(articles_list, update_the_article)
+
         removes = ['__rotation__', '__rotation_processor__', 'debug']
         for anId in the_master_list: # store the article from the master database into the local database. Does nothing if the article exists.
             item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=anId, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
             for r in removes:
                 if (r in item.keys()):
                     del item[r]
-            service_runner.allow(articles_list, update_the_article)
-            service_runner.articles_list.update_the_article(**plugins_handler.get_kwargs(the_choice=None, environ=__env__, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, logger=logger, item=item, ts_current_time=None))
+            service_runner.articles_list.update_the_article(**plugins_handler.get_kwargs(the_choice=None, environ=__env__, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger, item=item, ts_current_time=None))
 
 
     __backup_executor__ = pooled.BoundedExecutor(1, 5, callback=__backup_callback__)

@@ -181,14 +181,10 @@ def get_articles(*args, **kwargs):
 def __store_article_data(data, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, update=None):
     @__with.database(environ=environ)
     def db_store_article_data(db=None, data=None):
-        mongo_db_name = environ.get('mongo_db_name')
-        mongo_articles_col_name = environ.get('mongo_articles_col_name')
         assert vyperapi.is_not_none(db), 'There is no db.'
-        assert vyperapi.is_not_none(mongo_db_name), 'There is no mongo_db_name.'
-        assert vyperapi.is_not_none(mongo_articles_col_name), 'There is no mongo_articles_col_name.'
 
         tb_name = mongo_db_name
-        col_name = mongo_articles_col_name
+        col_name = '{}+{}'.format(mongo_articles_col_name, tenant_id)
         table = db[tb_name]
         coll = table[col_name]
 
