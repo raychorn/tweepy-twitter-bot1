@@ -604,10 +604,7 @@ if (__name__ == '__main__'):
                     logger.info(msg)
                     the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
 
-            if (0):
-                the_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger))
-            else:
-                the_list = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=None, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger))
+            the_list = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=None, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger))
             assert len(the_list) > 0, 'Nothing in the list.'
             
             wait_per_choice = secs_until_tomorrow_morning / len(the_list)
