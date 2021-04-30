@@ -521,7 +521,7 @@ if (__name__ == '__main__'):
 
     if (is_simulated_production()):
         # Perform analysis to determine usage stats
-        if (0):
+        if (1):
             service_runner.allow(articles_list, analyse_the_plans)
             service_runner.articles_list.analyse_the_plans(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, logger=logger))
         

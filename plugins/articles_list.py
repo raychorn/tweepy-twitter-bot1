@@ -53,7 +53,29 @@ __plans__ = '__plans__'
 __rotation_processor__ = '__rotation_processor__'
 
 
-def __get_the_plan(environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None):
+def __store_the_account(account, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None):
+    @__with.database(environ=environ)
+    def db_store_the_account(db=None):
+        assert vyperapi.is_not_none(db), 'There is no db.'
+        assert vyperapi.is_not_none(mongo_db_name), 'There is no mongo_db_name.'
+        assert vyperapi.is_not_none(mongo_articles_col_name), 'There is no mongo_articles_col_name.'
+
+        tb_name = mongo_db_name
+        col_name = mongo_articles_col_name
+        table = db[tb_name]
+        coll = table[col_name]
+
+        newvalue = { "$set": account }
+        coll.update_one({'_id': account._id}, newvalue)
+        
+        accounts = find_in_collection(coll, criteria={'uuid': tenant_id})
+        assert accounts.count() == 1, 'Cannot find the account for tenant #{}.'.format(tenant_id)
+        
+        return accounts[0]
+    return db_store_the_account()
+
+
+def __get_the_plan(environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None, kwargs=None):
     @__with.database(environ=environ)
     def db_get_the_plan(db=None):
         assert vyperapi.is_not_none(db), 'There is no db.'
@@ -72,7 +94,7 @@ def __get_the_plan(environ=None, tenant_id=None, mongo_db_name=None, mongo_artic
 
         doc = accounts[0].get('__plans__')
         if (callable(callback)):
-            callback(coll=coll, doc=doc)
+            callback(coll=coll, account=accounts[0], doc=doc, kwargs=kwargs)
         return doc
     return db_get_the_plan()
 
@@ -429,7 +451,18 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, logger=None):
     assert twitter_bot_account, 'Missing twitter_bot_account.'
     assert environ, 'Missing environ.'
 
-    plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id)
+    articles = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, logger=logger)
+    
+    def clean_account(*args, **kwargs):
+        account = kwargs.get('account')
+        if (account):
+            retirees = []
+            for k,v in account.items():
+                if (isinstance(v, dict)) and ('__real_list__' in list(v.keys())):
+                    retirees.append(k)
+            __store_the_account(account, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name)
+    
+    plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=clean_account, kwargs={'articles':articles})
     plan = plan[0] if (isinstance(plan, list) and (len(plan) > 0)) else plan
     
     for _,details in plan.items():
