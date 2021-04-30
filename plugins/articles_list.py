@@ -414,7 +414,7 @@ def __update_the_plan(tweet_stats=None, logger=None, environ={}, twitter_bot_acc
     plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id)
     plan = plan[0] if (isinstance(plan, list) and (len(plan) > 0)) else plan
 
-    resp = __store_the_plan(tweet_stats=tweet_stats, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name,  mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name)
+    resp = __store_the_plan(tweet_stats, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name,  mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name)
     assert isinstance(resp, int), 'Problem with the response? Expected int value but got {}'.format(resp)
 
     return
