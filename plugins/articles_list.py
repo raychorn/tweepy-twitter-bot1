@@ -30,7 +30,7 @@ get_rotations_from = lambda item:item.get(__rotation__, []) if (isinstance(item.
 
 collection_name = lambda c,t:'{}{}{}'.format(c,'+' if (is_really_a_string(t)) else '', t if (is_really_a_string(t)) else '')
 database_name = lambda db,t:'{}{}{}'.format(db,'+' if (is_really_a_string(t)) else '', t if (is_really_a_string(t)) else '')
-        
+
 class RotationProcessor(dict):
     def __setitem__(self, k, v):
         '''
@@ -79,6 +79,31 @@ def __store_the_account(account, environ=None, tenant_id=None, mongo_db_name=Non
     return db_store_the_account()
 
 
+def __get_the_account(environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None, kwargs=None):
+    @__with.database(environ=environ)
+    def db_get_the_account(db=None):
+        assert vyperapi.is_not_none(db), 'There is no db.'
+        assert vyperapi.is_not_none(mongo_db_name), 'There is no mongo_db_name.'
+        assert vyperapi.is_not_none(mongo_articles_col_name), 'There is no mongo_articles_col_name.'
+
+        tb_name = mongo_db_name
+        col_name = mongo_articles_col_name
+        table = db[tb_name]
+        coll = table[col_name]
+        
+        accounts = find_in_collection(coll, criteria={'uuid': tenant_id})
+        assert accounts.count() == 1, 'Cannot find the account for tenant #{}.'.format(tenant_id)
+        
+        account = accounts[0]
+
+        doc = account.get(__plans__)
+        if (callable(callback)):
+            callback(coll=coll, account=account, doc=doc, kwargs=kwargs)
+        return account
+    return db_get_the_account()
+
+
+
 def __get_the_plan(environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None, kwargs=None):
     @__with.database(environ=environ)
     def db_get_the_plan(db=None):
@@ -96,7 +121,7 @@ def __get_the_plan(environ=None, tenant_id=None, mongo_db_name=None, mongo_artic
         
         account = accounts[0]
 
-        doc = accounts[0].get('__plans__')
+        doc = account.get(__plans__)
         if (callable(callback)):
             callback(coll=coll, account=accounts[0], doc=doc, kwargs=kwargs)
         return doc
@@ -138,7 +163,7 @@ def __store_the_plan(data, environ=None, tenant_id=None, mongo_db_name=None, mon
         
         account = accounts[0]
 
-        doc = accounts[0].get('__plans__')
+        doc = accounts[0].get(__plans__)
         _id = accounts[0].get('_id')
         
         count = -1
@@ -308,7 +333,7 @@ def __get_a_choice(the_list=None, ts_current_time=None, this_process={}, environ
                 doy = '{}'.format(doy_from_ts(ts_current_time))
                 def has_rotations_now(obj, p=None):
                     if (p is not None):
-                        plans = p.get('__plans__', {})
+                        plans = p.get(__plans__, {})
                         if (isinstance(plans, dict)):
                             specific = plans.get(obj.get('_id'), {})
                             if (isinstance(specific, dict)):
@@ -355,7 +380,7 @@ def __reset_plans_for_choices(the_list=None, ts_current_time=None, environ=None,
             doy = '{}'.format(doy_from_ts(ts_current_time))
             def has_rotations_now(obj, p=None, reset=False):
                 if (p is not None):
-                    plans = p.get('__plans__', {})
+                    plans = p.get(__plans__, {})
                     if (isinstance(plans, dict)):
                         specific = plans.get(obj.get('_id'), {})
                         if (isinstance(specific, dict)):
@@ -429,7 +454,7 @@ def __update_the_article(item=None, the_choice=None, tenant_id=None, ts_current_
     assert isinstance(resp, int), 'Problem with the response? Expected int value but got {}'.format(resp)
     print('Update was done.')
     
-    return the_update.get(__rotation_processor__, []) if (the_choice is not None) else []
+    return resp
 
 @args.kwargs(__update_the_article)
 def update_the_article(*args, **kwargs):
@@ -438,13 +463,15 @@ def update_the_article(*args, **kwargs):
 
 def __update_the_plan(tweet_stats=None, logger=None, environ={}, twitter_bot_account=None):
 
-    plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id)
-    plan = plan[0] if (isinstance(plan, list) and (len(plan) > 0)) else plan
+    account = __get_the_account(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id)
 
-    resp = __store_the_plan(tweet_stats, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name,  mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name)
-    assert isinstance(resp, int), 'Problem with the response? Expected int value but got {}'.format(resp)
+    account[__plans__] = tweet_stats
+    
+    new_account = __store_the_account(account, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name)
+    
+    assert len(new_account.get(__plans__)) == len(tweet_stats), 'Problem with the updating the plan.'
 
-    return
+    return new_account
 
 @args.kwargs(__update_the_plan)
 def update_the_plan(*args, **kwargs):
@@ -483,13 +510,13 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, logger=None):
                     retirees.append(k)
             for retiree in retirees:
                 del account[retiree]
-            p = account.get('__plans__')
+            p = account.get(__plans__)
             if (p):
-                account['__plans__'] = {}
+                account[__plans__] = {}
             new_account = __store_the_account(account, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name)
             assert len(account) == len(new_account), 'Something went wrong. With cleaning the account.'
             
-            __drop_articles(environ=environ, tenant_id=tenant_id, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger)
+            __drop_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
     
     if (0):
         plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=clean_account, kwargs={'articles':articles})

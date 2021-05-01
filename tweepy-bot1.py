@@ -494,13 +494,15 @@ def save_tweet_stats(fpath, data, logger=None):
 
 
 class Options(enum.Enum):
-    do_analysis = 0
-    init_articles = 1
+    do_nothing = 0
+    do_analysis = 1
+    init_articles = 2
 
 
 if (__name__ == '__main__'):
+    __options__ = Options.do_nothing
     #__options__ = Options.init_articles
-    __options__ = Options.do_analysis
+    #__options__ = Options.do_analysis
     
     plugins_manager = plugins_handler.SmartPluginManager(plugins, debug=True, logger=logger)
     service_runner = plugins_manager.get_runner()
@@ -558,11 +560,8 @@ if (__name__ == '__main__'):
             logger.info('backup_master_list BEGIN:')
         if (os.environ.get('COSMOSDB0') or os.environ.get('COSMOSDB1')):
             ts_current_time = _utils.timeStamp(offset=0, use_iso=True)
-            if (0):
-                the_master_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
-            else:
-                service_runner.allow(articles_list, get_articles)
-                the_master_list = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
+            service_runner.allow(articles_list, get_articles)
+            the_master_list = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
                 
             
             for anId in the_master_list: # store the article from the master database into the cosmos1 database. Does nothing if the article exists.
@@ -682,15 +681,16 @@ if (__name__ == '__main__'):
             @interval.timer(wait_per_choice, no_initial_wait=False, run_once=True, blocking=True, logger=logger)
             def issue_tweet(aTimer, **kwargs):
                 random.seed(int(time.time()))
-                the_choice = service_runner.exec(articles_list, get_a_choice, **plugins_handler.get_kwargs(the_list=the_real_list, ts_current_time=ts_current_time, this_process=the_twitter_plan.the_process, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_plan_col_name, logger=logger))
+                service_runner.allow(articles_list, get_a_choice)
+                the_choice = service_runner.articles_list.get_a_choice(**plugins_handler.get_kwargs(the_list=the_real_list, ts_current_time=ts_current_time, this_process=the_twitter_plan.the_process, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_plan_col_name, logger=logger))
                 if (the_choice is None):
                     service_runner.exec(articles_list, reset_plans_for_choices, **plugins_handler.get_kwargs(the_list=the_real_list, ts_current_time=ts_current_time, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger))
-                the_choice = service_runner.exec(articles_list, get_a_choice, **plugins_handler.get_kwargs(the_list=the_real_list, ts_current_time=ts_current_time, this_process=the_twitter_plan.the_process, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_plan_col_name, logger=logger))
                 assert the_choice, 'Nothing in the list?  Please check.'
                 the_twitter_plan.the_choice = the_choice
                 if (is_production()):
                     the_choice = the_choice.get('_id') if (the_choice is not None) and (not isinstance(the_choice, str)) else the_choice
-                    item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=the_choice, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger))
+                    service_runner.allow(articles_list, get_articles)
+                    item = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=the_choice, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger))
                     assert item, 'Did not retrieve an item for {}.'.format(item)
                     if (not is_simulated_production()):
                         service_runner.exec(twitter_verse, do_the_tweet, **plugins_handler.get_kwargs(api=api, item=item, logger=logger))
