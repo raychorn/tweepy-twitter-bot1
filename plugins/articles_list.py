@@ -65,8 +65,12 @@ def __store_the_account(account, environ=None, tenant_id=None, mongo_db_name=Non
         table = db[tb_name]
         coll = table[col_name]
 
-        newvalue = { "$set": account }
-        coll.update_one({'_id': account._id}, newvalue)
+        _id = account.get('_id')
+        if (_id):
+            coll.replace_one({'_id': _id}, account)
+        else:
+            newvalue = { "$set": account }
+            coll.update_one({'_id': account._id}, newvalue)
         
         accounts = find_in_collection(coll, criteria={'uuid': tenant_id})
         assert accounts.count() == 1, 'Cannot find the account for tenant #{}.'.format(tenant_id)
@@ -161,7 +165,7 @@ def __get_articles(_id=None, environ=None, tenant_id=None, mongo_db_name=None, m
         assert vyperapi.is_not_none(db), 'There is no db.'
 
         tb_name = mongo_db_name
-        col_name = normalize_collection_name(tenant_id, mongo_articles_col_name)
+        col_name = normalize_collection_name(tenant_id, mongo_articles_col_name) if (tenant_id) else mongo_articles_col_name
         table = db[tb_name]
         coll = table[col_name]
 
@@ -419,7 +423,8 @@ def __update_the_article(item=None, the_choice=None, tenant_id=None, ts_current_
         msg = 'Updating: id: {}, {}'.format(the_choice, the_update)
         if (logger):
             logger.info(msg)
-    the_update = dictutils.bson_cleaner(the_update, returns_json=False)
+    if (the_update):
+        the_update = dictutils.bson_cleaner(the_update, returns_json=False)
     resp = __store_article_data(item, update=the_update, tenant_id=tenant_id, environ=environ, mongo_db_name=mongo_db_name,  mongo_articles_col_name=mongo_articles_col_name)
     assert isinstance(resp, int), 'Problem with the response? Expected int value but got {}'.format(resp)
     print('Update was done.')
@@ -447,6 +452,22 @@ def update_the_plan(*args, **kwargs):
 
 
 #######################################################################
+def __drop_articles(environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, logger=None):
+    @__with.database(environ=environ)
+    def db_drop_articles(db=None, _id=None):
+        assert vyperapi.is_not_none(db), 'There is no db.'
+
+        tb_name = mongo_db_name
+        col_name = normalize_collection_name(tenant_id, mongo_articles_col_name) if (tenant_id) else mongo_articles_col_name
+        table = db[tb_name]
+        coll = table[col_name]
+        
+        table.drop_collection(col_name)
+
+        return 0
+    return db_drop_articles()
+
+
 def __analyse_the_plans(twitter_bot_account=None, environ={}, logger=None):
     assert twitter_bot_account, 'Missing twitter_bot_account.'
     assert environ, 'Missing environ.'
@@ -460,11 +481,22 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, logger=None):
             for k,v in account.items():
                 if (isinstance(v, dict)) and ('__real_list__' in list(v.keys())):
                     retirees.append(k)
-            __store_the_account(account, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name)
+            for retiree in retirees:
+                del account[retiree]
+            p = account.get('__plans__')
+            if (p):
+                account['__plans__'] = {}
+            new_account = __store_the_account(account, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name)
+            assert len(account) == len(new_account), 'Something went wrong. With cleaning the account.'
+            
+            __drop_articles(environ=environ, tenant_id=tenant_id, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger)
     
-    plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=clean_account, kwargs={'articles':articles})
+    if (0):
+        plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=clean_account, kwargs={'articles':articles})
+    else:
+        plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id)
     plan = plan[0] if (isinstance(plan, list) and (len(plan) > 0)) else plan
-    
+
     for _,details in plan.items():
         for k,v in details.items():
             print()

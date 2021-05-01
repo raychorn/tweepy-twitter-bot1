@@ -28,7 +28,6 @@ default_timestamp = lambda t:t.isoformat().replace(':', '').replace('-','').spli
 
 is_uppercase = lambda ch:''.join([c for c in str(ch) if c.isupper()])
 
-
 class TheRunMode(enum.Enum):
     development = 0
     production = 1
@@ -494,7 +493,15 @@ def save_tweet_stats(fpath, data, logger=None):
     return
 
 
+class Options(enum.Enum):
+    do_analysis = 0
+    init_articles = 1
+
+
 if (__name__ == '__main__'):
+    #__options__ = Options.init_articles
+    __options__ = Options.do_analysis
+    
     plugins_manager = plugins_handler.SmartPluginManager(plugins, debug=True, logger=logger)
     service_runner = plugins_manager.get_runner()
     
@@ -521,7 +528,7 @@ if (__name__ == '__main__'):
 
     if (is_simulated_production()):
         # Perform analysis to determine usage stats
-        if (1):
+        if (__options__ == Options.do_analysis):
             service_runner.allow(articles_list, analyse_the_plans)
             service_runner.articles_list.analyse_the_plans(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, logger=logger))
         
@@ -531,12 +538,12 @@ if (__name__ == '__main__'):
     service_runner.allow(articles_list, get_articles)
     service_runner.allow(articles_list, update_the_article)
 
-    if (0): # copy articles into the new tenant structure.
-        the_master_list = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
+    if (__options__ == Options.init_articles): # copy articles into the new tenant structure.
+        the_master_list = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
 
         removes = ['__rotation__', '__rotation_processor__', 'debug']
         for anId in the_master_list: # store the article from the master database into the local database. Does nothing if the article exists.
-            item = service_runner.exec(articles_list, get_articles, **plugins_handler.get_kwargs(_id=anId, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
+            item = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=anId, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
             for r in removes:
                 if (r in item.keys()):
                     del item[r]
