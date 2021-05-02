@@ -1,3 +1,4 @@
+from collections import namedtuple
 import os
 import sys
 import enum
@@ -529,21 +530,89 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, logger=None):
             __drop_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
 
     def analyse_account_plan(*args, **kwargs):
-        import matplotlib.pyplot as plt; plt.rcdefaults()
+        import matplotlib.pyplot as plt
         import numpy as np
         import matplotlib.pyplot as plt
         
+        from collections import namedtuple
+        
+        tweet_factory = lambda : namedtuple('Tweet', ['ts', 'd_ts', 'num', 'delta_secs'])
+
+        _articles = kwargs.get('articles')
+        
+        s_articles = set(_articles if (_articles) else [])
+        has_articles = False if (len(s_articles) == 0) else True
+        
         account = kwargs.get('account')
         if (account):
+            ts = _utils.timeStamp(offset=0, use_iso=True)
+            min_ts = _utils.getFromNativeTimeStamp(ts)
+            max_ts = _utils.getFromNativeTimeStamp(ts)
+            the_plans = {}
+            total_tweets = 0
             plans = account.get(__plans__, {})
-            for _,details in plans.items():
-                for k,v in details.items():
-                    print()
+            _objects = []
+            _objects_nums = []
+            for _id,details in plans.items():
+                _objects.append(_id)
+                s_articles.discard(_id)
+                num_for_object = 0
+
+                article = __get_articles(_id=_id, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, logger=logger)
+                print()
+
+                for ts,num in details.items():
+                    d_ts = _utils.getFromNativeTimeStamp(ts,format=None)
+                    min_ts = min(min_ts, d_ts)
+                    max_ts = max(max_ts, d_ts)
+                    bucket = the_plans.get(_id, {})
+                    Tweet = tweet_factory()
+                    total_tweets += num
+                    num_for_object += num
+                    bucket[ts] = Tweet(ts=ts, d_ts=d_ts, num=num, delta_secs=0)
+                    the_plans[_id] = bucket
+                _objects_nums.append(num_for_object)
+            print('min_ts -> {}, max_ts -> {}'.format(min_ts, max_ts))
+
+            min_secs = sys.maxsize
+            max_secs = -sys.maxsize
+            discreet_steps = []
+            for _id,details in the_plans.items():
+                for ts,tweet in details.items():
+                    assert tweet.d_ts >= min_ts, '(1) Problem with # {} d_ts {} (ts {}) out of range of min_ts {}.'.format(_id, tweet.d_ts, ts, min_ts)
+                    assert tweet.d_ts <= max_ts, '(2) Problem with # {} d_ts {} (ts {}) out of range of max_ts {}.'.format(_id, tweet.d_ts, ts, max_ts)
+                    secs = tweet.d_ts - min_ts
+                    secs = secs.seconds
+                    bucket = the_plans.get(_id, {})
+                    Tweet = tweet_factory()
+                    bucket[ts] = Tweet(ts=ts, d_ts=tweet.d_ts, num=tweet.num, delta_secs=secs)
+                    min_secs = min(min_secs, secs)
+                    max_secs = max(max_secs, secs)
+                    discreet_steps.append(secs)
+                    the_plans[_id] = bucket
+            discreet_steps = set(discreet_steps)
+            print('min_secs -> {}, max_secs -> {}, number of discreet_steps {}'.format(min_secs, max_secs, len(discreet_steps)))
+            if (has_articles):
+                assert len(s_articles) == 0, 'Expected s_articles to be empty but it has {} items. This is a problem.'.format(len(s_articles))
+            else:
+                print('WARNING: There were no articles to analyze in the master list. Please fix.')
+            print('There were {} total tweets.'.format(total_tweets))
+
+            if (1):
+                plt.rcdefaults()
+                y_pos = np.arange(len(_objects))
+                plt.bar(y_pos, _objects_nums, align='center', alpha=0.5)
+                plt.xticks(y_pos, _objects)
+                plt.ylabel('Num Tweets')
+                plt.title('Tweet Counts by Article')
+                plt.show()
+            
+            print('DEBUG')
     
     if (__options__ == Options.do_reset):
         plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=clean_account, kwargs={'articles':articles})
     elif (__options__ == Options.do_analysis):
-        plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=analyse_account_plan)
+        plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=analyse_account_plan, kwargs={'articles':articles})
 
     return
 
