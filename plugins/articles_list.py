@@ -1,5 +1,6 @@
 import os
 import sys
+import enum
 import random
 import traceback
 import mujson as json
@@ -495,9 +496,18 @@ def __drop_articles(environ=None, tenant_id=None, mongo_db_name=None, mongo_arti
     return db_drop_articles()
 
 
+class Options(enum.Enum):
+    do_nothing = 0
+    do_reset = 1
+    do_analysis = 2
+
 def __analyse_the_plans(twitter_bot_account=None, environ={}, logger=None):
     assert twitter_bot_account, 'Missing twitter_bot_account.'
     assert environ, 'Missing environ.'
+    
+    #__options__ = Options.do_nothing
+    #__options__ = Options.do_reset
+    __options__ = Options.do_analysis
 
     articles = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, logger=logger)
     
@@ -517,16 +527,23 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, logger=None):
             assert len(account) == len(new_account), 'Something went wrong. With cleaning the account.'
             
             __drop_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
-    
-    if (0):
-        plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=clean_account, kwargs={'articles':articles})
-    else:
-        plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id)
-    plan = plan[0] if (isinstance(plan, list) and (len(plan) > 0)) else plan
 
-    for _,details in plan.items():
-        for k,v in details.items():
-            print()
+    def analyse_account_plan(*args, **kwargs):
+        import matplotlib.pyplot as plt; plt.rcdefaults()
+        import numpy as np
+        import matplotlib.pyplot as plt
+        
+        account = kwargs.get('account')
+        if (account):
+            plans = account.get(__plans__, {})
+            for _,details in plans.items():
+                for k,v in details.items():
+                    print()
+    
+    if (__options__ == Options.do_reset):
+        plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=clean_account, kwargs={'articles':articles})
+    elif (__options__ == Options.do_analysis):
+        plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=analyse_account_plan)
 
     return
 

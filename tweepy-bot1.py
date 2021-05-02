@@ -500,9 +500,9 @@ class Options(enum.Enum):
 
 
 if (__name__ == '__main__'):
-    __options__ = Options.do_nothing
+    #__options__ = Options.do_nothing
     #__options__ = Options.init_articles
-    #__options__ = Options.do_analysis
+    __options__ = Options.do_analysis
     
     plugins_manager = plugins_handler.SmartPluginManager(plugins, debug=True, logger=logger)
     service_runner = plugins_manager.get_runner()
