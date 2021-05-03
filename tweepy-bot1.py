@@ -500,9 +500,9 @@ class Options(enum.Enum):
 
 
 if (__name__ == '__main__'):
-    #__options__ = Options.do_nothing
+    __options__ = Options.do_nothing
     #__options__ = Options.init_articles
-    __options__ = Options.do_analysis
+    #__options__ = Options.do_analysis
     
     plugins_manager = plugins_handler.SmartPluginManager(plugins, debug=True, logger=logger)
     service_runner = plugins_manager.get_runner()
@@ -682,7 +682,7 @@ if (__name__ == '__main__'):
             def issue_tweet(aTimer, **kwargs):
                 random.seed(int(time.time()))
                 service_runner.allow(articles_list, get_a_choice)
-                the_choice = service_runner.articles_list.get_a_choice(**plugins_handler.get_kwargs(the_list=the_real_list, ts_current_time=ts_current_time, this_process=the_twitter_plan.the_process, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_plan_col_name, logger=logger))
+                the_choice = service_runner.articles_list.get_a_choice(**plugins_handler.get_kwargs(the_list=the_real_list, twitter_bot_account=twitter_bot_account, ts_current_time=ts_current_time, this_process=the_twitter_plan.the_process, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_plan_col_name, logger=logger))
                 if (the_choice is None):
                     service_runner.exec(articles_list, reset_plans_for_choices, **plugins_handler.get_kwargs(the_list=the_real_list, ts_current_time=ts_current_time, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger))
                 assert the_choice, 'Nothing in the list?  Please check.'

@@ -308,9 +308,8 @@ def __get_the_real_list(the_list=None, ts_tweeted_time=None, tweet_period_secs=N
 def get_the_real_list(*args, **kwargs):
     pass
 
-def __get_a_choice(the_list=None, ts_current_time=None, this_process={}, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, logger=None):
+def __get_a_choice(the_list=None, twitter_bot_account=None, ts_current_time=None, this_process={}, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, logger=None):
     choice = None
-    the_process = []
     assert isinstance(the_list, list), 'Wheres the list?'
     msg = 'the_list - the_list has {} items.'.format(len(the_list))
     assert isinstance(ts_current_time, str), 'Missing a usable ts_current_time.'
@@ -320,47 +319,26 @@ def __get_a_choice(the_list=None, ts_current_time=None, this_process={}, environ
     assert isinstance(mongo_articles_col_name, str), 'Missing the mongo_articles_col_name.'
     logger.info(msg)
     if (len(the_list) > 0):
-        priorities1 = [item for item in the_list if (isinstance(item, str))]
+        #articles = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
+        the_plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id)
+        
+        the_obvious = set(the_list) - set(list(the_plan.keys()))
+        
+        today = ts_current_time.split('T')[0]+'T'
+        not_todays = [_id for _id in list(the_plan.keys()) if (_id.find(today) == -1)]
+        
+        candidates = the_obvious.union(set(not_todays))
+
+        _items = list(candidates) if (len(candidates) > 0) else the_list
+        priorities1 = [item for item in _items]
         msg = 'priorities1 has {} items.'.format(len(priorities1))
         logger.info(msg)
-        the_process.append('1={}'.format(len(priorities1)))
         if (len(priorities1) > 0):
             choice = random.choice(priorities1)
             msg = 'priorities1 has choice {}.'.format(choice)
             logger.info(msg)
-        else:
-            the_plan = __get_the_plan(mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, environ=environ, tenant_id=tenant_id)
-
-            if (the_plan):
-                doy = '{}'.format(doy_from_ts(ts_current_time))
-                def has_rotations_now(obj, p=None):
-                    if (p is not None):
-                        plans = p.get(__plans__, {})
-                        if (isinstance(plans, dict)):
-                            specific = plans.get(obj.get('_id'), {})
-                            if (isinstance(specific, dict)):
-                                process = specific.get('__the_rotation__', {})
-                                if (not isinstance(process, dict)):
-                                    process = {}
-                                if (isinstance(process, dict)):
-                                    rotations = process.get(doy, {})
-                                    if (isinstance(rotations, dict)):
-                                        return len(rotations) > 0
-                    return False
-                priorities2 = [item for item in the_list if (not isinstance(item, str)) and (not has_rotations_now(item, p=the_plan))]
-            else:
-                priorities2 = [item for item in the_list if (not isinstance(item, str))]
-            msg = 'priorities2 has {} items.'.format(len(priorities2))
-            logger.info(msg)
-            the_process.append('2={}'.format(len(priorities2)))
-            if (len(priorities2) > 0):
-                choice = random.choice(priorities2)
-                msg = 'priorities2 has choice {}.'.format(choice)
-                logger.info(msg)
     msg = 'choice is  {}.'.format(choice)
     logger.info(msg)
-    the_process.append(choice)
-    this_process[ts_current_time] = the_process
     return choice
 
 @args.kwargs(__get_a_choice)
