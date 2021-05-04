@@ -116,6 +116,7 @@ reset_plans_for_choices = 'reset_plans_for_choices'
 reset_article_plans = 'reset_article_plans'
 twitterbot_accounts = 'twitterbot_accounts'
 get_account_id = 'get_account_id'
+get_Options = 'get_Options'
 
 
 word_cloud = 'word_cloud'
@@ -492,18 +493,7 @@ def save_tweet_stats(fpath, data, logger=None):
             logger.error(l.rstrip())
     return
 
-
-class Options(enum.Enum):
-    do_nothing = 0
-    do_analysis = 1
-    init_articles = 2
-
-
 if (__name__ == '__main__'):
-    __options__ = Options.do_nothing
-    #__options__ = Options.init_articles
-    #__options__ = Options.do_analysis
-    
     plugins_manager = plugins_handler.SmartPluginManager(plugins, debug=True, logger=logger)
     service_runner = plugins_manager.get_runner()
     
@@ -511,6 +501,13 @@ if (__name__ == '__main__'):
     twitter_bot_account.environ = __env__ if (is_simulated_production() or (__the_options__ == TheOptions.use_local)) else __env2__ if (__the_options__ == TheOptions.use_cluster) else __env3__ if (__the_options__ == TheOptions.use_cosmos0) else None
 
     assert is_really_a_string(twitter_bot_account.tenant_id), 'Missing the twitter_bot_account.tenant_id.'
+    
+    service_runner.allow(articles_list, get_Options)
+    Options = service_runner.articles_list.get_Options(**plugins_handler.get_kwargs())
+
+    __options__ = Options.do_nothing
+    #__options__ = Options.init_articles
+    #__options__ =  Options.do_analysis
     
     __followers_executor_running__ = True #not __production__
     __likes_executor_running__ = True #not __production__
@@ -532,7 +529,7 @@ if (__name__ == '__main__'):
         # Perform analysis to determine usage stats
         if (__options__ == Options.do_analysis):
             service_runner.allow(articles_list, analyse_the_plans)
-            service_runner.articles_list.analyse_the_plans(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, logger=logger))
+            service_runner.articles_list.analyse_the_plans(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, options=__options__, logger=logger))
         
         #service_runner.allow(articles_list, reset_article_plans)
         #the_plan = service_runner.articles_list.reset_article_plans(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, logger=logger))

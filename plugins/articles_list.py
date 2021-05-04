@@ -477,16 +477,16 @@ def __drop_articles(environ=None, tenant_id=None, mongo_db_name=None, mongo_arti
 
 class Options(enum.Enum):
     do_nothing = 0
-    do_reset = 1
-    do_analysis = 2
+    do_analysis = 1
+    init_articles = 2
+    do_reset = 4
 
-def __analyse_the_plans(twitter_bot_account=None, environ={}, logger=None):
+
+def __analyse_the_plans(twitter_bot_account=None, environ={}, options=Options.do_nothing, logger=None):
     assert twitter_bot_account, 'Missing twitter_bot_account.'
     assert environ, 'Missing environ.'
     
-    #__options__ = Options.do_nothing
-    __options__ = Options.do_reset
-    #__options__ = Options.do_analysis
+    __options__ = options
 
     articles = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, logger=logger)
     
@@ -598,5 +598,13 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, logger=None):
 def analyse_the_plans(*args, **kwargs):
     pass
 #######################################################################
+
+def __get_Options():
+    return Options
+
+
+@args.kwargs(__get_Options)
+def get_Options(*args, **kwargs):
+    pass
 
 
