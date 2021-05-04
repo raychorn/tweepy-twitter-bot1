@@ -485,8 +485,8 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, logger=None):
     assert environ, 'Missing environ.'
     
     #__options__ = Options.do_nothing
-    #__options__ = Options.do_reset
-    __options__ = Options.do_analysis
+    __options__ = Options.do_reset
+    #__options__ = Options.do_analysis
 
     articles = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, logger=logger)
     
@@ -505,7 +505,7 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, logger=None):
             new_account = __store_the_account(account, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name)
             assert len(account) == len(new_account), 'Something went wrong. With cleaning the account.'
             
-            __drop_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
+            #__drop_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
 
     def analyse_account_plan(*args, **kwargs):
         import matplotlib.pyplot as plt
