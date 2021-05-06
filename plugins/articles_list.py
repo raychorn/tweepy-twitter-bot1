@@ -197,7 +197,6 @@ def __get_articles(_id=None, environ=None, tenant_id=None, mongo_db_name=None, m
         coll = table[col_name]
 
         recs = []
-        print('DEBUG: logger -> {}'.format(logger))
         if (logger):
             logger.info('DEBUG: (1) _id -> {}'.format(_id))
         _id = _id[0] if (isinstance(_id, tuple)) else _id
@@ -489,10 +488,13 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, options=Options.do
     assert environ, 'Missing environ.'
     
     __options__ = options
+    
+    _is_advert_regex = re.compile('advert', re.IGNORECASE)
+    is_advert = lambda s:_is_advert_regex.search(s)
 
     all_articles = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
-    articles = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, criteria={'description': {'$not': re.compile('advert', re.IGNORECASE)}}, logger=logger)
-    adverts = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, criteria={'description': re.compile('advert', re.IGNORECASE)}, logger=logger)
+    articles = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, criteria={'description': {'$not': _is_advert_regex}}, logger=logger)
+    adverts = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, criteria={'description': _is_advert_regex}, logger=logger)
     
     assert len(all_articles) == len(articles) + len(adverts), 'Something wrong with the queries. Please fix.'
     
@@ -529,6 +531,9 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, options=Options.do
         _adverts = kwargs.get('kwargs', {}).get('adverts', [])
         s_adverts = set(_adverts)
         
+        __is_advert_func = kwargs.get('kwargs', {}).get('is_advert')
+        __is_advert = lambda s:(__is_advert_func(s) != None) if (callable(__is_advert_func)) else False
+        
         s_articles = set(_articles if (_articles) else [])
         has_articles = False if (len(s_articles) == 0) else True
         
@@ -538,17 +543,28 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, options=Options.do
             min_ts = _utils.getFromNativeTimeStamp(ts)
             max_ts = _utils.getFromNativeTimeStamp(ts)
             the_plans = {}
-            total_tweets = 0
+            total_tweets_adverts = 0
+            total_tweets_articles = 0
             plans = account.get(__plans__, {})
             _objects = []
             _objects_nums = []
+            count_adverts = 0
+            count_non_adverts = 0
             for _id,details in plans.items():
                 _objects.append(_id)
                 s_articles.discard(_id)
                 num_for_object = 0
 
-                #article = __get_articles(_id=_id, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
+                _article = __get_articles(_id=_id, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
+                __is__ = __is_advert(_article.get('description', ''))
                 __is_advert__ = _id in s_adverts
+                
+                assert __is__ == __is_advert__, 'Something went wrong. Please fix this.'
+                
+                if (__is_advert__ or __is__):
+                    count_adverts += 1
+                else:
+                    count_non_adverts += 1
 
                 for ts,num in details.items():
                     d_ts = _utils.getFromNativeTimeStamp(ts,format=None)
@@ -556,17 +572,27 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, options=Options.do
                     max_ts = max(max_ts, d_ts)
                     bucket = the_plans.get(_id, {})
                     Tweet = tweet_factory()
-                    total_tweets += num
+                    if (__is_advert__):
+                        total_tweets_adverts += num
+                    else:
+                        total_tweets_articles += num
                     num_for_object += num
                     bucket[ts] = Tweet(ts=ts, d_ts=d_ts, num=num, delta_secs=0)
                     the_plans[_id] = bucket
                 _objects_nums.append(num_for_object)
             print('min_ts -> {}, max_ts -> {}'.format(min_ts, max_ts))
+            
+            print('count_adverts -> {}, count_non_adverts -> {}'.format(count_adverts, count_non_adverts))
+            print('count of _adverts -> {}, count of _articles -> {}'.format(len(_adverts), len(_articles)))
 
-            min_secs = sys.maxsize
-            max_secs = -sys.maxsize
-            discreet_steps = []
+            stats_adverts_min_secs = sys.maxsize
+            stats_adverts_max_secs = -sys.maxsize
+            stats_articles_min_secs = sys.maxsize
+            stats_articles_max_secs = -sys.maxsize
+            discreet_steps_adverts = []
+            discreet_steps_articles = []
             for _id,details in the_plans.items():
+                __is_advert__ = _id in s_adverts
                 for ts,tweet in details.items():
                     assert tweet.d_ts >= min_ts, '(1) Problem with # {} d_ts {} (ts {}) out of range of min_ts {}.'.format(_id, tweet.d_ts, ts, min_ts)
                     assert tweet.d_ts <= max_ts, '(2) Problem with # {} d_ts {} (ts {}) out of range of max_ts {}.'.format(_id, tweet.d_ts, ts, max_ts)
@@ -575,19 +601,24 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, options=Options.do
                     bucket = the_plans.get(_id, {})
                     Tweet = tweet_factory()
                     bucket[ts] = Tweet(ts=ts, d_ts=tweet.d_ts, num=tweet.num, delta_secs=secs)
-                    min_secs = min(min_secs, secs)
-                    max_secs = max(max_secs, secs)
-                    discreet_steps.append(secs)
+                    if (__is_advert__):
+                        stats_adverts_min_secs = min(stats_adverts_min_secs, secs)
+                        stats_adverts_max_secs = min(stats_adverts_max_secs, secs)
+                        discreet_steps_adverts.append(secs)
+                    else:
+                        stats_articles_min_secs = min(stats_articles_min_secs, secs)
+                        stats_articles_max_secs = min(stats_articles_max_secs, secs)
+                        discreet_steps_articles.append(secs)
                     the_plans[_id] = bucket
-            discreet_steps = set(discreet_steps)
-            print('min_secs -> {}, max_secs -> {}, number of discreet_steps {}'.format(min_secs, max_secs, len(discreet_steps)))
-            if (has_articles):
-                assert len(s_articles) == 0, 'Expected s_articles to be empty but it has {} items. This is a problem.'.format(len(s_articles))
-            else:
-                print('WARNING: There were no articles to analyze in the master list. Please fix.')
-            print('There were {} total tweets.'.format(total_tweets))
+            discreet_steps_adverts = set(discreet_steps_adverts)
+            discreet_steps_articles = set(discreet_steps_articles)
+            print('Adverts: min_secs -> {}, max_secs -> {}, number of discreet_steps {}'.format(stats_adverts_min_secs, stats_adverts_max_secs, len(discreet_steps_adverts)))
+            print('Articles: min_secs -> {}, max_secs -> {}, number of discreet_steps {}'.format(stats_articles_min_secs, stats_articles_max_secs, len(discreet_steps_articles)))
+            assert len(s_articles) > 0, 'Expected s_articles to NOT be empty but it has {} items. This is a problem.'.format(len(s_articles))
+            print('Adverts: There were {} total tweets.'.format(total_tweets_adverts))
+            print('Articles: There were {} total tweets.'.format(total_tweets_articles))
 
-            if (1):
+            if (0):
                 plt.rcdefaults()
                 y_pos = np.arange(len(_objects))
                 plt.bar(y_pos, _objects_nums, align='center', alpha=0.5)
@@ -601,7 +632,7 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, options=Options.do
     if (__options__ == Options.do_reset):
         plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=clean_account, kwargs={'articles':articles})
     elif (__options__ == Options.do_analysis):
-        plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=analyse_account_plan, kwargs={'all_articles':all_articles, 'articles':articles, 'adverts':adverts})
+        plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=analyse_account_plan, kwargs={'all_articles':all_articles, 'articles':articles, 'adverts':adverts, 'is_advert':is_advert})
 
     return
 

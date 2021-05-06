@@ -8,6 +8,8 @@ import mujson as json
 import pprint
 import socket
 import logging
+
+from loguru import logger as smart_logger
 from logging.handlers import RotatingFileHandler
 
 import urllib3
@@ -493,7 +495,9 @@ def save_tweet_stats(fpath, data, logger=None):
             logger.error(l.rstrip())
     return
 
-if (__name__ == '__main__'):
+
+@smart_logger.catch
+def main_loop(max_tweets=None, debug=False, logger=None):
     plugins_manager = plugins_handler.SmartPluginManager(plugins, debug=True, logger=logger)
     service_runner = plugins_manager.get_runner()
     
@@ -507,7 +511,8 @@ if (__name__ == '__main__'):
 
     #__options__ = Options.do_nothing
     #__options__ = Options.init_articles
-    __options__ =  Options.do_analysis
+    #__options__ =  Options.do_analysis
+    __options__ =  Options.do_reset
     
     __followers_executor_running__ = True #not __production__
     __likes_executor_running__ = True #not __production__
@@ -530,6 +535,7 @@ if (__name__ == '__main__'):
         if (__options__ == Options.do_analysis):
             service_runner.allow(articles_list, analyse_the_plans)
             service_runner.articles_list.analyse_the_plans(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, options=__options__, logger=logger))
+            return
         
         #service_runner.allow(articles_list, reset_article_plans)
         #the_plan = service_runner.articles_list.reset_article_plans(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, logger=logger))
@@ -581,6 +587,7 @@ if (__name__ == '__main__'):
         h = get_top_trending_hashtags(api)
         print(h)
 
+    num_tweets = 0
     while(1):
         try:
             print('\n'*10)
@@ -721,6 +728,14 @@ if (__name__ == '__main__'):
                         logger.info('(3) backup_last_run -> {}'.format(backup_last_run))
                         #backup_master_list()
             issue_tweet()
+            if (isinstance(max_tweets, int)) and (is_simulated_production()):
+                num_tweets += 1
+                if (num_tweets > max_tweets):
+                    if (logger):
+                        logger.info('DONE: num_tweets -> {}, max_tweets -> {}'.format(num_tweets, max_tweets))
+                    break
+            if (logger):
+                logger.info('INFO: num_tweets -> {}, max_tweets -> {}'.format(num_tweets, max_tweets))
             
         except KeyboardInterrupt:
             msg = 'KeyboardInterrupt.'
@@ -738,3 +753,10 @@ if (__name__ == '__main__'):
                     logger.warning('Twitter rate limit was blown. Restarting after sleeping...')
                 time.sleep(3600)
                 api = service_runner.exec(twitter_verse, get_api, **plugins_handler.get_kwargs(consumer_key=consumer_key, consumer_secret=consumer_secret, access_token=access_token, access_token_secret=access_token_secret, logger=logger))
+
+
+if (__name__ == '__main__'):
+    max_tweets = None
+    if (is_simulated_production()):
+        max_tweets = 1000
+    main_loop(max_tweets=max_tweets, debug=True, logger=logger)
