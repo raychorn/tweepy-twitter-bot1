@@ -483,12 +483,18 @@ class Options(enum.Enum):
 
 
 def __analyse_the_plans(twitter_bot_account=None, environ={}, options=Options.do_nothing, logger=None):
+    import re
+    
     assert twitter_bot_account, 'Missing twitter_bot_account.'
     assert environ, 'Missing environ.'
     
     __options__ = options
 
-    articles = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, logger=logger)
+    all_articles = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
+    articles = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, criteria={'description': {'$not': re.compile('advert', re.IGNORECASE)}}, logger=logger)
+    adverts = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, criteria={'description': re.compile('advert', re.IGNORECASE)}, logger=logger)
+    
+    assert len(all_articles) == len(articles) + len(adverts), 'Something wrong with the queries. Please fix.'
     
     def clean_account(*args, **kwargs):
         account = kwargs.get('account')
@@ -516,7 +522,12 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, options=Options.do
         
         tweet_factory = lambda : namedtuple('Tweet', ['ts', 'd_ts', 'num', 'delta_secs'])
 
-        _articles = kwargs.get('articles')
+        _all_articles = kwargs.get('kwargs', {}).get('all_articles', [])
+        s_all_articles = set(_all_articles)
+        _articles = kwargs.get('kwargs', {}).get('articles', [])
+        s__articles = set(_articles)
+        _adverts = kwargs.get('kwargs', {}).get('adverts', [])
+        s_adverts = set(_adverts)
         
         s_articles = set(_articles if (_articles) else [])
         has_articles = False if (len(s_articles) == 0) else True
@@ -536,8 +547,8 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, options=Options.do
                 s_articles.discard(_id)
                 num_for_object = 0
 
-                article = __get_articles(_id=_id, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, logger=logger)
-                print()
+                #article = __get_articles(_id=_id, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
+                __is_advert__ = _id in s_adverts
 
                 for ts,num in details.items():
                     d_ts = _utils.getFromNativeTimeStamp(ts,format=None)
@@ -590,7 +601,7 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, options=Options.do
     if (__options__ == Options.do_reset):
         plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=clean_account, kwargs={'articles':articles})
     elif (__options__ == Options.do_analysis):
-        plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=analyse_account_plan, kwargs={'articles':articles})
+        plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=analyse_account_plan, kwargs={'all_articles':all_articles, 'articles':articles, 'adverts':adverts})
 
     return
 
