@@ -532,7 +532,7 @@ def main_loop(max_tweets=None, debug=False, logger=None):
 
     if (is_simulated_production()):
         # Perform analysis to determine usage stats
-        if (__options__ == Options.do_analysis):
+        if (__options__ == Options.do_analysis) or (__options__ == Options.do_reset):
             service_runner.allow(articles_list, analyse_the_plans)
             service_runner.articles_list.analyse_the_plans(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, options=__options__, logger=logger))
             return
