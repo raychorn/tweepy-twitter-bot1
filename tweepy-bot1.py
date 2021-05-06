@@ -509,10 +509,10 @@ def main_loop(max_tweets=None, debug=False, logger=None):
     service_runner.allow(articles_list, get_Options)
     Options = service_runner.articles_list.get_Options(**plugins_handler.get_kwargs())
 
-    #__options__ = Options.do_nothing
+    __options__ = Options.do_nothing
     #__options__ = Options.init_articles
     #__options__ =  Options.do_analysis
-    __options__ =  Options.do_reset
+    #__options__ =  Options.do_reset
     
     __followers_executor_running__ = True #not __production__
     __likes_executor_running__ = True #not __production__
