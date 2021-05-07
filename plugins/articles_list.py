@@ -481,7 +481,7 @@ class Options(enum.Enum):
     do_reset = 4
 
 
-def __analyse_the_plans(twitter_bot_account=None, environ={}, options=Options.do_nothing, logger=None):
+def __analyse_the_plans(twitter_bot_account=None, environ={}, json_path=None, options=Options.do_nothing, logger=None):
     import re
     
     assert twitter_bot_account, 'Missing twitter_bot_account.'
@@ -530,6 +530,8 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, options=Options.do
         s__articles = set(_articles)
         _adverts = kwargs.get('kwargs', {}).get('adverts', [])
         s_adverts = set(_adverts)
+        
+        _json_path = kwargs.get('kwargs', {}).get('json_path')
         
         __is_advert_func = kwargs.get('kwargs', {}).get('is_advert')
         __is_advert = lambda s:(__is_advert_func(s) != None) if (callable(__is_advert_func)) else False
@@ -603,18 +605,41 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, options=Options.do
                     bucket[ts] = Tweet(ts=ts, d_ts=tweet.d_ts, num=tweet.num, delta_secs=secs)
                     if (__is_advert__):
                         stats_adverts_min_secs = min(stats_adverts_min_secs, secs)
-                        stats_adverts_max_secs = min(stats_adverts_max_secs, secs)
+                        stats_adverts_max_secs = max(stats_adverts_max_secs, secs)
                         discreet_steps_adverts.append(secs)
                     else:
                         stats_articles_min_secs = min(stats_articles_min_secs, secs)
-                        stats_articles_max_secs = min(stats_articles_max_secs, secs)
+                        stats_articles_max_secs = max(stats_articles_max_secs, secs)
                         discreet_steps_articles.append(secs)
                     the_plans[_id] = bucket
             discreet_steps_adverts = set(discreet_steps_adverts)
             discreet_steps_articles = set(discreet_steps_articles)
+            if (is_really_a_string(_json_path)):
+                print('_json_path -> {}'.format(_json_path))
+                data = {
+                    'adverts': {
+                        'count_adverts': count_adverts,
+                        'len_adverts': len(_adverts),
+                        'stats_adverts_min_secs': stats_adverts_min_secs,
+                        'stats_adverts_max_secs': stats_adverts_max_secs,
+                        'discreet_steps_adverts': len(discreet_steps_adverts),
+                        'total_tweets_adverts': total_tweets_adverts
+                    },
+                    'articles': {
+                        'count_non_adverts': count_non_adverts,
+                        'len_non_adverts': len(_articles),
+                        'stats_articles_min_secs': stats_articles_min_secs,
+                        'stats_articles_max_secs': stats_articles_max_secs,
+                        'discreet_steps_articles': len(discreet_steps_articles),
+                        'total_tweets_articles': total_tweets_articles
+                    }
+                }
+                with open(_json_path, 'w') as fOut:
+                    print(json.dumps(data, indent=3), file=fOut)
+                
             print('Adverts: min_secs -> {}, max_secs -> {}, number of discreet_steps {}'.format(stats_adverts_min_secs, stats_adverts_max_secs, len(discreet_steps_adverts)))
             print('Articles: min_secs -> {}, max_secs -> {}, number of discreet_steps {}'.format(stats_articles_min_secs, stats_articles_max_secs, len(discreet_steps_articles)))
-            assert len(s_articles) > 0, 'Expected s_articles to NOT be empty but it has {} items. This is a problem.'.format(len(s_articles))
+            assert len(s_articles) == 0, 'Expected s_articles to NOT be empty but it has {} items. This is a problem.'.format(len(s_articles))
             print('Adverts: There were {} total tweets.'.format(total_tweets_adverts))
             print('Articles: There were {} total tweets.'.format(total_tweets_articles))
 
@@ -632,7 +657,7 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, options=Options.do
     if (__options__ == Options.do_reset):
         plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=clean_account, kwargs={'articles':articles})
     elif (__options__ == Options.do_analysis):
-        plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=analyse_account_plan, kwargs={'all_articles':all_articles, 'articles':articles, 'adverts':adverts, 'is_advert':is_advert})
+        plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=analyse_account_plan, kwargs={'all_articles':all_articles, 'articles':articles, 'adverts':adverts, 'is_advert':is_advert, 'json_path':json_path})
 
     return
 

@@ -99,6 +99,7 @@ logger = setup_rotating_file_handler(base_filename, log_filename, (1024*1024*102
 logger.addHandler(get_stream_handler())
 
 json_path = os.sep.join([os.path.dirname(__file__), 'json', '{}_tweet-stats.json'.format(base_filename)])
+json_final_path = os.sep.join([os.path.dirname(__file__), 'json', '{}_tweet-stats-final_{}.json'.format(base_filename, default_timestamp(datetime.utcnow()))])
 
 twitter_verse = 'twitter_verse'
 get_api = 'get_api'
@@ -509,9 +510,9 @@ def main_loop(max_tweets=None, debug=False, logger=None):
     service_runner.allow(articles_list, get_Options)
     Options = service_runner.articles_list.get_Options(**plugins_handler.get_kwargs())
 
-    __options__ = Options.do_nothing
+    #_options__ = Options.do_nothing
     #__options__ = Options.init_articles
-    #__options__ =  Options.do_analysis
+    __options__ =  Options.do_analysis
     #__options__ =  Options.do_reset
     
     __followers_executor_running__ = True #not __production__
@@ -534,7 +535,7 @@ def main_loop(max_tweets=None, debug=False, logger=None):
         # Perform analysis to determine usage stats
         if (__options__ == Options.do_analysis) or (__options__ == Options.do_reset):
             service_runner.allow(articles_list, analyse_the_plans)
-            service_runner.articles_list.analyse_the_plans(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, options=__options__, logger=logger))
+            service_runner.articles_list.analyse_the_plans(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, json_path=json_final_path, options=__options__, logger=logger))
             return
         
         #service_runner.allow(articles_list, reset_article_plans)
