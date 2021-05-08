@@ -459,7 +459,7 @@ def __update_the_plan(logger=None, environ={}, twitter_bot_account=None):
     
     new_account = __store_the_account(account, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name)
     
-    assert len(new_account.get(__plans__)) == len(twitter_bot_account.tweet_stats), 'Problem with the updating the plan.'
+    #assert len(new_account.get(__plans__)) == len(twitter_bot_account.tweet_stats), 'Problem with the updating the plan.'
 
     return new_account
 

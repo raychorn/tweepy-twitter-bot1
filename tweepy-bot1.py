@@ -385,7 +385,7 @@ class TwitterBotAccount():
             self.service_runner.allow(articles_list, 'get_articles')
             __data_adverts__['adverts'] = self.service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(environ=self.environ, tenant_id=self.tenant_id, mongo_db_name=self.mongo_db_name, mongo_articles_col_name=self.mongo_articles_col_name, criteria=just_adverts_critera, logger=logger))
             if (isinstance(__data_adverts__.get('adverts'), list)):
-                __data_adverts__['adverts'] = set(__data_adverts__.get('adverts', []))
+                __data_adverts__['adverts'] = __data_adverts__.get('adverts', [])
             __data_adverts__['count_adverts'] = len(__data_adverts__.get('adverts', []))
             
             assert __data_adverts__.get('count_adverts', -1) > 0, 'Something went wrong with the adverts count. Please fix.'
@@ -468,7 +468,7 @@ class TwitterBotAccount():
             if (count_just_adverts > __data_adverts__.get('count_adverts', -1)):
                 __data_adverts__['adverts'] = self.service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(environ=self.environ, tenant_id=self.tenant_id, mongo_db_name=self.mongo_db_name, mongo_articles_col_name=self.mongo_articles_col_name, criteria=just_adverts_critera, logger=logger))
                 if (isinstance(__data_adverts__.get('adverts'), list)):
-                    __data_adverts__['adverts'] = set(__data_adverts__.get('adverts', []))
+                    __data_adverts__['adverts'] = __data_adverts__.get('adverts', [])
         
         s_just_adverts = __data_adverts__.get('adverts', [])
         is_advert = the_choice in s_just_adverts
