@@ -452,6 +452,34 @@ class TwitterBotAccount():
                 'total_tweets_articles': total_tweets_articles
             }
         '''
+        __data__ = self.__tweet_stats__.get('__data__', {})
+        if (len(__data__) > 0):
+            __data_start_ts__ = __data__.get('start_ts')
+            if (not is_really_a_string(__data_start_ts__)):
+                __data__['start_ts'] = ts_current_time
+
+            __data_adverts__ = __data__.get('adverts', {})
+
+            self.service_runner.allow(articles_list, 'criteria')
+            just_adverts_critera = self.service_runner.articles_list.criteria(**plugins_handler.get_kwargs(property='description', keyword='advert', is_not=False, ignore_case=True))
+            self.service_runner.allow(articles_list, 'get_articles')
+            count_just_adverts = self.service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(get_count_only=True, environ=self.environ, tenant_id=self.tenant_id, mongo_db_name=self.mongo_db_name, mongo_articles_col_name=self.mongo_articles_col_name, criteria=just_adverts_critera, logger=logger))
+            
+            if (count_just_adverts > __data_adverts__.get('count_adverts', -1)):
+                __data_adverts__['adverts'] = self.service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(environ=self.environ, tenant_id=self.tenant_id, mongo_db_name=self.mongo_db_name, mongo_articles_col_name=self.mongo_articles_col_name, criteria=just_adverts_critera, logger=logger))
+                if (isinstance(__data_adverts__.get('adverts'), list)):
+                    __data_adverts__['adverts'] = set(__data_adverts__.get('adverts', []))
+        
+        s_just_adverts = __data_adverts__.get('adverts', [])
+        is_advert = the_choice in s_just_adverts
+        
+        if (is_advert):
+            __data_adverts__ = __data__.get('adverts', {})
+            __data_adverts__['count_tweets'] = __data_adverts__.get('count_tweets', 0) + 1
+        else:
+            __data_articles__ = __data__.get('articles', {})
+            __data_articles__['count_tweets'] = __data_articles__.get('count_tweets', 0) + 1
+        
         self.__tweet_stats__[the_choice] = self.__tweet_stats__.get(the_choice, {})
         self.__tweet_stats__[the_choice][ts_current_time] = self.__tweet_stats__[the_choice].get(ts_current_time, 0) + 1
         
