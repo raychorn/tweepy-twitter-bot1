@@ -186,7 +186,7 @@ def __store_the_plan(data, environ=None, tenant_id=None, mongo_db_name=None, mon
     return db_store_the_plan(data=data)
 
 
-def __get_articles(_id=None, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, callback=None, logger=None):
+def __get_articles(_id=None, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, get_count_only=False, callback=None, logger=None):
     @__with.database(environ=environ)
     def db_get_articles(db=None, _id=None):
         assert vyperapi.is_not_none(db), 'There is no db.'
@@ -206,7 +206,7 @@ def __get_articles(_id=None, environ=None, tenant_id=None, mongo_db_name=None, m
             if (logger):
                 logger.info('DEBUG: (3) criteria -> {}'.format(criteria))
             try:
-                recs = [str(doc.get('_id')) for doc in find_in_collection(coll, criteria=criteria)]
+                recs = [str(doc.get('_id')) for doc in find_in_collection(coll, criteria=criteria)] if (not get_count_only) else find_in_collection(coll, criteria=criteria).count()
             except Exception as ex:
                 extype, ex, tb = sys.exc_info()
                 for l in traceback.format_exception(extype, ex, tb):
@@ -226,6 +226,17 @@ def __get_articles(_id=None, environ=None, tenant_id=None, mongo_db_name=None, m
 @args.kwargs(__get_articles)
 def get_articles(*args, **kwargs):
     pass
+
+###########################################################
+
+def __count_all_articles(twitter_bot_account=None, environ=None, callback=None, logger=None):
+    return __get_articles(get_count_only=True, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, callback=callback, logger=logger)
+
+@args.kwargs(__count_all_articles)
+def count_all_articles(*args, **kwargs):
+    pass
+
+###########################################################
 
 
 def __store_article_data(data, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, update=None):
@@ -440,15 +451,15 @@ def update_the_article(*args, **kwargs):
     pass
 
 
-def __update_the_plan(tweet_stats=None, logger=None, environ={}, twitter_bot_account=None):
+def __update_the_plan(logger=None, environ={}, twitter_bot_account=None):
 
     account = __get_the_account(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id)
 
-    account[__plans__] = tweet_stats
+    account[__plans__] = twitter_bot_account.tweet_stats
     
     new_account = __store_the_account(account, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name)
     
-    assert len(new_account.get(__plans__)) == len(tweet_stats), 'Problem with the updating the plan.'
+    assert len(new_account.get(__plans__)) == len(twitter_bot_account.tweet_stats), 'Problem with the updating the plan.'
 
     return new_account
 
@@ -481,20 +492,40 @@ class Options(enum.Enum):
     do_reset = 4
 
 
-def __analyse_the_plans(twitter_bot_account=None, environ={}, json_path=None, options=Options.do_nothing, logger=None):
+def __criteria(property=None, keyword=None, is_not=False, ignore_case=False):
     import re
-    
+    assert is_really_a_string(property), 'Missing property. Cannot do search in database without this one.'
+    assert is_really_a_string(keyword), 'Missing keyword. Cannot do search in database without this one.'
+    _is_regex = re.compile(keyword, re.IGNORECASE)  if (ignore_case) else re.compile(keyword)
+    return {property: {'$not': _is_regex}} if (is_not) else {property: _is_regex}
+
+@args.kwargs(__criteria)
+def criteria(*args, **kwargs):
+    pass
+
+
+def __analyse_the_plans(twitter_bot_account=None, environ={}, json_path=None, options=Options.do_nothing, logger=None):
     assert twitter_bot_account, 'Missing twitter_bot_account.'
     assert environ, 'Missing environ.'
     
     __options__ = options
     
-    _is_advert_regex = re.compile('advert', re.IGNORECASE)
-    is_advert = lambda s:_is_advert_regex.search(s)
-
+    count_all_articles = __get_articles(get_count_only=True, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
     all_articles = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
-    articles = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, criteria={'description': {'$not': _is_advert_regex}}, logger=logger)
-    adverts = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, criteria={'description': _is_advert_regex}, logger=logger)
+    assert count_all_articles > 0, '(1) Something wrong with getting the recs count? Please fix.'
+    assert count_all_articles == len(all_articles), '(2) Something wrong with getting the recs count? Please fix.'
+
+    just_articles_critera = __criteria(property='description', keyword='advert', is_not=True, ignore_case=True)
+    count_just_articles = __get_articles(get_count_only=True, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, criteria=just_articles_critera, logger=logger)
+    articles = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, criteria=just_articles_critera, logger=logger)
+    assert count_just_articles > 0, '(1) Something wrong with getting the recs count for just articles? Please fix.'
+    assert count_just_articles == len(articles), '(2) Something wrong with getting the recs count for just articles? Please fix.'
+
+    just_adverts_critera = __criteria(property='description', keyword='advert', is_not=False, ignore_case=True)
+    count_just_adverts = __get_articles(get_count_only=True, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, criteria=just_adverts_critera, logger=logger)
+    adverts = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, criteria=just_adverts_critera, logger=logger)
+    assert count_just_adverts > 0, '(1) Something wrong with getting the recs count for just adverts? Please fix.'
+    assert count_just_adverts == len(adverts), '(2) Something wrong with getting the recs count for just adverts? Please fix.'
     
     assert len(all_articles) == len(articles) + len(adverts), 'Something wrong with the queries. Please fix.'
     

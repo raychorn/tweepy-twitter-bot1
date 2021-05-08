@@ -349,6 +349,7 @@ class TwitterBotAccount():
         self.__environ__ = environ
         self.__service_runner__ = service_runner
         self.__account_cache__ = {}
+        self.__tweet_stats__ = {}
         
     @property
     def account_cache(self):
@@ -369,6 +370,35 @@ class TwitterBotAccount():
     @service_runner.setter
     def service_runner(self, value):
         self.__service_runner__ = value
+
+        __data__ = self.__tweet_stats__.get('__data__', {})
+        if (len(__data__) == 0):
+            self.__tweet_stats__['__data__'] = {}
+            __data__ = self.__tweet_stats__.get('__data__', {})
+            
+            __data__['adverts'] = {}
+            __data_adverts__ = __data__.get('adverts', {})
+
+            self.service_runner.allow(articles_list, 'criteria')
+            just_adverts_critera = self.service_runner.articles_list.criteria(**plugins_handler.get_kwargs(property='description', keyword='advert', is_not=False, ignore_case=True))
+
+            self.service_runner.allow(articles_list, 'get_articles')
+            __data_adverts__['adverts'] = self.service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(environ=self.environ, tenant_id=self.tenant_id, mongo_db_name=self.mongo_db_name, mongo_articles_col_name=self.mongo_articles_col_name, criteria=just_adverts_critera, logger=logger))
+            if (isinstance(__data_adverts__.get('adverts'), list)):
+                __data_adverts__['adverts'] = set(__data_adverts__.get('adverts', []))
+            __data_adverts__['count_adverts'] = len(__data_adverts__.get('adverts', []))
+            
+            assert __data_adverts__.get('count_adverts', -1) > 0, 'Something went wrong with the adverts count. Please fix.'
+
+            __data__['articles'] = {}
+            __data_articles__ = __data__.get('articles', {})
+
+            self.service_runner.allow(articles_list, 'criteria')
+            just_articles_critera = self.service_runner.articles_list.criteria(**plugins_handler.get_kwargs(property='description', keyword='advert', is_not=True, ignore_case=True))
+
+            self.service_runner.allow(articles_list, 'get_articles')
+            __data_articles__['count_articles'] = self.service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(get_count_only=True, environ=self.environ, tenant_id=self.tenant_id, mongo_db_name=self.mongo_db_name, mongo_articles_col_name=self.mongo_articles_col_name, criteria=just_articles_critera, logger=logger))
+
 
     @property
     def environ(self):
@@ -403,6 +433,34 @@ class TwitterBotAccount():
             return doc
         return None
     
+    
+    def track_the_tweet(self, the_choice, ts_current_time):
+        '''
+        data = {
+            'adverts': {
+                'count_adverts': count_adverts,
+                'stats_adverts_min_secs': stats_adverts_min_secs,
+                'stats_adverts_max_secs': stats_adverts_max_secs,
+                'discreet_steps_adverts': len(discreet_steps_adverts),
+                'total_tweets_adverts': total_tweets_adverts
+            },
+            'articles': {
+                'count_non_adverts': count_non_adverts,
+                'stats_articles_min_secs': stats_articles_min_secs,
+                'stats_articles_max_secs': stats_articles_max_secs,
+                'discreet_steps_articles': len(discreet_steps_articles),
+                'total_tweets_articles': total_tweets_articles
+            }
+        '''
+        self.__tweet_stats__[the_choice] = self.__tweet_stats__.get(the_choice, {})
+        self.__tweet_stats__[the_choice][ts_current_time] = self.__tweet_stats__[the_choice].get(ts_current_time, 0) + 1
+        
+    
+    @property
+    def tweet_stats(self):
+        return self.__tweet_stats__
+    
+
     @property
     def mongo_db_name(self):
         return mongo_twitterbot_db_name if (is_really_a_string(self.__tenant_id__)) else mongo_db_name
@@ -456,8 +514,6 @@ __vector__ = {}
 
 twitter_bot_account = TwitterBotAccount(tenant_id=os.environ.get('__tenant__'), logger=logger)
 
-__tweet_stats__ = {}
-
 def save_tweet_stats(fpath, data, logger=None):
     def eat_numbers_from_end(value):
         while(1):
@@ -502,17 +558,17 @@ def main_loop(max_tweets=None, debug=False, logger=None):
     plugins_manager = plugins_handler.SmartPluginManager(plugins, debug=True, logger=logger)
     service_runner = plugins_manager.get_runner()
     
-    twitter_bot_account.service_runner = service_runner
     twitter_bot_account.environ = __env__ if (is_simulated_production() or (__the_options__ == TheOptions.use_local)) else __env2__ if (__the_options__ == TheOptions.use_cluster) else __env3__ if (__the_options__ == TheOptions.use_cosmos0) else None
+    twitter_bot_account.service_runner = service_runner
 
     assert is_really_a_string(twitter_bot_account.tenant_id), 'Missing the twitter_bot_account.tenant_id.'
     
     service_runner.allow(articles_list, get_Options)
     Options = service_runner.articles_list.get_Options(**plugins_handler.get_kwargs())
 
-    #_options__ = Options.do_nothing
+    __options__ = Options.do_nothing
     #__options__ = Options.init_articles
-    __options__ =  Options.do_analysis
+    #__options__ =  Options.do_analysis
     #__options__ =  Options.do_reset
     
     __followers_executor_running__ = True #not __production__
@@ -699,15 +755,14 @@ def main_loop(max_tweets=None, debug=False, logger=None):
                     assert item, 'Did not retrieve an item for {}.'.format(item)
                     if (not is_simulated_production()):
                         service_runner.exec(twitter_verse, do_the_tweet, **plugins_handler.get_kwargs(api=api, item=item, logger=logger))
-                    else:
-                        __tweet_stats__[the_choice] = __tweet_stats__.get(the_choice, {})
-                        __tweet_stats__[the_choice][ts_current_time] = __tweet_stats__[the_choice].get(ts_current_time, 0) + 1
-                        save_tweet_stats(json_path, __tweet_stats__, logger=logger)
-                        if (logger):
-                            logger.debug('Simulated Tweet: {} -> {}'.format(the_choice, item.get('name')))
+                    
+                    twitter_bot_account.track_the_tweet(the_choice, ts_current_time)
+                    #save_tweet_stats(json_path, __tweet_stats__, logger=logger)
+                    if (logger):
+                        logger.debug('{} Tweet: {} -> {}'.format('Simulated' if (is_simulated_production()) else 'Real', the_choice, item.get('name')))
 
                 service_runner.allow(articles_list, update_the_plan)
-                service_runner.articles_list.update_the_plan(**plugins_handler.get_kwargs(tweet_stats=__tweet_stats__, environ=environ(), twitter_bot_account=twitter_bot_account, logger=logger))
+                service_runner.articles_list.update_the_plan(**plugins_handler.get_kwargs(environ=environ(), twitter_bot_account=twitter_bot_account, logger=logger))
                 
                 backup_last_run = __vector__.get('backup_last_run')
                 if (logger):
