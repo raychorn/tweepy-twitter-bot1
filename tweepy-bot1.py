@@ -9,6 +9,8 @@ import pprint
 import socket
 import logging
 
+from collections import namedtuple
+
 from loguru import logger as smart_logger
 from logging.handlers import RotatingFileHandler
 
@@ -462,6 +464,7 @@ class TwitterBotAccount():
             if (not is_really_a_string(__data_start_ts__)):
                 __data__['start_ts'] = ts_current_time
 
+            __data__['adverts'] = __data__.get('adverts', {})
             __data_adverts__ = __data__.get('adverts', {})
 
             self.service_runner.allow(articles_list, 'criteria')
@@ -477,7 +480,10 @@ class TwitterBotAccount():
         s_just_adverts = __data_adverts__.get('adverts', [])
         is_advert = the_choice in s_just_adverts
         
+        __data__['adverts'] = __data__.get('adverts', {})
         __data_adverts__ = __data__.get('adverts', {})
+
+        __data__['articles'] = __data__.get('articles', {})
         __data_articles__ = __data__.get('articles', {})
 
         if (is_advert):
@@ -485,9 +491,18 @@ class TwitterBotAccount():
         else:
             __data_articles__['count_tweets'] = __data_articles__.get('count_tweets', 0) + 1
 
+        __data__['summary'] = __data__.get('summary', {})
         __data_summary__ = __data__.get('summary', {})
         __data_summary__['adverts_velocity'] = (__data_adverts__.get('count_tweets', 0) / (__data_adverts__.get('count_tweets', 0) + __data_articles__.get('count_tweets', 0))) * 100.0
         __data_summary__['articles_velocity'] = (__data_articles__.get('count_tweets', 0) / (__data_adverts__.get('count_tweets', 0) + __data_articles__.get('count_tweets', 0))) * 100.0
+
+        velocity_factory = lambda : namedtuple('Velocity', ['adverts', 'articles', 'num'])
+        Velocity = velocity_factory()
+
+        __data_summary__['velocities'] = __data_summary__.get('velocities', [])
+        bucket = __data_summary__.get('velocities', [])
+        bucket.append(Velocity(adverts=__data_summary__.get('adverts_velocity', -1), articles=__data_summary__.get('articles_velocity', -1), num=len(bucket)+1))
+        __data_summary__['velocities'] = bucket
         
         self.__tweet_stats__[the_choice] = self.__tweet_stats__.get(the_choice, {})
         self.__tweet_stats__[the_choice][ts_current_time] = self.__tweet_stats__[the_choice].get(ts_current_time, 0) + 1
@@ -605,8 +620,6 @@ def main_loop(max_tweets=None, debug=False, logger=None):
 
     __options__ = Options.do_nothing
     #__options__ = Options.init_articles
-    #__options__ =  Options.do_analysis
-    #__options__ =  Options.do_reset
     
     __followers_executor_running__ = True #not __production__
     __likes_executor_running__ = True #not __production__
@@ -626,10 +639,8 @@ def main_loop(max_tweets=None, debug=False, logger=None):
 
     if (is_simulated_production()):
         # Perform analysis to determine usage stats
-        if (__options__ == Options.do_analysis) or (__options__ == Options.do_reset):
-            service_runner.allow(articles_list, analyse_the_plans)
-            service_runner.articles_list.analyse_the_plans(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, json_path=json_final_path, options=__options__, logger=logger))
-            return
+        service_runner.allow(articles_list, analyse_the_plans)
+        service_runner.articles_list.analyse_the_plans(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, json_path=json_final_path, options=Options.do_reset, logger=logger))
         
         #service_runner.allow(articles_list, reset_article_plans)
         #the_plan = service_runner.articles_list.reset_article_plans(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, logger=logger))
@@ -826,6 +837,8 @@ def main_loop(max_tweets=None, debug=False, logger=None):
                 if (num_tweets > max_tweets):
                     if (logger):
                         logger.info('DONE: num_tweets -> {}, max_tweets -> {}'.format(num_tweets, max_tweets))
+                    service_runner.allow(articles_list, analyse_the_plans)
+                    service_runner.articles_list.analyse_the_plans(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, json_path=json_final_path, options=Options.do_analysis, logger=logger))
                     break
             if (logger):
                 logger.info('INFO: num_tweets -> {}, max_tweets -> {}'.format(num_tweets, max_tweets))
