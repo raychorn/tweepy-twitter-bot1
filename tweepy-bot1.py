@@ -345,7 +345,7 @@ class TwitterPlan():
 
 
 class TwitterBotAccount():
-    def __init__(self, tenant_id=None, service_runner=None, environ=None, desired_advert_velocity=0.0, logger=None):
+    def __init__(self, tenant_id=None, service_runner=None, environ=None, desired_advert_velocity=0.0, track_velocities=False, logger=None):
         self.__logger__ = logger
         self.__tenant_id__ = tenant_id
         self.__environ__ = environ
@@ -354,6 +354,7 @@ class TwitterBotAccount():
         self.__tweet_stats__ = {}
         self.__desired_advert_velocity__ = float(desired_advert_velocity)
         self.__adverts_cache__ = {}
+        self.__track_velocities__ = track_velocities
         
     @property
     def adverts_cache(self):
@@ -370,6 +371,14 @@ class TwitterBotAccount():
     @desired_advert_velocity.setter
     def desired_advert_velocity(self, value):
         self.__desired_advert_velocity__ = value
+
+    @property
+    def track_velocities(self):
+        return self.__track_velocities__
+    
+    @track_velocities.setter
+    def track_velocities(self, value):
+        self.__track_velocities__ = value
 
     @property
     def logger(self):
@@ -517,13 +526,14 @@ class TwitterBotAccount():
         __data_summary__['adverts_velocity'] = (__data_adverts__.get('count_tweets', 0) / (__data_adverts__.get('count_tweets', 0) + __data_articles__.get('count_tweets', 1))) * 100.0
         __data_summary__['articles_velocity'] = (__data_articles__.get('count_tweets', 0) / (__data_adverts__.get('count_tweets', 0) + __data_articles__.get('count_tweets', 1))) * 100.0
 
-        velocity_factory = lambda : namedtuple('Velocity', ['adverts', 'articles', 'is_advert', 'num'])
-        Velocity = velocity_factory()
+        if (self.track_velocities):
+            velocity_factory = lambda : namedtuple('Velocity', ['adverts', 'articles', 'is_advert', 'num'])
+            Velocity = velocity_factory()
 
-        __data_summary__['velocities'] = __data_summary__.get('velocities', [])
-        bucket = __data_summary__.get('velocities', [])
-        bucket.append(Velocity(adverts=__data_summary__.get('adverts_velocity', -1), articles=__data_summary__.get('articles_velocity', -1), is_advert=is_advert, num=len(bucket)+1))
-        __data_summary__['velocities'] = bucket
+            __data_summary__['velocities'] = __data_summary__.get('velocities', [])
+            bucket = __data_summary__.get('velocities', [])
+            bucket.append(Velocity(adverts=__data_summary__.get('adverts_velocity', -1), articles=__data_summary__.get('articles_velocity', -1), is_advert=is_advert, num=len(bucket)+1))
+            __data_summary__['velocities'] = bucket
         
         self.__tweet_stats__[the_choice] = self.__tweet_stats__.get(the_choice, {})
         self.__tweet_stats__[the_choice][ts_current_time] = self.__tweet_stats__[the_choice].get(ts_current_time, 0) + 1
@@ -646,7 +656,7 @@ def save_tweet_stats(fpath, data, logger=None):
 
 
 @smart_logger.catch
-def main_loop(twitter_bot_account, environ=None, max_tweets=None, debug=False, logger=None):
+def main_loop(twitter_bot_account, max_tweets=None, debug=False, logger=None):
     plugins_manager = plugins_handler.SmartPluginManager(plugins, debug=True, logger=logger)
     service_runner = plugins_manager.get_runner()
     
@@ -904,10 +914,10 @@ def main_loop(twitter_bot_account, environ=None, max_tweets=None, debug=False, l
 
 
 if (__name__ == '__main__'):
-    twitter_bot_account = TwitterBotAccount(tenant_id=os.environ.get('__tenant__'), desired_advert_velocity=1, logger=logger)
+    twitter_bot_account = TwitterBotAccount(tenant_id=os.environ.get('__tenant__'), desired_advert_velocity=45.0, logger=logger)
     twitter_bot_account.environ = __env__ if (is_simulated_production() or (__the_options__ == TheOptions.use_local)) else __env2__ if (__the_options__ == TheOptions.use_cluster) else __env3__ if (__the_options__ == TheOptions.use_cosmos0) else None
     
     max_tweets = None
     if (is_simulated_production()):
-        max_tweets = 2000
+        max_tweets = 5000
     main_loop(twitter_bot_account, max_tweets=max_tweets, debug=True, logger=logger)
