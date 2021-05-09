@@ -352,7 +352,7 @@ class TwitterBotAccount():
         self.__service_runner__ = service_runner
         self.__account_cache__ = {}
         self.__tweet_stats__ = {}
-        self.__desired_advert_velocity__ = desired_advert_velocity
+        self.__desired_advert_velocity__ = float(desired_advert_velocity)
         self.__adverts_cache__ = {}
         
     @property
@@ -514,8 +514,8 @@ class TwitterBotAccount():
 
         __data__['summary'] = __data__.get('summary', {})
         __data_summary__ = __data__.get('summary', {})
-        __data_summary__['adverts_velocity'] = (__data_adverts__.get('count_tweets', 0) / (__data_adverts__.get('count_tweets', 0) + __data_articles__.get('count_tweets', 0))) * 100.0
-        __data_summary__['articles_velocity'] = (__data_articles__.get('count_tweets', 0) / (__data_adverts__.get('count_tweets', 0) + __data_articles__.get('count_tweets', 0))) * 100.0
+        __data_summary__['adverts_velocity'] = (__data_adverts__.get('count_tweets', 0) / (__data_adverts__.get('count_tweets', 0) + __data_articles__.get('count_tweets', 1))) * 100.0
+        __data_summary__['articles_velocity'] = (__data_articles__.get('count_tweets', 0) / (__data_adverts__.get('count_tweets', 0) + __data_articles__.get('count_tweets', 1))) * 100.0
 
         velocity_factory = lambda : namedtuple('Velocity', ['adverts', 'articles', 'is_advert', 'num'])
         Velocity = velocity_factory()
@@ -541,7 +541,7 @@ class TwitterBotAccount():
         if (len(__data__) > 0):
             __data_adverts__ = __data__.get('adverts', {})
             __data_articles__ = __data__.get('articles', {})
-            assumed_adverts_velocity = ((__data_adverts__.get('count_tweets', 0) + 1) / (__data_adverts__.get('count_tweets', 0) + __data_articles__.get('count_tweets', 0))) * 100.0
+            assumed_adverts_velocity = ((__data_adverts__.get('count_tweets', 0) + 1) / (__data_adverts__.get('count_tweets', 0) + __data_articles__.get('count_tweets', 1))) * 100.0
             __is__ = assumed_adverts_velocity <= self.desired_advert_velocity
         return __is__
     
@@ -606,8 +606,6 @@ environ = lambda : __env__ if (__the_options__ is not TheOptions.use_cluster) el
 
 __vector__ = {}
 
-twitter_bot_account = TwitterBotAccount(tenant_id=os.environ.get('__tenant__'), logger=logger)
-
 def save_tweet_stats(fpath, data, logger=None):
     def eat_numbers_from_end(value):
         while(1):
@@ -648,11 +646,10 @@ def save_tweet_stats(fpath, data, logger=None):
 
 
 @smart_logger.catch
-def main_loop(max_tweets=None, debug=False, logger=None):
+def main_loop(twitter_bot_account, environ=None, max_tweets=None, debug=False, logger=None):
     plugins_manager = plugins_handler.SmartPluginManager(plugins, debug=True, logger=logger)
     service_runner = plugins_manager.get_runner()
     
-    twitter_bot_account.environ = __env__ if (is_simulated_production() or (__the_options__ == TheOptions.use_local)) else __env2__ if (__the_options__ == TheOptions.use_cluster) else __env3__ if (__the_options__ == TheOptions.use_cosmos0) else None
     twitter_bot_account.service_runner = service_runner
 
     assert is_really_a_string(twitter_bot_account.tenant_id), 'Missing the twitter_bot_account.tenant_id.'
@@ -907,7 +904,10 @@ def main_loop(max_tweets=None, debug=False, logger=None):
 
 
 if (__name__ == '__main__'):
+    twitter_bot_account = TwitterBotAccount(tenant_id=os.environ.get('__tenant__'), desired_advert_velocity=1, logger=logger)
+    twitter_bot_account.environ = __env__ if (is_simulated_production() or (__the_options__ == TheOptions.use_local)) else __env2__ if (__the_options__ == TheOptions.use_cluster) else __env3__ if (__the_options__ == TheOptions.use_cosmos0) else None
+    
     max_tweets = None
     if (is_simulated_production()):
-        max_tweets = 10000
-    main_loop(max_tweets=max_tweets, debug=True, logger=logger)
+        max_tweets = 2000
+    main_loop(twitter_bot_account, max_tweets=max_tweets, debug=True, logger=logger)
