@@ -526,6 +526,11 @@ class TwitterBotAccount():
         __data_summary__['adverts_velocity'] = (__data_adverts__.get('count_tweets', 0) / (__data_adverts__.get('count_tweets', 0) + __data_articles__.get('count_tweets', 1))) * 100.0
         __data_summary__['articles_velocity'] = (__data_articles__.get('count_tweets', 0) / (__data_adverts__.get('count_tweets', 0) + __data_articles__.get('count_tweets', 1))) * 100.0
 
+        __data_summary__['stats'] = __data_summary__.get('stats', {})
+        bucket = __data_summary__.get('stats', {})
+        bucket[the_choice] = bucket.get(the_choice, 0) + 1
+        __data_summary__['stats'] = bucket
+
         if (self.track_velocities):
             velocity_factory = lambda : namedtuple('Velocity', ['adverts', 'articles', 'is_advert', 'num'])
             Velocity = velocity_factory()
@@ -919,5 +924,5 @@ if (__name__ == '__main__'):
     
     max_tweets = None
     if (is_simulated_production()):
-        max_tweets = 5000
+        max_tweets = 10000
     main_loop(twitter_bot_account, max_tweets=max_tweets, debug=True, logger=logger)
