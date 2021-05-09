@@ -332,7 +332,6 @@ def __get_a_choice(the_list=None, twitter_bot_account=None, ts_current_time=None
     assert isinstance(mongo_articles_col_name, str), 'Missing the mongo_articles_col_name.'
     logger.info(msg)
     if (len(the_list) > 0):
-        #articles = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
         the_plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id)
         
         normalize_list = lambda l:[item for item in l if (str(item[0]).isdigit())]
@@ -342,9 +341,15 @@ def __get_a_choice(the_list=None, twitter_bot_account=None, ts_current_time=None
         not_todays = [_id for _id in list(normalize_list(the_plan.keys())) if (_id.find(today) == -1)]
         
         candidates = the_obvious.union(set(not_todays))
+        
+        # time for an advert?
+        is_time_for_an_advert = twitter_bot_account.is_time_for_an_advert
+        if (is_time_for_an_advert):
+            priorities1 = twitter_bot_account.adverts_cache
+        else:
+            _items = list(candidates) if (len(candidates) > 0) else the_list
+            priorities1 = [item for item in _items]
 
-        _items = list(candidates) if (len(candidates) > 0) else the_list
-        priorities1 = [item for item in _items]
         msg = 'priorities1 has {} items.'.format(len(priorities1))
         logger.info(msg)
         if (len(priorities1) > 0):

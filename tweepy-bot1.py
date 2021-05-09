@@ -345,18 +345,32 @@ class TwitterPlan():
 
 
 class TwitterBotAccount():
-    def __init__(self, tenant_id=None, service_runner=None, environ=None, logger=None):
+    def __init__(self, tenant_id=None, service_runner=None, environ=None, desired_advert_velocity=0.0, logger=None):
         self.__logger__ = logger
         self.__tenant_id__ = tenant_id
         self.__environ__ = environ
         self.__service_runner__ = service_runner
         self.__account_cache__ = {}
         self.__tweet_stats__ = {}
+        self.__desired_advert_velocity__ = desired_advert_velocity
+        self.__adverts_cache__ = {}
         
+    @property
+    def adverts_cache(self):
+        return self.__adverts_cache__.get('adverts', [])
+    
     @property
     def account_cache(self):
         return self.__account_cache__
     
+    @property
+    def desired_advert_velocity(self):
+        return self.__desired_advert_velocity__
+    
+    @desired_advert_velocity.setter
+    def desired_advert_velocity(self, value):
+        self.__desired_advert_velocity__ = value
+
     @property
     def logger(self):
         return self.__logger__
@@ -389,6 +403,8 @@ class TwitterBotAccount():
             if (isinstance(__data_adverts__.get('adverts'), list)):
                 __data_adverts__['adverts'] = __data_adverts__.get('adverts', [])
             __data_adverts__['count_adverts'] = len(__data_adverts__.get('adverts', []))
+
+            self.__adverts_cache__['adverts'] = __data_adverts__.get('adverts', [])
             
             assert __data_adverts__.get('count_adverts', -1) > 0, 'Something went wrong with the adverts count. Please fix.'
 
@@ -472,8 +488,13 @@ class TwitterBotAccount():
             self.service_runner.allow(articles_list, 'get_articles')
             count_just_adverts = self.service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(get_count_only=True, environ=self.environ, tenant_id=self.tenant_id, mongo_db_name=self.mongo_db_name, mongo_articles_col_name=self.mongo_articles_col_name, criteria=just_adverts_critera, logger=logger))
             
-            if (count_just_adverts > __data_adverts__.get('count_adverts', -1)):
+            if (count_just_adverts != len(self.adverts_cache)):
+                # grab the latest adverts from the database and cache them here.
                 __data_adverts__['adverts'] = self.service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(environ=self.environ, tenant_id=self.tenant_id, mongo_db_name=self.mongo_db_name, mongo_articles_col_name=self.mongo_articles_col_name, criteria=just_adverts_critera, logger=logger))
+                self.__adverts_cache__['adverts'] = __data_adverts__.get('adverts', [])
+            
+            if (count_just_adverts > __data_adverts__.get('count_adverts', -1)):
+                __data_adverts__['adverts'] = self.adverts_cache
                 if (isinstance(__data_adverts__.get('adverts'), list)):
                     __data_adverts__['adverts'] = __data_adverts__.get('adverts', [])
         
@@ -496,12 +517,12 @@ class TwitterBotAccount():
         __data_summary__['adverts_velocity'] = (__data_adverts__.get('count_tweets', 0) / (__data_adverts__.get('count_tweets', 0) + __data_articles__.get('count_tweets', 0))) * 100.0
         __data_summary__['articles_velocity'] = (__data_articles__.get('count_tweets', 0) / (__data_adverts__.get('count_tweets', 0) + __data_articles__.get('count_tweets', 0))) * 100.0
 
-        velocity_factory = lambda : namedtuple('Velocity', ['adverts', 'articles', 'num'])
+        velocity_factory = lambda : namedtuple('Velocity', ['adverts', 'articles', 'is_advert', 'num'])
         Velocity = velocity_factory()
 
         __data_summary__['velocities'] = __data_summary__.get('velocities', [])
         bucket = __data_summary__.get('velocities', [])
-        bucket.append(Velocity(adverts=__data_summary__.get('adverts_velocity', -1), articles=__data_summary__.get('articles_velocity', -1), num=len(bucket)+1))
+        bucket.append(Velocity(adverts=__data_summary__.get('adverts_velocity', -1), articles=__data_summary__.get('articles_velocity', -1), is_advert=is_advert, num=len(bucket)+1))
         __data_summary__['velocities'] = bucket
         
         self.__tweet_stats__[the_choice] = self.__tweet_stats__.get(the_choice, {})
@@ -511,6 +532,27 @@ class TwitterBotAccount():
     @property
     def tweet_stats(self):
         return self.__tweet_stats__
+
+
+    @property
+    def is_time_for_an_advert(self):
+        __is__ = False
+        __data__ = self.__tweet_stats__.get('__data__', {})
+        if (len(__data__) > 0):
+            __data_adverts__ = __data__.get('adverts', {})
+            __data_articles__ = __data__.get('articles', {})
+            assumed_adverts_velocity = ((__data_adverts__.get('count_tweets', 0) + 1) / (__data_adverts__.get('count_tweets', 0) + __data_articles__.get('count_tweets', 0))) * 100.0
+            __is__ = assumed_adverts_velocity <= self.desired_advert_velocity
+        return __is__
+    
+
+    @property
+    def articles(self):
+        self.service_runner.allow(articles_list, 'criteria')
+        just_articles_critera = self.service_runner.articles_list.criteria(**plugins_handler.get_kwargs(property='description', keyword='advert', is_not=True, ignore_case=True))
+        self.service_runner.allow(articles_list, 'get_articles')
+        the_articles = self.service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(environ=self.environ, tenant_id=self.tenant_id, mongo_db_name=self.mongo_db_name, mongo_articles_col_name=self.mongo_articles_col_name, criteria=just_articles_critera, logger=logger))
+        return the_articles
     
 
     @property
@@ -719,7 +761,10 @@ def main_loop(max_tweets=None, debug=False, logger=None):
                     logger.info(msg)
                     the_rotation = service_runner.exec(articles_list, update_the_article, **plugins_handler.get_kwargs(the_choice=None, environ=__env__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger, item=item, ts_current_time=ts_current_time))
 
-            the_list = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=None, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger))
+            if (0):
+                the_list = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=None, environ=environ(), tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger))
+            else:
+                the_list = twitter_bot_account.articles
             assert len(the_list) > 0, 'Nothing in the list.'
             
             wait_per_choice = secs_until_tomorrow_morning / len(the_list)
@@ -864,5 +909,5 @@ def main_loop(max_tweets=None, debug=False, logger=None):
 if (__name__ == '__main__'):
     max_tweets = None
     if (is_simulated_production()):
-        max_tweets = 1000
+        max_tweets = 10000
     main_loop(max_tweets=max_tweets, debug=True, logger=logger)
