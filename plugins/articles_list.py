@@ -6,6 +6,8 @@ import random
 import traceback
 import mujson as json
 
+from loguru import logger as smart_logger
+
 from datetime import datetime, date
 
 from vyperlogix.iterators.dict import dictutils
@@ -186,6 +188,7 @@ def __store_the_plan(data, environ=None, tenant_id=None, mongo_db_name=None, mon
     return db_store_the_plan(data=data)
 
 
+@smart_logger.catch
 def __get_articles(_id=None, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, get_count_only=False, callback=None, logger=None):
     @__with.database(environ=environ)
     def db_get_articles(db=None, _id=None):
@@ -332,10 +335,11 @@ def __get_a_choice(the_list=None, twitter_bot_account=None, ts_current_time=None
         #articles = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
         the_plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id)
         
-        the_obvious = set(the_list) - set(list(the_plan.keys()))
+        normalize_list = lambda l:[item for item in l if (str(item[0]).isdigit())]
+        the_obvious = set(normalize_list(the_list)) - set(list(normalize_list(the_plan.keys())))
         
         today = ts_current_time.split('T')[0]+'T'
-        not_todays = [_id for _id in list(the_plan.keys()) if (_id.find(today) == -1)]
+        not_todays = [_id for _id in list(normalize_list(the_plan.keys())) if (_id.find(today) == -1)]
         
         candidates = the_obvious.union(set(not_todays))
 
@@ -504,6 +508,7 @@ def criteria(*args, **kwargs):
     pass
 
 
+@smart_logger.catch
 def __analyse_the_plans(twitter_bot_account=None, environ={}, json_path=None, options=Options.do_nothing, logger=None):
     assert twitter_bot_account, 'Missing twitter_bot_account.'
     assert environ, 'Missing environ.'
@@ -564,9 +569,6 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, json_path=None, op
         
         _json_path = kwargs.get('kwargs', {}).get('json_path')
         
-        __is_advert_func = kwargs.get('kwargs', {}).get('is_advert')
-        __is_advert = lambda s:(__is_advert_func(s) != None) if (callable(__is_advert_func)) else False
-        
         s_articles = set(_articles if (_articles) else [])
         has_articles = False if (len(s_articles) == 0) else True
         
@@ -584,17 +586,16 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, json_path=None, op
             count_adverts = 0
             count_non_adverts = 0
             for _id,details in plans.items():
+                if (not str(_id)[0].isdigit()):
+                    continue
                 _objects.append(_id)
                 s_articles.discard(_id)
                 num_for_object = 0
 
-                _article = __get_articles(_id=_id, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
-                __is__ = __is_advert(_article.get('description', ''))
+                #_article = __get_articles(_id=_id, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
                 __is_advert__ = _id in s_adverts
                 
-                assert __is__ == __is_advert__, 'Something went wrong. Please fix this.'
-                
-                if (__is_advert__ or __is__):
+                if (__is_advert__):
                     count_adverts += 1
                 else:
                     count_non_adverts += 1
@@ -663,10 +664,19 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, json_path=None, op
                         'stats_articles_max_secs': stats_articles_max_secs,
                         'discreet_steps_articles': len(discreet_steps_articles),
                         'total_tweets_articles': total_tweets_articles
+                    },
+                    'summary': {
+                        'adverts_velocity': '%2.2f%%' % ((len(discreet_steps_adverts) / (total_tweets_adverts + total_tweets_articles)) * 100.0),
+                        'articles_velocity': '%2.2f%%' % ((len(discreet_steps_articles) / (total_tweets_adverts + total_tweets_articles)) * 100.0)
                     }
                 }
-                with open(_json_path, 'w') as fOut:
+                toks = os.path.splitext(_json_path)
+                _json_path1 = '{}_{}{}'.format(toks[0], 1, toks[-1])
+                with open(_json_path1, 'w') as fOut:
                     print(json.dumps(data, indent=3), file=fOut)
+                _json_path2 = '{}_{}{}'.format(toks[0], 2, toks[-1])
+                with open(_json_path2, 'w') as fOut:
+                    print(json.dumps(plans, indent=3), file=fOut)
                 
             print('Adverts: min_secs -> {}, max_secs -> {}, number of discreet_steps {}'.format(stats_adverts_min_secs, stats_adverts_max_secs, len(discreet_steps_adverts)))
             print('Articles: min_secs -> {}, max_secs -> {}, number of discreet_steps {}'.format(stats_articles_min_secs, stats_articles_max_secs, len(discreet_steps_articles)))
@@ -688,7 +698,7 @@ def __analyse_the_plans(twitter_bot_account=None, environ={}, json_path=None, op
     if (__options__ == Options.do_reset):
         plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=clean_account, kwargs={'articles':articles})
     elif (__options__ == Options.do_analysis):
-        plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=analyse_account_plan, kwargs={'all_articles':all_articles, 'articles':articles, 'adverts':adverts, 'is_advert':is_advert, 'json_path':json_path})
+        plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id, callback=analyse_account_plan, kwargs={'all_articles':all_articles, 'articles':articles, 'adverts':adverts, 'json_path':json_path})
 
     return
 
