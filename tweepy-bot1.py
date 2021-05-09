@@ -450,6 +450,10 @@ class TwitterBotAccount():
                 'stats_articles_max_secs': stats_articles_max_secs,
                 'discreet_steps_articles': len(discreet_steps_articles),
                 'total_tweets_articles': total_tweets_articles
+            },
+            'summary': {
+                'adverts_velocity': '%2.2f%%' % ((len(discreet_steps_adverts) / (total_tweets_adverts + total_tweets_articles)) * 100.0),
+                'articles_velocity': '%2.2f%%' % ((len(discreet_steps_articles) / (total_tweets_adverts + total_tweets_articles)) * 100.0)
             }
         '''
         __data__ = self.__tweet_stats__.get('__data__', {})
@@ -473,12 +477,17 @@ class TwitterBotAccount():
         s_just_adverts = __data_adverts__.get('adverts', [])
         is_advert = the_choice in s_just_adverts
         
+        __data_adverts__ = __data__.get('adverts', {})
+        __data_articles__ = __data__.get('articles', {})
+
         if (is_advert):
-            __data_adverts__ = __data__.get('adverts', {})
             __data_adverts__['count_tweets'] = __data_adverts__.get('count_tweets', 0) + 1
         else:
-            __data_articles__ = __data__.get('articles', {})
             __data_articles__['count_tweets'] = __data_articles__.get('count_tweets', 0) + 1
+
+        __data_summary__ = __data__.get('summary', {})
+        __data_summary__['adverts_velocity'] = (__data_adverts__.get('count_tweets', 0) / (__data_adverts__.get('count_tweets', 0) + __data_articles__.get('count_tweets', 0))) * 100.0
+        __data_summary__['articles_velocity'] = (__data_articles__.get('count_tweets', 0) / (__data_adverts__.get('count_tweets', 0) + __data_articles__.get('count_tweets', 0))) * 100.0
         
         self.__tweet_stats__[the_choice] = self.__tweet_stats__.get(the_choice, {})
         self.__tweet_stats__[the_choice][ts_current_time] = self.__tweet_stats__[the_choice].get(ts_current_time, 0) + 1
