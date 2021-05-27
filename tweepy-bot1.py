@@ -919,10 +919,10 @@ def main_loop(twitter_bot_account, max_tweets=None, debug=False, logger=None):
 
 
 if (__name__ == '__main__'):
-    twitter_bot_account = TwitterBotAccount(tenant_id=os.environ.get('__tenant__'), desired_advert_velocity=45.0, logger=logger)
+    twitter_bot_account = TwitterBotAccount(tenant_id=os.environ.get('__tenant__'), desired_advert_velocity=5.0, logger=logger)
     twitter_bot_account.environ = __env__ if (is_simulated_production() or (__the_options__ == TheOptions.use_local)) else __env2__ if (__the_options__ == TheOptions.use_cluster) else __env3__ if (__the_options__ == TheOptions.use_cosmos0) else None
     
     max_tweets = None
     if (is_simulated_production()):
-        max_tweets = 10000
+        max_tweets = 20000
     main_loop(twitter_bot_account, max_tweets=max_tweets, debug=True, logger=logger)
