@@ -49,26 +49,6 @@ else
 
 fi
 
-versions=$(pyenv versions --bare)
-
-if [[ "$versions." == "." ]]
-then
-    for i in {9..1}; do 
-        chk_vers=$(pyenv install --list | grep $TARGET_PY.$i)
-        if [[ "$chk_vers." == "." ]]
-        then
-            echo ""
-        else
-            vers=$(echo "$TARGET_PY.$i")
-            echo "6. Installing $vers"
-            pyenv install $vers
-            pyenv local $vers
-            break
-        fi
-        echo "";
-    done
-fi
-
 python39=$(which python3.9)
 
 if [[ -f $python39 ]]
@@ -192,8 +172,6 @@ echo "Use this -> $choice --> $version"
 v=$($choice -c 'import sys; i=sys.version_info; print("{}{}{}".format(i.major,i.minor,i.micro))')
 vv=$($choice -c 'import sys; i=sys.version_info; print("{}.{}.{}".format(i.major,i.minor,i.micro))')
 echo "Use this -> $choice --> $v -> $vv"
-
-pyenv local $vv > /dev/null 2>&1
 
 VENV=$VENV$v
 echo "VENV -> $VENV"
