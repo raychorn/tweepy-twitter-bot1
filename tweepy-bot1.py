@@ -37,6 +37,7 @@ class TheRunMode(enum.Enum):
     production = 1
     prod_dev = 2
 
+is_really_a_string = lambda s:(s is not None) and (len(s) > 0)
 
 production_token = 'production'
 development_token = 'development'
@@ -48,11 +49,27 @@ __run_mode__ = TheRunMode.production if (__production__) else TheRunMode.develop
 is_production = lambda : __run_mode__ in [TheRunMode.production, TheRunMode.prod_dev]
 is_simulated_production = lambda : __run_mode__ in [TheRunMode.prod_dev]
 
-__run_mode__ = TheRunMode.prod_dev if (socket.gethostname() == 'DESKTOP-JJ95ENL') else __run_mode__ # Comment this out for production deployment.
-
 production_token = production_token if (is_production()) else development_token
 
 assert (TheRunMode.production if (any([arg == production_token for arg in [production_token]])) else TheRunMode.development) == TheRunMode.production, 'Something wrong with production mode detection.'
+
+def get_local_ether_interface():
+    import ifcfg
+    import ipaddress
+
+    for name, interface in ifcfg.interfaces().items():
+        ip_addr = interface.get('inet')
+        ip_ether = interface.get('ether')
+        if (ip_addr and ip_ether):
+            i = ipaddress.ip_address(ip_addr)
+            if (i.is_private):
+                return interface
+    return None
+        
+local_ether_interface = get_local_ether_interface()
+assert local_ether_interface is not None, 'Cannot get the local ip address from the ifconfig interface. Please fix.'
+os.environ['LOCAL_INET'] = local_ether_interface.get('inet')
+assert is_really_a_string(os.environ.get('LOCAL_INET')), 'Cannot validate the local ip address from the ifconfig interface that was found.  Please fix.'
 
 
 def get_stream_handler(streamformat="%(asctime)s:%(levelname)s:%(message)s"):
@@ -213,12 +230,12 @@ explainOptions = lambda x:str(x)
 
 __the_options__ = TheOptions.use_local if (os.environ.get('OPTIONS') == 'use_local') else TheOptions.master_list if (os.environ.get('OPTIONS') == 'master_list') else TheOptions.use_cluster if (os.environ.get('OPTIONS') == 'use_cluster') else TheOptions.use_cosmos0 if (os.environ.get('OPTIONS') == 'use_cosmos0') else TheOptions.use_cosmos1 if (os.environ.get('OPTIONS') == 'use_cosmos1') else TheOptions.use_local
 
+__run_mode__ = TheRunMode.prod_dev if (socket.gethostname() == __env__.get('LOCAL_MACHINE_NAME')) else __run_mode__ # Comment this out for production deployment.
+
 if (__run_mode__ == TheRunMode.prod_dev):
     __the_options__ = TheOptions.use_local
 
 logger.info('__the_options__ -> {} -> {}'.format(__the_options__, explainOptions(__the_options__)))
-
-is_really_a_string = lambda s:(s is not None) and (len(s) > 0)
 
 access_token = os.environ.get('access_token', __env__.get('access_token'))
 access_token_secret = os.environ.get('access_token_secret', __env__.get('access_token_secret'))
