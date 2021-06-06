@@ -364,6 +364,49 @@ def __get_a_choice(the_list=None, twitter_bot_account=None, ts_current_time=None
 def get_a_choice(*args, **kwargs):
     pass
 
+#########################################################################
+def __delete_all_local_articles(the_list=None, twitter_bot_account=None, environ=None, options=None, mongo_db_name=None, mongo_articles_col_name=None, logger=None):
+    assert options.name == 'do_reset', 'Cannot remove local articles without the proper options.'
+    msg = 'the_list - the_list has {} items.'.format(len(the_list))
+    assert environ is not None, 'Missing the environ.'
+    mongo_db_name = twitter_bot_account
+    assert isinstance(mongo_db_name, str), 'Missing the mongo_db_name.'
+    assert isinstance(mongo_articles_col_name, str), 'Missing the mongo_articles_col_name.'
+    logger.info(msg)
+    if (len(the_list) > 0):
+        the_plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id)
+        
+        normalize_list = lambda l:[item for item in l if (str(item[0]).isdigit())]
+        the_obvious = set(normalize_list(the_list)) - set(list(normalize_list(the_plan.keys())))
+        
+        today = ts_current_time.split('T')[0]+'T'
+        not_todays = [_id for _id in list(normalize_list(the_plan.keys())) if (_id.find(today) == -1)]
+        
+        candidates = the_obvious.union(set(not_todays))
+        
+        # time for an advert?
+        is_time_for_an_advert = twitter_bot_account.is_time_for_an_advert
+        if (is_time_for_an_advert):
+            priorities1 = twitter_bot_account.adverts_cache
+        else:
+            _items = list(candidates) if (len(candidates) > 0) else the_list
+            priorities1 = [item for item in _items]
+
+        msg = 'priorities1 has {} items.'.format(len(priorities1))
+        logger.info(msg)
+        if (len(priorities1) > 0):
+            choice = random.choice(priorities1)
+            msg = 'priorities1 has choice {}.'.format(choice)
+            logger.info(msg)
+    msg = 'choice is  {}.'.format(choice)
+    logger.info(msg)
+    return choice
+
+@args.kwargs(__delete_all_local_articles)
+def delete_all_local_articles(*args, **kwargs):
+    pass
+#########################################################################
+
 def __reset_plans_for_choices(the_list=None, ts_current_time=None, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, logger=None):
     choice = None
     assert isinstance(the_list, list), 'Wheres the list?'

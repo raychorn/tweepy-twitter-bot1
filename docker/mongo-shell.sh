@@ -14,7 +14,16 @@ fi
 
 if [ -f $dir1/.env ]
 then
-    export $(cat $dir1/.env | sed 's/#.*//g' | xargs)
+    basedir=".."
+    venv=$(ls $basedir/.venv*/bin/activate)
+    echo "venv=$venv"
+    if [ -f $venv ]
+    then
+        . $venv
+        #python ./scripts/get_env.py
+        export $(python ./scripts/get_env.py | sed 's/#.*//g' | xargs)
+    fi
+    #export $(cat $dir1/.env | sed 's/#.*//g' | xargs)
 fi
 
 CMD="mongo --username $MONGO_INITDB_ROOT_USERNAME --password --authenticationDatabase $MONGO_INITDB_DATABASE --host $MONGO_HOST --port $MONGO_PORT"
