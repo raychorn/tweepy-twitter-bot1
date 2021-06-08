@@ -366,41 +366,25 @@ def get_a_choice(*args, **kwargs):
 
 #########################################################################
 def __delete_all_local_articles(the_list=None, twitter_bot_account=None, environ=None, options=None, mongo_db_name=None, mongo_articles_col_name=None, logger=None):
+    '''
+    This removed each item by item because removing the collection seems too dangerous so this is a bit inefficient by design.
+    '''
     assert options.name == 'do_reset', 'Cannot remove local articles without the proper options.'
-    msg = 'the_list - the_list has {} items.'.format(len(the_list))
     assert environ is not None, 'Missing the environ.'
-    mongo_db_name = twitter_bot_account
     assert isinstance(mongo_db_name, str), 'Missing the mongo_db_name.'
     assert isinstance(mongo_articles_col_name, str), 'Missing the mongo_articles_col_name.'
-    logger.info(msg)
-    if (len(the_list) > 0):
-        the_plan = __get_the_plan(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id)
-        
-        normalize_list = lambda l:[item for item in l if (str(item[0]).isdigit())]
-        the_obvious = set(normalize_list(the_list)) - set(list(normalize_list(the_plan.keys())))
-        
-        today = ts_current_time.split('T')[0]+'T'
-        not_todays = [_id for _id in list(normalize_list(the_plan.keys())) if (_id.find(today) == -1)]
-        
-        candidates = the_obvious.union(set(not_todays))
-        
-        # time for an advert?
-        is_time_for_an_advert = twitter_bot_account.is_time_for_an_advert
-        if (is_time_for_an_advert):
-            priorities1 = twitter_bot_account.adverts_cache
-        else:
-            _items = list(candidates) if (len(candidates) > 0) else the_list
-            priorities1 = [item for item in _items]
 
-        msg = 'priorities1 has {} items.'.format(len(priorities1))
-        logger.info(msg)
-        if (len(priorities1) > 0):
-            choice = random.choice(priorities1)
-            msg = 'priorities1 has choice {}.'.format(choice)
-            logger.info(msg)
-    msg = 'choice is  {}.'.format(choice)
-    logger.info(msg)
-    return choice
+    just_articles_critera = __criteria(property='description', keyword='advert', is_not=True, ignore_case=True)
+    articles = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, criteria=just_articles_critera, logger=logger)
+
+    just_adverts_critera = __criteria(property='description', keyword='advert', is_not=False, ignore_case=True)
+    adverts = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, criteria=just_adverts_critera, logger=logger)
+
+    all_items = articles+adverts if (isinstance(articles, list) and isinstance(adverts, list)) else []
+    if (all_items):
+        for _id in all_items:
+            __drop_article(_id=_id, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
+    return None
 
 @args.kwargs(__delete_all_local_articles)
 def delete_all_local_articles(*args, **kwargs):
@@ -531,10 +515,31 @@ def __drop_articles(environ=None, tenant_id=None, mongo_db_name=None, mongo_arti
         table = db[tb_name]
         coll = table[col_name]
         
+        criteria = {'Class':'2'}
         table.drop_collection(col_name)
 
         return 0
     return db_drop_articles()
+
+
+def __drop_article(_id=None, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, logger=None):
+    @__with.database(environ=environ)
+    def db_drop_article(db=None, _id=None):
+        assert vyperapi.is_not_none(db), 'There is no db.'
+
+        tb_name = mongo_db_name
+        col_name = normalize_collection_name(tenant_id, mongo_articles_col_name) if (tenant_id) else mongo_articles_col_name
+        table = db[tb_name]
+        coll = table[col_name]
+
+        _criteria = {"_id": ObjectId(_id)} if (is_really_a_string(_id)) else criteria if (criteria) else {}
+        assert len(_criteria) > 0, 'Cannot proceed without a criteria and {} will not work.'.format(json.dumps(_criteria, indent=3))
+        coll.delete_one(_criteria)
+        docs = coll.find_one(_criteria)
+
+        return 0
+    return db_drop_article(_id=_id)
+
 
 
 class Options(enum.Enum):

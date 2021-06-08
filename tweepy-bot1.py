@@ -731,13 +731,8 @@ def main_loop(twitter_bot_account, max_tweets=None, debug=False, logger=None):
                     del item[r]
             service_runner.articles_list.update_the_article(**plugins_handler.get_kwargs(the_choice=None, environ=__env__, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger, item=item, ts_current_time=None))
     elif (__the_options__ == TheOptions.use_local):
-        # pull articles from cluster and re-init local articles list for each client. (__env2__)
         service_runner.allow(articles_list, delete_all_local_articles)
         service_runner.articles_list.delete_all_local_articles(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, options=Options.do_reset, logger=logger))
-        # remove all the local articles.
-        the_master_list = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
-        for anId in the_master_list:
-            item = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=anId, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
 
 
     __backup_executor__ = pooled.BoundedExecutor(1, 5, callback=__backup_callback__)
