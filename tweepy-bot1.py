@@ -732,7 +732,20 @@ def main_loop(twitter_bot_account, max_tweets=None, debug=False, logger=None):
             service_runner.articles_list.update_the_article(**plugins_handler.get_kwargs(the_choice=None, environ=__env__, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger, item=item, ts_current_time=None))
     elif (__the_options__ == TheOptions.use_local):
         service_runner.allow(articles_list, delete_all_local_articles)
-        service_runner.articles_list.delete_all_local_articles(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, options=Options.do_reset, logger=logger))
+        num = service_runner.articles_list.delete_all_local_articles(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, options=Options.do_reset, logger=logger))
+
+        the_master_list = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
+
+        removes = ['__rotation__', '__rotation_processor__', 'debug']
+        for anId in the_master_list: # store the article from the master database into the local database. Does nothing if the article exists.
+            item = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=anId, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
+            for r in removes:
+                if (r in item.keys()):
+                    del item[r]
+            service_runner.articles_list.update_the_article(**plugins_handler.get_kwargs(the_choice=None, environ=__env__, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger, item=item, ts_current_time=None))
+        the_local_list = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=None, environ=__env__, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger))
+        assert len(the_master_list) == len(the_local_list), '(1) Could not verify the master list was copied from the remote server. Expected {} records but got {} instead.'.format(len(the_master_list), len(the_local_list))
+        assert len(set(the_master_list) - set(the_local_list)) == 0, '(2) Could not verify the master list was copied from the remote server. Expected {} records but got {} instead.'.format(len(the_master_list), len(the_local_list))
 
 
     __backup_executor__ = pooled.BoundedExecutor(1, 5, callback=__backup_callback__)

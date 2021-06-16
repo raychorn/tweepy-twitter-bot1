@@ -382,9 +382,12 @@ def __delete_all_local_articles(the_list=None, twitter_bot_account=None, environ
 
     all_items = articles+adverts if (isinstance(articles, list) and isinstance(adverts, list)) else []
     if (all_items):
+        _cnt = 0
         for _id in all_items:
-            __drop_article(_id=_id, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
-    return None
+            resp = __drop_article(_id=_id, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
+            if (resp is None):
+                _cnt += 1
+    return _cnt
 
 @args.kwargs(__delete_all_local_articles)
 def delete_all_local_articles(*args, **kwargs):
@@ -537,7 +540,7 @@ def __drop_article(_id=None, environ=None, tenant_id=None, mongo_db_name=None, m
         coll.delete_one(_criteria)
         docs = coll.find_one(_criteria)
 
-        return 0
+        return docs
     return db_drop_article(_id=_id)
 
 

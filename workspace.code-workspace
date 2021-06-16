@@ -1,0 +1,26 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../private_vyperlogix_lib3"
+		},
+		{
+			"path": "../sleepy.mongoose"
+		},
+		{
+			"path": "../microservices-framework"
+		},
+		{
+			"path": "../private-microservices-framework"
+		},
+		{
+			"path": ".venv391/lib/python3.9/site-packages"
+		}
+	],
+	"settings": {
+		"DockerRun.DisableAutoGenerateConfig": true,
+		"python.pythonPath": "./.venv395/bin/python3.9"
+	}
+}
