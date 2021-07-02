@@ -22,40 +22,26 @@ find_python(){
     done
 }
 
-pyenv="$HOME/.pyenv/bin/pyenv"
+pypy3=$(which pypy3)
 
-if [[ -f $pyenv ]]
+if [[ -f $pypy3 ]]
 then
-    echo "1. Found $pyenv"
+    echo "7. Found $pypy3"
 else
-    echo "2. Installing pyenv"
-    apt install build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git -y
-    curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
-    export PATH="$HOME/.pyenv/bin:$PATH"
-    pyenv=$(which pyenv)
-
-    if [[ -f $pyenv ]]
-    then
-        eval "$($pyenv init -)"
-        eval "$($pyenv virtualenv-init -)"
-    else
-        echo "3. Cannot find pyenv."
-    fi
-
-    apt install pipenv -y
-
-    echo "4. pyenv install --list"
-    echo "5. pyenv virtualenv 3.9.4 .venv394"
-
+    echo "8. Installing pypy3"
+    apt update -y
+    echo -ne '\n' | add-apt-repository ppa:pypy/ppa
+    apt update -y
+    apt install pypy3 -y
 fi
 
 python39=$(which python3.9)
 
 if [[ -f $python39 ]]
 then
-    echo "7. Found $python39"
+    echo "9. Found $python39"
 else
-    echo "8. Installing python3.9"
+    echo "10. Installing python3.9"
     apt update -y
     apt install software-properties-common -y
     echo -ne '\n' | add-apt-repository ppa:deadsnakes/ppa
@@ -72,15 +58,15 @@ then
     pip_local=$LOCAL_BIN/pip3
     if [[ -f $pip_local ]]
     then
-        echo "8. Found $pip_local"
+        echo "11. Found $pip_local"
         export PATH=$LOCAL_BIN:$PATH
     else
         echo "Must install PIP?"
         if [[ -f $pip3 ]]
         then
-            echo "9. $pip3 exists so not installing pip3, at this time."
+            echo "12. $pip3 exists so not installing pip3, at this time."
         else
-            echo "10. Installing pip3"
+            echo "13. Installing pip3"
             GETPIP=$DIR0/get-pip.py
 
             if [[ -f $GETPIP ]]
@@ -90,7 +76,7 @@ then
                 pip3=$(which pip3)
                 if [[ -f $pip3 ]]
                 then
-                    echo "11. Upgrading setuptools"
+                    echo "14. Upgrading setuptools"
                     setuptools="1"
                     $pip3 install --upgrade setuptools > /dev/null 2>&1
                 fi
@@ -100,53 +86,36 @@ then
 fi
 
 pip3=$(which pip3)
-echo "12. pip3 is $pip3"
+echo "15. pip3 is $pip3"
 
 if [[ -f $pip3 ]]
 then
-    echo "13. Upgrading pip"
+    echo "16. Upgrading pip"
     $pip3 install --upgrade pip > /dev/null 2>&1
     if [[ "$setuptools." == "0." ]]
     then
-        echo "14. Upgrading setuptools"
+        echo "17. Upgrading setuptools"
         $pip3 install --upgrade setuptools > /dev/null 2>&1
     fi
 fi
 
-#virtualenv=$(which virtualenv)
-virtualenv=/usr/local/bin/virtualenv
-echo "15. virtualenv is $virtualenv"
+virtualenv=$(which virtualenv)
+#virtualenv=/usr/local/bin/virtualenv
+echo "18. virtualenv is $virtualenv"
 
 if [[ -f $virtualenv ]]
 then
+    echo "19. Found $virtualenv"
+else
     $pip3 install virtualenv > /dev/null 2>&1
     $pip3 install --upgrade virtualenv > /dev/null 2>&1
+    virtualenv=$(which virtualenv)
 fi
 
+find_python pypy3
 find_python python
 
-pyston="/usr/bin/pyston3.8"
-
-if [[ -f $pyston ]]
-then
-    echo "16. Found $pyston"
-else
-    apt-get install wget -y
-    wget https://github.com/pyston/pyston/releases/download/v2.1/pyston_2.1_20.04.deb
-
-    pyston_deb="$DIR0/pyston_2.1_20.04.deb"
-    if [[ -f $pyston_deb ]]
-    then
-        apt install $pyston_deb -y
-        rm -f $pyston_deb
-    fi
-fi
-
-find_python pyston
-
-#echo ${ARRAY[@]}
 v=$($python39 sort.py "${ARRAY[@]}")
-#echo "17. Use this -> $v"
 ARRAY=()
 ARRAY2=()
 for val in $v; do
@@ -154,8 +123,6 @@ for val in $v; do
     x=$($val -c 'import sys; i=sys.version_info; print("{}.{}.{}".format(i.major,i.minor,i.micro))')
     ARRAY2+=("$val $x")
 done
-#echo ${ARRAY[@]}
-#echo ${ARRAY2[@]}
 
 PS3="Choose: "
 

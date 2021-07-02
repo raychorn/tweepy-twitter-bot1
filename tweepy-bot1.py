@@ -37,12 +37,12 @@ class TheRunMode(enum.Enum):
     production = 1
     prod_dev = 2
 
-is_really_a_string = lambda s:(s is not None) and (len(s) > 0)
+is_really_a_string = lambda s:(isinstance(s, str)) and (s is not None) and (len(s) > 0)
 
 production_token = 'production'
 development_token = 'development'
 
-__production__ = any([arg == production_token for arg in sys.argv])
+is_running_production = __production__ = lambda : (socket.gethostname() not in ['DESKTOP-JJ95ENL', 'DESKTOP-9J3LL5Q'])
 
 __run_mode__ = TheRunMode.production if (__production__) else TheRunMode.development
 
@@ -146,13 +146,11 @@ word_cloud = 'word_cloud'
 get_final_word_cloud = 'get_final_word_cloud'
 store_one_hashtag = 'store_one_hashtag'
 
-try:
-    from vyperlogix.misc import _utils
-except ImportError:
-    pylib = '/home/raychorn/projects/python-projects/private_vyperlogix_lib3'
-    if (not any([f == pylib for f in sys.path])):
-        print('Adding {}'.format(pylib))
-        sys.path.insert(0, pylib)
+pylib = os.environ.get('pylib')
+assert is_really_a_string(pylib), 'Cannot proceed without pylib.'
+if (not any([f == pylib for f in sys.path])):
+    print('Adding {}'.format(pylib))
+    sys.path.insert(0, pylib)
     
 from vyperlogix.misc import _utils
 from vyperlogix.env.environ import MyDotEnv
@@ -161,6 +159,8 @@ from vyperlogix.plugins import handler as plugins_handler
 from vyperlogix.threads import pooled
 from vyperlogix.decorators import interval
 from vyperlogix.decorators import executor
+
+from vyperlogix.mongo._object import MongoDBObject
 
 class TheOptions(enum.Enum):
     use_local = 0
@@ -180,7 +180,6 @@ def __unescape(v):
 __env__ = {}
 env_literals = []
 def get_environ_keys(*args, **kwargs):
-    #global env_literals
     from expandvars import expandvars
     
     k = kwargs.get('key')
@@ -362,7 +361,7 @@ class TwitterPlan():
         return self.__dict__
 
 
-class TwitterBotAccount():
+class TwitterBotAccount(MongoDBObject):
     def __init__(self, tenant_id=None, service_runner=None, environ=None, desired_advert_velocity=0.0, track_velocities=False, logger=None):
         self.__logger__ = logger
         self.__tenant_id__ = tenant_id
@@ -463,7 +462,7 @@ class TwitterBotAccount():
             doc = self.service_runner.exec(twitterbot_accounts, get_account_id, **plugins_handler.get_kwargs(environ=self.environ, tenant_id=self.__tenant_id__, mongo_db_name=self.mongo_db_name, mongo_col_name=mongo_twitterbot_account_col_name, logger=logger))
             __id = doc.get("_id") if (doc) else None
             if (isinstance(__id, ObjectId)):
-                self.account_cache[self.__tenant_id__] = doc
+                self.account_cache[self.__tenant_id__] = self.__clean_bson_object__(doc) #{k:(v if (not isinstance(v, ObjectId)) else str(v)) for k,v in doc.items()}
             else:
                 return None
         return self.__tenant_id__
@@ -954,7 +953,7 @@ def main_loop(twitter_bot_account, max_tweets=None, debug=False, logger=None):
 
 if (__name__ == '__main__'):
     twitter_bot_account = TwitterBotAccount(tenant_id=os.environ.get('__tenant__'), desired_advert_velocity=5.0, logger=logger)
-    twitter_bot_account.environ = __env__ if (is_simulated_production() or (__the_options__ == TheOptions.use_local)) else __env2__ if (__the_options__ == TheOptions.use_cluster) else __env3__ if (__the_options__ == TheOptions.use_cosmos0) else None
+    twitter_bot_account.environ = __env__ #if (is_simulated_production() or (__the_options__ == TheOptions.use_local)) else __env2__ if (__the_options__ == TheOptions.use_cluster) else __env3__ if (__the_options__ == TheOptions.use_cosmos0) else None
     
     max_tweets = None
     if (is_simulated_production()):
