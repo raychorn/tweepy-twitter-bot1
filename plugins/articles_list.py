@@ -380,9 +380,9 @@ def __delete_all_local_articles(the_list=None, twitter_bot_account=None, environ
     just_adverts_critera = __criteria(property='description', keyword='advert', is_not=False, ignore_case=True)
     adverts = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, criteria=just_adverts_critera, logger=logger)
 
+    _cnt = 0
     all_items = articles+adverts if (isinstance(articles, list) and isinstance(adverts, list)) else []
     if (all_items):
-        _cnt = 0
         for _id in all_items:
             resp = __drop_article(_id=_id, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)
             if (resp is None):

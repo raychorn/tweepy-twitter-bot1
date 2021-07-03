@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import time
 import math
@@ -146,12 +147,13 @@ word_cloud = 'word_cloud'
 get_final_word_cloud = 'get_final_word_cloud'
 store_one_hashtag = 'store_one_hashtag'
 
-pylib = os.environ.get('pylib')
-assert is_really_a_string(pylib), 'Cannot proceed without pylib.'
-if (not any([f == pylib for f in sys.path])):
-    print('Adding {}'.format(pylib))
-    sys.path.insert(0, pylib)
-    
+pylibs = re.split(";|: ", os.environ.get('pylib'))
+assert all([is_really_a_string(s) for s in pylibs]), 'Cannot proceed without pylib.'
+for pylib in pylibs:
+    if (not any([f == pylib for f in sys.path])):
+        print('Adding {}'.format(pylib))
+        sys.path.insert(0, pylib)
+
 from vyperlogix.misc import _utils
 from vyperlogix.env.environ import MyDotEnv
 from vyperlogix.plugins import handler as plugins_handler
@@ -742,6 +744,7 @@ def main_loop(twitter_bot_account, max_tweets=None, debug=False, logger=None):
     elif (__the_options__ in [TheOptions.use_local, TheOptions.use_cluster_local_hybrid]):
         service_runner.allow(articles_list, delete_all_local_articles)
         num = service_runner.articles_list.delete_all_local_articles(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, options=Options.do_reset, logger=logger))
+        logger.info('Deleted {} from the local database and this is a normal function because the cluster has the master data for redundancy by design.'.format(num if (isinstance(num, int) or isinstance(num, float)) else 0))
 
         the_master_list = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
 
