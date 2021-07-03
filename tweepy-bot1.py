@@ -167,7 +167,16 @@ class TheOptions(enum.Enum):
     master_list = 1
     use_cluster = 2
     use_cosmos0 = 4
-    
+    use_cluster_local_hybrid = 8
+
+
+available_options = {}
+available_options['use_local'] = TheOptions.use_local
+available_options['master_list'] = TheOptions.master_list
+available_options['use_cluster'] = TheOptions.use_cluster
+available_options['use_cosmos0'] = TheOptions.use_cosmos0
+available_options['use_cluster_local_hybrid'] = TheOptions.use_cluster_local_hybrid
+
 def __escape(v):
     from urllib import parse
     return parse.quote_plus(v)
@@ -228,7 +237,8 @@ __mirrors__ = [__getattr(m, {}) for m in os.environ.get('MIRRORS', [])]
 
 explainOptions = lambda x:str(x)
 
-__the_options__ = TheOptions.use_local if (os.environ.get('OPTIONS') == 'use_local') else TheOptions.master_list if (os.environ.get('OPTIONS') == 'master_list') else TheOptions.use_cluster if (os.environ.get('OPTIONS') == 'use_cluster') else TheOptions.use_cosmos0 if (os.environ.get('OPTIONS') == 'use_cosmos0') else TheOptions.use_cosmos1 if (os.environ.get('OPTIONS') == 'use_cosmos1') else TheOptions.use_local
+options_from_env = os.environ.get('OPTIONS')
+__the_options__ = available_options.get(options_from_env, TheOptions.use_local)
 
 __run_mode__ = TheRunMode.prod_dev if (socket.gethostname() == __env__.get('LOCAL_MACHINE_NAME')) else __run_mode__ # Comment this out for production deployment.
 
@@ -729,7 +739,7 @@ def main_loop(twitter_bot_account, max_tweets=None, debug=False, logger=None):
                 if (r in item.keys()):
                     del item[r]
             service_runner.articles_list.update_the_article(**plugins_handler.get_kwargs(the_choice=None, environ=__env__, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger, item=item, ts_current_time=None))
-    elif (__the_options__ == TheOptions.use_local):
+    elif (__the_options__ in [TheOptions.use_local, TheOptions.use_cluster_local_hybrid]):
         service_runner.allow(articles_list, delete_all_local_articles)
         num = service_runner.articles_list.delete_all_local_articles(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, options=Options.do_reset, logger=logger))
 
@@ -953,7 +963,7 @@ def main_loop(twitter_bot_account, max_tweets=None, debug=False, logger=None):
 
 if (__name__ == '__main__'):
     twitter_bot_account = TwitterBotAccount(tenant_id=os.environ.get('__tenant__'), desired_advert_velocity=5.0, logger=logger)
-    twitter_bot_account.environ = __env__ #if (is_simulated_production() or (__the_options__ == TheOptions.use_local)) else __env2__ if (__the_options__ == TheOptions.use_cluster) else __env3__ if (__the_options__ == TheOptions.use_cosmos0) else None
+    twitter_bot_account.environ = __env__
     
     max_tweets = None
     if (is_simulated_production()):
