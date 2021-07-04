@@ -42,7 +42,7 @@ def __store_the_account(data, environ=None, tenant_id=None, mongo_db_name=None, 
 
 
 def __get_account_id(environ=None, tenant_id=None, mongo_db_name=None, mongo_col_name=None, criteria=None, callback=None, logger=None):
-    @__with.database(environ=environ)
+    @__with.database(environ=environ, logger=logger)
     def db_get_account_id(db=None, data=None):
         assert vyperapi.is_not_none(db), 'There is no db.'
         assert vyperapi.is_not_none(mongo_db_name), 'There is no mongo_db_name.'

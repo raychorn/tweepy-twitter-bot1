@@ -190,7 +190,7 @@ def __store_the_plan(data, environ=None, tenant_id=None, mongo_db_name=None, mon
 
 @smart_logger.catch
 def __get_articles(_id=None, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, get_count_only=False, callback=None, logger=None):
-    @__with.database(environ=environ)
+    @__with.database(environ=environ, logger=logger)
     def db_get_articles(db=None, _id=None):
         assert vyperapi.is_not_none(db), 'There is no db.'
 
@@ -509,7 +509,7 @@ def update_the_plan(*args, **kwargs):
 
 #######################################################################
 def __drop_articles(environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, logger=None):
-    @__with.database(environ=environ)
+    @__with.database(environ=environ, logger=logger)
     def db_drop_articles(db=None, _id=None):
         assert vyperapi.is_not_none(db), 'There is no db.'
 
@@ -526,7 +526,7 @@ def __drop_articles(environ=None, tenant_id=None, mongo_db_name=None, mongo_arti
 
 
 def __drop_article(_id=None, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, logger=None):
-    @__with.database(environ=environ)
+    @__with.database(environ=environ, logger=logger)
     def db_drop_article(db=None, _id=None):
         assert vyperapi.is_not_none(db), 'There is no db.'
 
