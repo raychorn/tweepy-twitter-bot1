@@ -189,7 +189,7 @@ def __store_the_plan(data, environ=None, tenant_id=None, mongo_db_name=None, mon
 
 
 @smart_logger.catch
-def __get_articles(_id=None, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, get_count_only=False, callback=None, logger=None):
+def __get_articles(_id=None, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, criteria=None, get_count_only=False, callback=None, return_doc_ids=True, logger=None):
     @__with.database(environ=environ, logger=logger)
     def db_get_articles(db=None, _id=None):
         assert vyperapi.is_not_none(db), 'There is no db.'
@@ -209,7 +209,7 @@ def __get_articles(_id=None, environ=None, tenant_id=None, mongo_db_name=None, m
             if (logger):
                 logger.info('DEBUG: (3) criteria -> {}'.format(criteria))
             try:
-                recs = [str(doc.get('_id')) for doc in find_in_collection(coll, criteria=criteria)] if (not get_count_only) else find_in_collection(coll, criteria=criteria).count()
+                recs = [str(doc.get('_id')) if (return_doc_ids) else doc for doc in find_in_collection(coll, criteria=criteria)] if (not get_count_only) else find_in_collection(coll, criteria=criteria).count()
             except Exception as ex:
                 extype, ex, tb = sys.exc_info()
                 for l in traceback.format_exception(extype, ex, tb):
@@ -459,6 +459,38 @@ def most_recent_number_of_days(bucket, num_days=30):
                 new_bucket[ts] = bucket.get(ts)
     assert len(new_bucket) > 0, 'There cannot be less than one item after an update.'
     return new_bucket
+
+
+def __store_articles(items=None, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, logger=None):
+    @__with.database(environ=environ, logger=logger)
+    def db_store_articles(db=None, items=None):
+        from vyperlogix.mongo import database
+
+        assert vyperapi.is_not_none(db), 'There is no db.'
+
+        tb_name = mongo_db_name
+        col_name = normalize_collection_name(tenant_id, mongo_articles_col_name) if (tenant_id) else mongo_articles_col_name
+        table = db[tb_name]
+        coll = table[col_name]
+        
+        criteria = {'Class':'2'}
+        table.drop_collection(col_name)
+
+        return 0
+    return db_store_articles()
+
+
+def __bulk_store_the_articles(items=None, tenant_id=None, environ={}, mongo_db_name=None, mongo_articles_col_name=None, logger=None):
+    '''
+    bulk store items in mongo
+    '''
+    assert isinstance(items, list), 'Missing items or items is not a list.'
+
+    return __store_articles(items=items, environ=environ, tenant_id=tenant_id, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger)
+
+@args.kwargs(__bulk_store_the_articles)
+def bulk_store_the_articles(*args, **kwargs):
+    pass
 
 
 def __update_the_article(item=None, the_choice=None, tenant_id=None, ts_current_time=None, logger=None, environ={}, mongo_db_name=None, mongo_articles_col_name=None):

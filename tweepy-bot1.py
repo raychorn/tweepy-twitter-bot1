@@ -141,6 +141,7 @@ twitterbot_accounts = 'twitterbot_accounts'
 get_account_id = 'get_account_id'
 get_Options = 'get_Options'
 delete_all_local_articles = 'delete_all_local_articles'
+bulk_store_the_articles = 'bulk_store_the_articles'
 
 
 word_cloud = 'word_cloud'
@@ -437,7 +438,7 @@ class TwitterBotAccount(MongoDBObject):
             just_adverts_critera = self.service_runner.articles_list.criteria(**plugins_handler.get_kwargs(property='description', keyword='advert', is_not=False, ignore_case=True))
 
             self.service_runner.allow(articles_list, 'get_articles')
-            __data_adverts__['adverts'] = self.service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(environ=self.environ, tenant_id=self.tenant_id, mongo_db_name=self.mongo_db_name, mongo_articles_col_name=self.mongo_articles_col_name, criteria=just_adverts_critera, logger=logger))
+            __data_adverts__['adverts'] = self.service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(environ=self.environ, tenant_id=self.tenant_id, mongo_db_name=self.mongo_db_name, mongo_articles_col_name=self.mongo_articles_col_name, criteria=just_adverts_critera, return_doc_ids=True, logger=logger))
             if (isinstance(__data_adverts__.get('adverts'), list)):
                 __data_adverts__['adverts'] = __data_adverts__.get('adverts', [])
             __data_adverts__['count_adverts'] = len(__data_adverts__.get('adverts', []))
@@ -453,7 +454,7 @@ class TwitterBotAccount(MongoDBObject):
             just_articles_critera = self.service_runner.articles_list.criteria(**plugins_handler.get_kwargs(property='description', keyword='advert', is_not=True, ignore_case=True))
 
             self.service_runner.allow(articles_list, 'get_articles')
-            __data_articles__['count_articles'] = self.service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(get_count_only=True, environ=self.environ, tenant_id=self.tenant_id, mongo_db_name=self.mongo_db_name, mongo_articles_col_name=self.mongo_articles_col_name, criteria=just_articles_critera, logger=logger))
+            __data_articles__['count_articles'] = self.service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(get_count_only=True, environ=self.environ, tenant_id=self.tenant_id, mongo_db_name=self.mongo_db_name, mongo_articles_col_name=self.mongo_articles_col_name, criteria=just_articles_critera, return_doc_ids=True, logger=logger))
 
 
     @property
@@ -746,15 +747,15 @@ def main_loop(twitter_bot_account, max_tweets=None, debug=False, logger=None):
         num = service_runner.articles_list.delete_all_local_articles(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, options=Options.do_reset, logger=logger))
         logger.info('Deleted {} from the local database and this is a normal function because the cluster has the master data for redundancy by design.'.format(num if (isinstance(num, int) or isinstance(num, float)) else 0))
 
-        the_master_list = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
+        service_runner.allow(bulk_store_the_articles)
 
-        removes = ['__rotation__', '__rotation_processor__', 'debug']
-        for anId in the_master_list: # store the article from the master database into the local database. Does nothing if the article exists.
-            item = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=anId, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, logger=logger))
-            for r in removes:
-                if (r in item.keys()):
-                    del item[r]
-            service_runner.articles_list.update_the_article(**plugins_handler.get_kwargs(the_choice=None, environ=__env__, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger, item=item, ts_current_time=None))
+        the_master_list = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, return_doc_ids=False, logger=logger))
+
+        new_master_list = []
+        removes = ['_id', '__rotation__', '__rotation_processor__', 'debug']
+        for doc in the_master_list: # store the article from the master database into the local database. Does nothing if the article exists.
+            new_master_list.append({k:v for k,v in doc.items() if (k not in removes)})
+        service_runner.articles_list.bulk_store_the_articles(**plugins_handler.get_kwargs(items=new_master_list, environ=__env__, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger))
         the_local_list = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=None, environ=__env__, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger))
         assert len(the_master_list) == len(the_local_list), '(1) Could not verify the master list was copied from the remote server. Expected {} records but got {} instead.'.format(len(the_master_list), len(the_local_list))
         assert len(set(the_master_list) - set(the_local_list)) == 0, '(2) Could not verify the master list was copied from the remote server. Expected {} records but got {} instead.'.format(len(the_master_list), len(the_local_list))
