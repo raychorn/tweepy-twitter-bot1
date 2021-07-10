@@ -1,0 +1,2405 @@
+[
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "site",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "site",
+        "description": "site",
+        "detail": "site",
+        "documentation": {}
+    },
+    {
+        "label": "sys",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sys",
+        "description": "sys",
+        "detail": "sys",
+        "documentation": {}
+    },
+    {
+        "label": "tweepy",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "tweepy",
+        "description": "tweepy",
+        "detail": "tweepy",
+        "documentation": {}
+    },
+    {
+        "label": "imghdr",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "imghdr",
+        "description": "imghdr",
+        "detail": "imghdr",
+        "documentation": {}
+    },
+    {
+        "label": "mimetypes",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "mimetypes",
+        "description": "mimetypes",
+        "detail": "mimetypes",
+        "documentation": {}
+    },
+    {
+        "label": "TweepError",
+        "importPath": "tweepy.error",
+        "description": "tweepy.error",
+        "isExtraImport": true,
+        "detail": "tweepy.error",
+        "documentation": {}
+    },
+    {
+        "label": "is_rate_limit_error_message",
+        "importPath": "tweepy.error",
+        "description": "tweepy.error",
+        "isExtraImport": true,
+        "detail": "tweepy.error",
+        "documentation": {}
+    },
+    {
+        "label": "RateLimitError",
+        "importPath": "tweepy.error",
+        "description": "tweepy.error",
+        "isExtraImport": true,
+        "detail": "tweepy.error",
+        "documentation": {}
+    },
+    {
+        "label": "TweepError",
+        "importPath": "tweepy.error",
+        "description": "tweepy.error",
+        "isExtraImport": true,
+        "detail": "tweepy.error",
+        "documentation": {}
+    },
+    {
+        "label": "list_to_csv",
+        "importPath": "tweepy.utils",
+        "description": "tweepy.utils",
+        "isExtraImport": true,
+        "detail": "tweepy.utils",
+        "documentation": {}
+    },
+    {
+        "label": "convert_to_utf8_str",
+        "importPath": "tweepy.utils",
+        "description": "tweepy.utils",
+        "isExtraImport": true,
+        "detail": "tweepy.utils",
+        "documentation": {}
+    },
+    {
+        "label": "pagination",
+        "importPath": "tweepy.binder",
+        "description": "tweepy.binder",
+        "isExtraImport": true,
+        "detail": "tweepy.binder",
+        "documentation": {}
+    },
+    {
+        "label": "logging",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "logging",
+        "description": "logging",
+        "detail": "logging",
+        "documentation": {}
+    },
+    {
+        "label": "re",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "re",
+        "description": "re",
+        "detail": "re",
+        "documentation": {}
+    },
+    {
+        "label": "time",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "time",
+        "description": "time",
+        "detail": "time",
+        "documentation": {}
+    },
+    {
+        "label": "requests",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "requests",
+        "description": "requests",
+        "detail": "requests",
+        "documentation": {}
+    },
+    {
+        "label": "six",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "six",
+        "description": "six",
+        "detail": "six",
+        "documentation": {}
+    },
+    {
+        "label": "quote",
+        "importPath": "six.moves.urllib.parse",
+        "description": "six.moves.urllib.parse",
+        "isExtraImport": true,
+        "detail": "six.moves.urllib.parse",
+        "documentation": {}
+    },
+    {
+        "label": "urlencode",
+        "importPath": "six.moves.urllib.parse",
+        "description": "six.moves.urllib.parse",
+        "isExtraImport": true,
+        "detail": "six.moves.urllib.parse",
+        "documentation": {}
+    },
+    {
+        "label": "Model",
+        "importPath": "tweepy.models",
+        "description": "tweepy.models",
+        "isExtraImport": true,
+        "detail": "tweepy.models",
+        "documentation": {}
+    },
+    {
+        "label": "os,",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os.",
+        "description": "os.",
+        "detail": "os.",
+        "documentation": {}
+    },
+    {
+        "label": "find_dotenv",
+        "importPath": "dotenv",
+        "description": "dotenv",
+        "isExtraImport": true,
+        "detail": "dotenv",
+        "documentation": {}
+    },
+    {
+        "label": "find_dotenv",
+        "importPath": "dotenv",
+        "description": "dotenv",
+        "isExtraImport": true,
+        "detail": "dotenv",
+        "documentation": {}
+    },
+    {
+        "label": "mujson",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "mujson",
+        "description": "mujson",
+        "detail": "mujson",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "date",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "date",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "SmartDict",
+        "importPath": "vyperlogix.hash.dict",
+        "description": "vyperlogix.hash.dict",
+        "isExtraImport": true,
+        "detail": "vyperlogix.hash.dict",
+        "documentation": {}
+    },
+    {
+        "label": "SmartDict",
+        "importPath": "vyperlogix.hash.dict",
+        "description": "vyperlogix.hash.dict",
+        "isExtraImport": true,
+        "detail": "vyperlogix.hash.dict",
+        "documentation": {}
+    },
+    {
+        "label": "io",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "io",
+        "description": "io",
+        "detail": "io",
+        "documentation": {}
+    },
+    {
+        "label": "traceback",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "traceback",
+        "description": "traceback",
+        "detail": "traceback",
+        "documentation": {}
+    },
+    {
+        "label": "uuid4",
+        "importPath": "uuid",
+        "description": "uuid",
+        "isExtraImport": true,
+        "detail": "uuid",
+        "documentation": {}
+    },
+    {
+        "label": "misc",
+        "importPath": "vyperlogix",
+        "description": "vyperlogix",
+        "isExtraImport": true,
+        "detail": "vyperlogix",
+        "documentation": {}
+    },
+    {
+        "label": "_utils",
+        "importPath": "vyperlogix.misc",
+        "description": "vyperlogix.misc",
+        "isExtraImport": true,
+        "detail": "vyperlogix.misc",
+        "documentation": {}
+    },
+    {
+        "label": "_utils",
+        "importPath": "vyperlogix.misc",
+        "description": "vyperlogix.misc",
+        "isExtraImport": true,
+        "detail": "vyperlogix.misc",
+        "documentation": {}
+    },
+    {
+        "label": "normalize_int_from_str",
+        "importPath": "vyperlogix.misc",
+        "description": "vyperlogix.misc",
+        "isExtraImport": true,
+        "detail": "vyperlogix.misc",
+        "documentation": {}
+    },
+    {
+        "label": "_utils",
+        "importPath": "vyperlogix.misc",
+        "description": "vyperlogix.misc",
+        "isExtraImport": true,
+        "detail": "vyperlogix.misc",
+        "documentation": {}
+    },
+    {
+        "label": "normalize_int_from_str",
+        "importPath": "vyperlogix.misc",
+        "description": "vyperlogix.misc",
+        "isExtraImport": true,
+        "detail": "vyperlogix.misc",
+        "documentation": {}
+    },
+    {
+        "label": "normalize_float_from_str",
+        "importPath": "vyperlogix.misc",
+        "description": "vyperlogix.misc",
+        "isExtraImport": true,
+        "detail": "vyperlogix.misc",
+        "documentation": {}
+    },
+    {
+        "label": "_utils",
+        "importPath": "vyperlogix.misc",
+        "description": "vyperlogix.misc",
+        "isExtraImport": true,
+        "detail": "vyperlogix.misc",
+        "documentation": {}
+    },
+    {
+        "label": "_utils",
+        "importPath": "vyperlogix.misc",
+        "description": "vyperlogix.misc",
+        "isExtraImport": true,
+        "detail": "vyperlogix.misc",
+        "documentation": {}
+    },
+    {
+        "label": "_utils",
+        "importPath": "vyperlogix.misc",
+        "description": "vyperlogix.misc",
+        "isExtraImport": true,
+        "detail": "vyperlogix.misc",
+        "documentation": {}
+    },
+    {
+        "label": "Wrapper",
+        "importPath": "vyperlogix.classes.MagicObject",
+        "description": "vyperlogix.classes.MagicObject",
+        "isExtraImport": true,
+        "detail": "vyperlogix.classes.MagicObject",
+        "documentation": {}
+    },
+    {
+        "label": "MagicObject2",
+        "importPath": "vyperlogix.classes.MagicObject",
+        "description": "vyperlogix.classes.MagicObject",
+        "isExtraImport": true,
+        "detail": "vyperlogix.classes.MagicObject",
+        "documentation": {}
+    },
+    {
+        "label": "namedtuple",
+        "importPath": "collections",
+        "description": "collections",
+        "isExtraImport": true,
+        "detail": "collections",
+        "documentation": {}
+    },
+    {
+        "label": "namedtuple",
+        "importPath": "collections",
+        "description": "collections",
+        "isExtraImport": true,
+        "detail": "collections",
+        "documentation": {}
+    },
+    {
+        "label": "enum",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "enum",
+        "description": "enum",
+        "detail": "enum",
+        "documentation": {}
+    },
+    {
+        "label": "random",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "random",
+        "description": "random",
+        "detail": "random",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "importPath": "loguru",
+        "description": "loguru",
+        "isExtraImport": true,
+        "detail": "loguru",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "importPath": "loguru",
+        "description": "loguru",
+        "isExtraImport": true,
+        "detail": "loguru",
+        "documentation": {}
+    },
+    {
+        "label": "dictutils",
+        "importPath": "vyperlogix.iterators.dict",
+        "description": "vyperlogix.iterators.dict",
+        "isExtraImport": true,
+        "detail": "vyperlogix.iterators.dict",
+        "documentation": {}
+    },
+    {
+        "label": "ObjectId",
+        "importPath": "bson.objectid",
+        "description": "bson.objectid",
+        "isExtraImport": true,
+        "detail": "bson.objectid",
+        "documentation": {}
+    },
+    {
+        "label": "ObjectId",
+        "importPath": "bson.objectid",
+        "description": "bson.objectid",
+        "isExtraImport": true,
+        "detail": "bson.objectid",
+        "documentation": {}
+    },
+    {
+        "label": "ObjectId",
+        "importPath": "bson.objectid",
+        "description": "bson.objectid",
+        "isExtraImport": true,
+        "detail": "bson.objectid",
+        "documentation": {}
+    },
+    {
+        "label": "vyperapi",
+        "importPath": "vyperlogix.mongo",
+        "description": "vyperlogix.mongo",
+        "isExtraImport": true,
+        "detail": "vyperlogix.mongo",
+        "documentation": {}
+    },
+    {
+        "label": "vyperapi",
+        "importPath": "vyperlogix.mongo",
+        "description": "vyperlogix.mongo",
+        "isExtraImport": true,
+        "detail": "vyperlogix.mongo",
+        "documentation": {}
+    },
+    {
+        "label": "vyperapi",
+        "importPath": "vyperlogix.mongo",
+        "description": "vyperlogix.mongo",
+        "isExtraImport": true,
+        "detail": "vyperlogix.mongo",
+        "documentation": {}
+    },
+    {
+        "label": "__with",
+        "importPath": "vyperlogix.decorators",
+        "description": "vyperlogix.decorators",
+        "isExtraImport": true,
+        "detail": "vyperlogix.decorators",
+        "documentation": {}
+    },
+    {
+        "label": "args",
+        "importPath": "vyperlogix.decorators",
+        "description": "vyperlogix.decorators",
+        "isExtraImport": true,
+        "detail": "vyperlogix.decorators",
+        "documentation": {}
+    },
+    {
+        "label": "args",
+        "importPath": "vyperlogix.decorators",
+        "description": "vyperlogix.decorators",
+        "isExtraImport": true,
+        "detail": "vyperlogix.decorators",
+        "documentation": {}
+    },
+    {
+        "label": "__with",
+        "importPath": "vyperlogix.decorators",
+        "description": "vyperlogix.decorators",
+        "isExtraImport": true,
+        "detail": "vyperlogix.decorators",
+        "documentation": {}
+    },
+    {
+        "label": "args",
+        "importPath": "vyperlogix.decorators",
+        "description": "vyperlogix.decorators",
+        "isExtraImport": true,
+        "detail": "vyperlogix.decorators",
+        "documentation": {}
+    },
+    {
+        "label": "__with",
+        "importPath": "vyperlogix.decorators",
+        "description": "vyperlogix.decorators",
+        "isExtraImport": true,
+        "detail": "vyperlogix.decorators",
+        "documentation": {}
+    },
+    {
+        "label": "args",
+        "importPath": "vyperlogix.decorators",
+        "description": "vyperlogix.decorators",
+        "isExtraImport": true,
+        "detail": "vyperlogix.decorators",
+        "documentation": {}
+    },
+    {
+        "label": "interval",
+        "importPath": "vyperlogix.decorators",
+        "description": "vyperlogix.decorators",
+        "isExtraImport": true,
+        "detail": "vyperlogix.decorators",
+        "documentation": {}
+    },
+    {
+        "label": "executor",
+        "importPath": "vyperlogix.decorators",
+        "description": "vyperlogix.decorators",
+        "isExtraImport": true,
+        "detail": "vyperlogix.decorators",
+        "documentation": {}
+    },
+    {
+        "label": "TweepyAPI",
+        "importPath": "_tweepy.api",
+        "description": "_tweepy.api",
+        "isExtraImport": true,
+        "detail": "_tweepy.api",
+        "documentation": {}
+    },
+    {
+        "label": "handler",
+        "importPath": "vyperlogix.plugins",
+        "description": "vyperlogix.plugins",
+        "isExtraImport": true,
+        "detail": "vyperlogix.plugins",
+        "documentation": {}
+    },
+    {
+        "label": "handler",
+        "importPath": "vyperlogix.plugins",
+        "description": "vyperlogix.plugins",
+        "isExtraImport": true,
+        "detail": "vyperlogix.plugins",
+        "documentation": {}
+    },
+    {
+        "label": "os.path",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os.path",
+        "description": "os.path",
+        "detail": "os.path",
+        "documentation": {}
+    },
+    {
+        "label": "pkgutil",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "pkgutil",
+        "description": "pkgutil",
+        "detail": "pkgutil",
+        "documentation": {}
+    },
+    {
+        "label": "shutil",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "shutil",
+        "description": "shutil",
+        "detail": "shutil",
+        "documentation": {}
+    },
+    {
+        "label": "tempfile",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "tempfile",
+        "description": "tempfile",
+        "detail": "tempfile",
+        "documentation": {}
+    },
+    {
+        "label": "b85decode",
+        "importPath": "base64",
+        "description": "base64",
+        "isExtraImport": true,
+        "detail": "base64",
+        "documentation": {}
+    },
+    {
+        "label": "math",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "math",
+        "description": "math",
+        "detail": "math",
+        "documentation": {}
+    },
+    {
+        "label": "pprint",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "pprint",
+        "description": "pprint",
+        "detail": "pprint",
+        "documentation": {}
+    },
+    {
+        "label": "socket",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "socket",
+        "description": "socket",
+        "detail": "socket",
+        "documentation": {}
+    },
+    {
+        "label": "RotatingFileHandler",
+        "importPath": "logging.handlers",
+        "description": "logging.handlers",
+        "isExtraImport": true,
+        "detail": "logging.handlers",
+        "documentation": {}
+    },
+    {
+        "label": "urllib3",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "urllib3",
+        "description": "urllib3",
+        "detail": "urllib3",
+        "documentation": {}
+    },
+    {
+        "label": "Queue",
+        "importPath": "queue",
+        "description": "queue",
+        "isExtraImport": true,
+        "detail": "queue",
+        "documentation": {}
+    },
+    {
+        "label": "MyDotEnv",
+        "importPath": "vyperlogix.env.environ",
+        "description": "vyperlogix.env.environ",
+        "isExtraImport": true,
+        "detail": "vyperlogix.env.environ",
+        "documentation": {}
+    },
+    {
+        "label": "pooled",
+        "importPath": "vyperlogix.threads",
+        "description": "vyperlogix.threads",
+        "isExtraImport": true,
+        "detail": "vyperlogix.threads",
+        "documentation": {}
+    },
+    {
+        "label": "MongoDBObject",
+        "importPath": "vyperlogix.mongo._object",
+        "description": "vyperlogix.mongo._object",
+        "isExtraImport": true,
+        "detail": "vyperlogix.mongo._object",
+        "documentation": {}
+    },
+    {
+        "label": "bin_dir",
+        "kind": 5,
+        "importPath": ".venv395.bin.activate_this",
+        "description": ".venv395.bin.activate_this",
+        "peekOfCode": "bin_dir = os.path.dirname(abs_file)\nbase = bin_dir[: -len(\"bin\") - 1]  # strip away the bin part from the __file__, plus the path separator\n# prepend bin to PATH (this file is inside the bin directory)\nos.environ[\"PATH\"] = os.pathsep.join([bin_dir] + os.environ.get(\"PATH\", \"\").split(os.pathsep))\nos.environ[\"VIRTUAL_ENV\"] = base  # virtual env is right above bin directory\n# add the virtual environments libraries to the host python import mechanism\nprev_length = len(sys.path)\nfor lib in \"../lib/python3.9/site-packages\".split(os.pathsep):\n    path = os.path.realpath(os.path.join(bin_dir, lib))\n    site.addsitedir(path.decode(\"utf-8\") if \"\" else path)",
+        "detail": ".venv395.bin.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "base",
+        "kind": 5,
+        "importPath": ".venv395.bin.activate_this",
+        "description": ".venv395.bin.activate_this",
+        "peekOfCode": "base = bin_dir[: -len(\"bin\") - 1]  # strip away the bin part from the __file__, plus the path separator\n# prepend bin to PATH (this file is inside the bin directory)\nos.environ[\"PATH\"] = os.pathsep.join([bin_dir] + os.environ.get(\"PATH\", \"\").split(os.pathsep))\nos.environ[\"VIRTUAL_ENV\"] = base  # virtual env is right above bin directory\n# add the virtual environments libraries to the host python import mechanism\nprev_length = len(sys.path)\nfor lib in \"../lib/python3.9/site-packages\".split(os.pathsep):\n    path = os.path.realpath(os.path.join(bin_dir, lib))\n    site.addsitedir(path.decode(\"utf-8\") if \"\" else path)\nsys.path[:] = sys.path[prev_length:] + sys.path[0:prev_length]",
+        "detail": ".venv395.bin.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "os.environ[\"PATH\"]",
+        "kind": 5,
+        "importPath": ".venv395.bin.activate_this",
+        "description": ".venv395.bin.activate_this",
+        "peekOfCode": "os.environ[\"PATH\"] = os.pathsep.join([bin_dir] + os.environ.get(\"PATH\", \"\").split(os.pathsep))\nos.environ[\"VIRTUAL_ENV\"] = base  # virtual env is right above bin directory\n# add the virtual environments libraries to the host python import mechanism\nprev_length = len(sys.path)\nfor lib in \"../lib/python3.9/site-packages\".split(os.pathsep):\n    path = os.path.realpath(os.path.join(bin_dir, lib))\n    site.addsitedir(path.decode(\"utf-8\") if \"\" else path)\nsys.path[:] = sys.path[prev_length:] + sys.path[0:prev_length]\nsys.real_prefix = sys.prefix\nsys.prefix = base",
+        "detail": ".venv395.bin.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "os.environ[\"VIRTUAL_ENV\"]",
+        "kind": 5,
+        "importPath": ".venv395.bin.activate_this",
+        "description": ".venv395.bin.activate_this",
+        "peekOfCode": "os.environ[\"VIRTUAL_ENV\"] = base  # virtual env is right above bin directory\n# add the virtual environments libraries to the host python import mechanism\nprev_length = len(sys.path)\nfor lib in \"../lib/python3.9/site-packages\".split(os.pathsep):\n    path = os.path.realpath(os.path.join(bin_dir, lib))\n    site.addsitedir(path.decode(\"utf-8\") if \"\" else path)\nsys.path[:] = sys.path[prev_length:] + sys.path[0:prev_length]\nsys.real_prefix = sys.prefix\nsys.prefix = base",
+        "detail": ".venv395.bin.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "prev_length",
+        "kind": 5,
+        "importPath": ".venv395.bin.activate_this",
+        "description": ".venv395.bin.activate_this",
+        "peekOfCode": "prev_length = len(sys.path)\nfor lib in \"../lib/python3.9/site-packages\".split(os.pathsep):\n    path = os.path.realpath(os.path.join(bin_dir, lib))\n    site.addsitedir(path.decode(\"utf-8\") if \"\" else path)\nsys.path[:] = sys.path[prev_length:] + sys.path[0:prev_length]\nsys.real_prefix = sys.prefix\nsys.prefix = base",
+        "detail": ".venv395.bin.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "sys.path[:]",
+        "kind": 5,
+        "importPath": ".venv395.bin.activate_this",
+        "description": ".venv395.bin.activate_this",
+        "peekOfCode": "sys.path[:] = sys.path[prev_length:] + sys.path[0:prev_length]\nsys.real_prefix = sys.prefix\nsys.prefix = base",
+        "detail": ".venv395.bin.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "sys.real_prefix",
+        "kind": 5,
+        "importPath": ".venv395.bin.activate_this",
+        "description": ".venv395.bin.activate_this",
+        "peekOfCode": "sys.real_prefix = sys.prefix\nsys.prefix = base",
+        "detail": ".venv395.bin.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "sys.prefix",
+        "kind": 5,
+        "importPath": ".venv395.bin.activate_this",
+        "description": ".venv395.bin.activate_this",
+        "peekOfCode": "sys.prefix = base",
+        "detail": ".venv395.bin.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "TweepyAPI",
+        "kind": 6,
+        "importPath": "_tweepy.api",
+        "description": "_tweepy.api",
+        "peekOfCode": "class TweepyAPI(tweepy.API):\n    \"\"\"My Twitter API\"\"\"\n    @property\n    def home_timeline(self):\n        \"\"\" :reference: https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-home_timeline\n            :allowed_param: 'count', 'since_id', 'max_id', 'trim_user',\n                            'exclude_replies', 'include_entities'\n        \"\"\"\n        return bind_api(\n            api=self,",
+        "detail": "_tweepy.api",
+        "documentation": {}
+    },
+    {
+        "label": "bind_api",
+        "kind": 2,
+        "importPath": "_tweepy.binder",
+        "description": "_tweepy.binder",
+        "peekOfCode": "def bind_api(**config):\n    class APIMethod(object):\n        api = config['api']\n        path = config['path']\n        payload_type = config.get('payload_type', None)\n        payload_list = config.get('payload_list', False)\n        allowed_param = config.get('allowed_param', [])\n        method = config.get('method', 'GET')\n        require_auth = config.get('require_auth', False)\n        search_api = config.get('search_api', False)",
+        "detail": "_tweepy.binder",
+        "documentation": {}
+    },
+    {
+        "label": "re_path_template",
+        "kind": 5,
+        "importPath": "_tweepy.binder",
+        "description": "_tweepy.binder",
+        "peekOfCode": "re_path_template = re.compile(r'{\\w+}')\nlog = logging.getLogger(__name__)\ndef bind_api(**config):\n    class APIMethod(object):\n        api = config['api']\n        path = config['path']\n        payload_type = config.get('payload_type', None)\n        payload_list = config.get('payload_list', False)\n        allowed_param = config.get('allowed_param', [])\n        method = config.get('method', 'GET')",
+        "detail": "_tweepy.binder",
+        "documentation": {}
+    },
+    {
+        "label": "log",
+        "kind": 5,
+        "importPath": "_tweepy.binder",
+        "description": "_tweepy.binder",
+        "peekOfCode": "log = logging.getLogger(__name__)\ndef bind_api(**config):\n    class APIMethod(object):\n        api = config['api']\n        path = config['path']\n        payload_type = config.get('payload_type', None)\n        payload_list = config.get('payload_list', False)\n        allowed_param = config.get('allowed_param', [])\n        method = config.get('method', 'GET')\n        require_auth = config.get('require_auth', False)",
+        "detail": "_tweepy.binder",
+        "documentation": {}
+    },
+    {
+        "label": "get_local_ether_interface",
+        "kind": 2,
+        "importPath": "docker.scripts.get_env",
+        "description": "docker.scripts.get_env",
+        "peekOfCode": "def get_local_ether_interface():\n    import ifcfg\n    import ipaddress\n    for name, interface in ifcfg.interfaces().items():\n        ip_addr = interface.get('inet')\n        ip_ether = interface.get('ether')\n        if (ip_addr and ip_ether):\n            i = ipaddress.ip_address(ip_addr)\n            if (i.is_private):\n                return interface",
+        "detail": "docker.scripts.get_env",
+        "documentation": {}
+    },
+    {
+        "label": "get_environ_keys",
+        "kind": 2,
+        "importPath": "docker.scripts.get_env",
+        "description": "docker.scripts.get_env",
+        "peekOfCode": "def get_environ_keys(*args, **kwargs):\n    from expandvars import expandvars\n    k = kwargs.get('key')\n    v = kwargs.get('value')\n    assert (k is not None) and (v is not None), 'Problem with kwargs -> {}, k={}, v={}'.format(kwargs,k,v)\n    __logger__ = kwargs.get('logger')\n    if (k == '__LITERALS__'):\n        for item in v:\n            env_literals.append(item)\n    if (isinstance(v, str)):",
+        "detail": "docker.scripts.get_env",
+        "documentation": {}
+    },
+    {
+        "label": "local_ether_interface",
+        "kind": 5,
+        "importPath": "docker.scripts.get_env",
+        "description": "docker.scripts.get_env",
+        "peekOfCode": "local_ether_interface = get_local_ether_interface()\nassert local_ether_interface is not None, 'Cannot get the local ip address from the ifconfig interface. Please fix.'\nos.environ['LOCAL_INET'] = local_ether_interface.get('inet')\n__env__ = {}\nenv_literals = []\ndef get_environ_keys(*args, **kwargs):\n    from expandvars import expandvars\n    k = kwargs.get('key')\n    v = kwargs.get('value')\n    assert (k is not None) and (v is not None), 'Problem with kwargs -> {}, k={}, v={}'.format(kwargs,k,v)",
+        "detail": "docker.scripts.get_env",
+        "documentation": {}
+    },
+    {
+        "label": "os.environ['LOCAL_INET']",
+        "kind": 5,
+        "importPath": "docker.scripts.get_env",
+        "description": "docker.scripts.get_env",
+        "peekOfCode": "os.environ['LOCAL_INET'] = local_ether_interface.get('inet')\n__env__ = {}\nenv_literals = []\ndef get_environ_keys(*args, **kwargs):\n    from expandvars import expandvars\n    k = kwargs.get('key')\n    v = kwargs.get('value')\n    assert (k is not None) and (v is not None), 'Problem with kwargs -> {}, k={}, v={}'.format(kwargs,k,v)\n    __logger__ = kwargs.get('logger')\n    if (k == '__LITERALS__'):",
+        "detail": "docker.scripts.get_env",
+        "documentation": {}
+    },
+    {
+        "label": "__env__",
+        "kind": 5,
+        "importPath": "docker.scripts.get_env",
+        "description": "docker.scripts.get_env",
+        "peekOfCode": "__env__ = {}\nenv_literals = []\ndef get_environ_keys(*args, **kwargs):\n    from expandvars import expandvars\n    k = kwargs.get('key')\n    v = kwargs.get('value')\n    assert (k is not None) and (v is not None), 'Problem with kwargs -> {}, k={}, v={}'.format(kwargs,k,v)\n    __logger__ = kwargs.get('logger')\n    if (k == '__LITERALS__'):\n        for item in v:",
+        "detail": "docker.scripts.get_env",
+        "documentation": {}
+    },
+    {
+        "label": "env_literals",
+        "kind": 5,
+        "importPath": "docker.scripts.get_env",
+        "description": "docker.scripts.get_env",
+        "peekOfCode": "env_literals = []\ndef get_environ_keys(*args, **kwargs):\n    from expandvars import expandvars\n    k = kwargs.get('key')\n    v = kwargs.get('value')\n    assert (k is not None) and (v is not None), 'Problem with kwargs -> {}, k={}, v={}'.format(kwargs,k,v)\n    __logger__ = kwargs.get('logger')\n    if (k == '__LITERALS__'):\n        for item in v:\n            env_literals.append(item)",
+        "detail": "docker.scripts.get_env",
+        "documentation": {}
+    },
+    {
+        "label": "fp",
+        "kind": 5,
+        "importPath": "docker.scripts.get_env",
+        "description": "docker.scripts.get_env",
+        "peekOfCode": "fp = find_dotenv()\nif (fp.find('/docker/')):\n    fp = fp.replace('/docker', '')\ndotenv = MyDotEnv(fp, verbose=True, interpolate=True, override=True, logger=None, callback=get_environ_keys)\ndotenv.set_as_environment_variables()\nignore_values = [\n    '/home/raychorn/projects/python-projects/private_vyperlogix_lib3', \n    'COSMOS_INITDB_ROOT_PASSWORD',\n    'MONGO_INITDB_ROOT_PASSWORD',\n    'COSMOS_URI',",
+        "detail": "docker.scripts.get_env",
+        "documentation": {}
+    },
+    {
+        "label": "dotenv",
+        "kind": 5,
+        "importPath": "docker.scripts.get_env",
+        "description": "docker.scripts.get_env",
+        "peekOfCode": "dotenv = MyDotEnv(fp, verbose=True, interpolate=True, override=True, logger=None, callback=get_environ_keys)\ndotenv.set_as_environment_variables()\nignore_values = [\n    '/home/raychorn/projects/python-projects/private_vyperlogix_lib3', \n    'COSMOS_INITDB_ROOT_PASSWORD',\n    'MONGO_INITDB_ROOT_PASSWORD',\n    'COSMOS_URI',\n    '__env4__'\n]\nfor k,v in __env__.items():",
+        "detail": "docker.scripts.get_env",
+        "documentation": {}
+    },
+    {
+        "label": "ignore_values",
+        "kind": 5,
+        "importPath": "docker.scripts.get_env",
+        "description": "docker.scripts.get_env",
+        "peekOfCode": "ignore_values = [\n    '/home/raychorn/projects/python-projects/private_vyperlogix_lib3', \n    'COSMOS_INITDB_ROOT_PASSWORD',\n    'MONGO_INITDB_ROOT_PASSWORD',\n    'COSMOS_URI',\n    '__env4__'\n]\nfor k,v in __env__.items():\n    try:\n        if (isinstance(v, str)) and (not any([v.find(s) > -1 for s in ignore_values])):",
+        "detail": "docker.scripts.get_env",
+        "documentation": {}
+    },
+    {
+        "label": "RotationProcessor",
+        "kind": 6,
+        "importPath": "json.prototype1",
+        "description": "json.prototype1",
+        "peekOfCode": "class RotationProcessor(dict):\n    def __setitem__(self, k, v):\n        '''\n        key is the timestamp and value is a number > 0\n        ts -> day_of_year -> key\n        value is dict where key is the hour number and value is the count for that hour\n        '''\n        toks = k.split('T')\n        yy,mm,dd = tuple([int(s) for s in toks[0].split('-')])\n        day_of_year = date(yy,mm,dd).timetuple().tm_yday",
+        "detail": "json.prototype1",
+        "documentation": {}
+    },
+    {
+        "label": "crud_store_data",
+        "kind": 2,
+        "importPath": "libs.database",
+        "description": "libs.database",
+        "peekOfCode": "def crud_store_data(environ=None, mongo_db_name=None, mongo_col_name=None, mongo_key_name=None, data=None, criteria=None, uniques=True, using_clean_data=False, verbose=False, debug=False, logger=None):\n    '''\n    CRUD automation - stores data\n    '''\n    from vyperlogix.mongo import vyperapi\n    from vyperlogix.decorators import __with\n    response = {}\n    assert isinstance(mongo_db_name, str) and (len(mongo_db_name) > 0), '(1) Cannot proceed without a mongo_db_name and \"{}\" is not usable.'.format(mongo_db_name)\n    assert isinstance(mongo_col_name, str) and (len(mongo_col_name) > 0), '(1) Cannot proceed without a mongo_col_name and \"{}\" is not usable.'.format(mongo_col_name)\n    assert (data), '(1) Cannot proceed without data and \"{}\" is not usable.'.format(data)",
+        "detail": "libs.database",
+        "documentation": {}
+    },
+    {
+        "label": "crud_get_data",
+        "kind": 2,
+        "importPath": "libs.database",
+        "description": "libs.database",
+        "peekOfCode": "def crud_get_data(environ=None, mongo_db_name=None, mongo_col_name=None, mongo_key_name=None, criteria=None, verbose=False, debug=False, logger=None):\n    '''\n    CRUD automation - stores data\n    '''\n    from vyperlogix.mongo import vyperapi\n    from vyperlogix.decorators import __with\n    response = {}\n    assert isinstance(mongo_db_name, str) and (len(mongo_db_name) > 0), '(1) Cannot proceed without a mongo_db_name and \"{}\" is not usable.'.format(mongo_db_name)\n    assert isinstance(mongo_col_name, str) and (len(mongo_col_name) > 0), '(1) Cannot proceed without a mongo_col_name and \"{}\" is not usable.'.format(mongo_col_name)\n    @__with.mongodb(environ=environ, table_name=mongo_db_name, col_name=mongo_col_name, criteria=criteria, verbose=debug, logger=logger)",
+        "detail": "libs.database",
+        "documentation": {}
+    },
+    {
+        "label": "crud_get_collection",
+        "kind": 2,
+        "importPath": "libs.database",
+        "description": "libs.database",
+        "peekOfCode": "def crud_get_collection(environ=None, mongo_db_name=None, mongo_col_name=None, criteria=None, callback=None, verbose=False, debug=False, logger=None):\n    '''\n    CRUD automation - performs collection operations\n    '''\n    from vyperlogix.mongo import vyperapi\n    from vyperlogix.decorators import __with\n    response = {}\n    assert isinstance(mongo_db_name, str) and (len(mongo_db_name) > 0), '(1) Cannot proceed without a mongo_db_name and \"{}\" is not usable.'.format(mongo_db_name)\n    assert isinstance(mongo_col_name, str) and (len(mongo_col_name) > 0), '(1) Cannot proceed without a mongo_col_name and \"{}\" is not usable.'.format(mongo_col_name)\n    @__with.mongodb(environ=environ, table_name=mongo_db_name, col_name=mongo_col_name, criteria=criteria, callback=callback, verbose=debug, logger=logger)",
+        "detail": "libs.database",
+        "documentation": {}
+    },
+    {
+        "label": "crud_delete_data",
+        "kind": 2,
+        "importPath": "libs.database",
+        "description": "libs.database",
+        "peekOfCode": "def crud_delete_data(environ=None, mongo_db_name=None, mongo_col_name=None, mongo_key_name=None, data=None, criteria=None, verbose=False, debug=False, logger=None):\n    '''\n    CRUD automation - stores data\n    '''\n    from vyperlogix.mongo import vyperapi\n    from vyperlogix.decorators import __with\n    response = {}\n    assert isinstance(mongo_db_name, str) and (len(mongo_db_name) > 0), '(1) Cannot proceed without a mongo_db_name and \"{}\" is not usable.'.format(mongo_db_name)\n    assert isinstance(mongo_col_name, str) and (len(mongo_col_name) > 0), '(1) Cannot proceed without a mongo_col_name and \"{}\" is not usable.'.format(mongo_col_name)\n    assert (isinstance(mongo_key_name, str) and (len(mongo_key_name) > 0)) or (criteria), '(1) Cannot proceed without a mongo_key_name (\"{}\") or criteria (\"{}\") and one of these is not usable.'.format(mongo_key_name, criteria)",
+        "detail": "libs.database",
+        "documentation": {}
+    },
+    {
+        "label": "crud_update_data",
+        "kind": 2,
+        "importPath": "libs.database",
+        "description": "libs.database",
+        "peekOfCode": "def crud_update_data(environ=None, mongo_db_name=None, mongo_col_name=None, mongo_key_name=None, data=None, criteria=None, verbose=False, debug=False, logger=None):\n    '''\n    CRUD automation - stores data\n    '''\n    from vyperlogix.mongo import vyperapi\n    from vyperlogix.decorators import __with\n    response = {}\n    assert isinstance(mongo_db_name, str) and (len(mongo_db_name) > 0), '(1) Cannot proceed without a mongo_db_name and \"{}\" is not usable.'.format(mongo_db_name)\n    assert isinstance(mongo_col_name, str) and (len(mongo_col_name) > 0), '(1) Cannot proceed without a mongo_col_name and \"{}\" is not usable.'.format(mongo_col_name)\n    assert (isinstance(mongo_key_name, str) and (len(mongo_key_name) > 0)) or (criteria), '(1) Cannot proceed without a mongo_key_name (\"{}\") or criteria (\"{}\") and one of these is not usable.'.format(mongo_key_name, criteria)",
+        "detail": "libs.database",
+        "documentation": {}
+    },
+    {
+        "label": "db_do_with_client",
+        "kind": 2,
+        "importPath": "libs.database",
+        "description": "libs.database",
+        "peekOfCode": "def db_do_with_client(environ=None, source_code=None, verbose=False, debug=False, logger=None):\n    '''\n    CRUD automation - does stuff with the database client.\n    '''\n    from vyperlogix.mongo import vyperapi\n    from vyperlogix.decorators import __with\n    response = {}\n    @__with.mongodb(environ=environ, verbose=debug, logger=logger)\n    def __get_client(resp=None, db=None):\n        '''",
+        "detail": "libs.database",
+        "documentation": {}
+    },
+    {
+        "label": "SmartWrapper",
+        "kind": 6,
+        "importPath": "libs.smarts",
+        "description": "libs.smarts",
+        "peekOfCode": "class SmartWrapper(Wrapper):\n    __cache__ = {}\n    def __init__(self,__object__,callback=None):\n        self.__id__ = str(uuid4())\n        SmartWrapper.__cache__[self.__id__] = __object__\n        self.__callback__ = callback\n        self.__stack__ = []\n        super().__init__(self)\n    def __getattr__(self,name,*args,**kwargs):\n        self.__reset_magic__()",
+        "detail": "libs.smarts",
+        "documentation": {}
+    },
+    {
+        "label": "print_traceback",
+        "kind": 2,
+        "importPath": "libs.utils2",
+        "description": "libs.utils2",
+        "peekOfCode": "def print_traceback(ex, ex_traceback=None):\n    import traceback\n    if ex_traceback is None:\n        ex_traceback = ex.__traceback__\n    tb_lines = [ line.strip() for line in\n                traceback.format_exception(ex.__class__, ex, ex_traceback)]\n    print('\\n'.join(tb_lines))",
+        "detail": "libs.utils2",
+        "documentation": {}
+    },
+    {
+        "label": "typeName",
+        "kind": 5,
+        "importPath": "libs.utils2",
+        "description": "libs.utils2",
+        "peekOfCode": "typeName = lambda x:''.join([ch for ch in str(x).split()[-1] if (str(ch).isprintable() and (str(ch).isalnum() or (str(ch) in ['.'])))])\ndef print_traceback(ex, ex_traceback=None):\n    import traceback\n    if ex_traceback is None:\n        ex_traceback = ex.__traceback__\n    tb_lines = [ line.strip() for line in\n                traceback.format_exception(ex.__class__, ex, ex_traceback)]\n    print('\\n'.join(tb_lines))",
+        "detail": "libs.utils2",
+        "documentation": {}
+    },
+    {
+        "label": "RotationProcessor",
+        "kind": 6,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "class RotationProcessor(dict):\n    def __setitem__(self, k, v):\n        '''\n        key is the timestamp and value is a number > 0\n        ts -> day_of_year -> key\n        value is dict where key is the hour number and value is the count for that hour\n        '''\n        toks = k.split('T')\n        yy,mm,dd = tuple([int(s) for s in toks[0].split('-')])\n        day_of_year = date(yy,mm,dd).timetuple().tm_yday",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "Options",
+        "kind": 6,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "class Options(enum.Enum):\n    do_nothing = 0\n    do_analysis = 1\n    init_articles = 2\n    do_reset = 4\ndef __criteria(property=None, keyword=None, is_not=False, ignore_case=False):\n    import re\n    assert is_really_a_string(property), 'Missing property. Cannot do search in database without this one.'\n    assert is_really_a_string(keyword), 'Missing keyword. Cannot do search in database without this one.'\n    _is_regex = re.compile(keyword, re.IGNORECASE)  if (ignore_case) else re.compile(keyword)",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "reset_article_plans",
+        "kind": 2,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "def reset_article_plans(*args, **kwargs):\n    pass\ndef __store_the_plan(data, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, update=None):\n    @__with.database(environ=environ)\n    def db_store_the_plan(db=None, data=None):\n        assert vyperapi.is_not_none(db), 'There is no db.'\n        assert vyperapi.is_not_none(mongo_db_name), 'There is no mongo_db_name.'\n        assert vyperapi.is_not_none(mongo_articles_col_name), 'There is no mongo_articles_col_name.'\n        tb_name = mongo_db_name\n        col_name = mongo_articles_col_name",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "get_articles",
+        "kind": 2,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "def get_articles(*args, **kwargs):\n    pass\n###########################################################\ndef __count_all_articles(twitter_bot_account=None, environ=None, callback=None, logger=None):\n    return __get_articles(get_count_only=True, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, callback=callback, logger=logger)\n@args.kwargs(__count_all_articles)\ndef count_all_articles(*args, **kwargs):\n    pass\n###########################################################\ndef __store_article_data(data, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, update=None):",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "count_all_articles",
+        "kind": 2,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "def count_all_articles(*args, **kwargs):\n    pass\n###########################################################\ndef __store_article_data(data, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, update=None):\n    @__with.database(environ=environ)\n    def db_store_article_data(db=None, data=None):\n        assert vyperapi.is_not_none(db), 'There is no db.'\n        tb_name = mongo_db_name\n        col_name = normalize_collection_name(tenant_id, mongo_articles_col_name)\n        table = db[tb_name]",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "get_the_real_list",
+        "kind": 2,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "def get_the_real_list(*args, **kwargs):\n    pass\ndef __get_a_choice(the_list=None, twitter_bot_account=None, ts_current_time=None, this_process={}, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, logger=None):\n    choice = None\n    assert isinstance(the_list, list), 'Wheres the list?'\n    msg = 'the_list - the_list has {} items.'.format(len(the_list))\n    assert isinstance(ts_current_time, str), 'Missing a usable ts_current_time.'\n    assert isinstance(this_process, dict), 'Missing a usable this_process.'\n    assert environ is not None, 'Missing the environ.'\n    assert isinstance(mongo_db_name, str), 'Missing the mongo_db_name.'",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "get_a_choice",
+        "kind": 2,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "def get_a_choice(*args, **kwargs):\n    pass\n#########################################################################\ndef __delete_all_local_articles(the_list=None, twitter_bot_account=None, environ=None, options=None, mongo_db_name=None, mongo_articles_col_name=None, logger=None):\n    '''\n    This removed each item by item because removing the collection seems too dangerous so this is a bit inefficient by design.\n    '''\n    assert options.name == 'do_reset', 'Cannot remove local articles without the proper options.'\n    assert environ is not None, 'Missing the environ.'\n    assert isinstance(mongo_db_name, str), 'Missing the mongo_db_name.'",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "delete_all_local_articles",
+        "kind": 2,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "def delete_all_local_articles(*args, **kwargs):\n    pass\n#########################################################################\ndef __reset_plans_for_choices(the_list=None, ts_current_time=None, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, logger=None):\n    choice = None\n    assert isinstance(the_list, list), 'Wheres the list?'\n    msg = 'the_list - the_list has {} items.'.format(len(the_list))\n    assert isinstance(ts_current_time, str), 'Missing a usable ts_current_time.'\n    assert environ is not None, 'Missing the environ.'\n    assert isinstance(mongo_db_name, str), 'Missing the mongo_db_name.'",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "reset_plans_for_choices",
+        "kind": 2,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "def reset_plans_for_choices(*args, **kwargs):\n    pass\ndef most_recent_number_of_days(bucket, num_days=30):\n    '''\n    To Do: Do some analysis to see if there are any articles that have not been tweeted recently? (Whatever thay means.)\n    '''\n    period_secs = (normalize_int_from_str(num_days)*24*60*60)\n    thirty_days_ago = datetime.fromisoformat(_utils.timeStamp(offset=-period_secs, use_iso=True))\n    period_secs += 3600  # Daylight Savings Time issue? Or typical translation bias?\n    new_bucket = [] if (isinstance(bucket, list)) else {} if (isinstance(bucket, dict)) else None",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "most_recent_number_of_days",
+        "kind": 2,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "def most_recent_number_of_days(bucket, num_days=30):\n    '''\n    To Do: Do some analysis to see if there are any articles that have not been tweeted recently? (Whatever thay means.)\n    '''\n    period_secs = (normalize_int_from_str(num_days)*24*60*60)\n    thirty_days_ago = datetime.fromisoformat(_utils.timeStamp(offset=-period_secs, use_iso=True))\n    period_secs += 3600  # Daylight Savings Time issue? Or typical translation bias?\n    new_bucket = [] if (isinstance(bucket, list)) else {} if (isinstance(bucket, dict)) else None\n    if (new_bucket is not None):\n        for ts in bucket if (isinstance(bucket, list)) else bucket.keys() if (isinstance(bucket, dict)) else []:",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "bulk_store_the_articles",
+        "kind": 2,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "def bulk_store_the_articles(*args, **kwargs):\n    pass\ndef __update_the_article(item=None, the_choice=None, tenant_id=None, ts_current_time=None, logger=None, environ={}, mongo_db_name=None, mongo_articles_col_name=None):\n    '''\n    deprecated. The rotations are now stored on the Account and not the Article(s). 04-15-2021\n    '''\n    assert item, 'Missing item.'\n    the_update = the_choice\n    if (the_choice is not None):\n        the_update = {}",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "update_the_article",
+        "kind": 2,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "def update_the_article(*args, **kwargs):\n    pass\ndef __update_the_plan(logger=None, environ={}, twitter_bot_account=None):\n    account = __get_the_account(mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name, environ=environ, tenant_id=twitter_bot_account.tenant_id)\n    account[__plans__] = twitter_bot_account.tweet_stats\n    new_account = __store_the_account(account, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_twitterbot_account_col_name)\n    #assert len(new_account.get(__plans__)) == len(twitter_bot_account.tweet_stats), 'Problem with the updating the plan.'\n    return new_account\n@args.kwargs(__update_the_plan)\ndef update_the_plan(*args, **kwargs):",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "update_the_plan",
+        "kind": 2,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "def update_the_plan(*args, **kwargs):\n    pass\n#######################################################################\ndef __drop_articles(environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None, logger=None):\n    @__with.database(environ=environ, logger=logger)\n    def db_drop_articles(db=None, _id=None):\n        assert vyperapi.is_not_none(db), 'There is no db.'\n        tb_name = mongo_db_name\n        col_name = normalize_collection_name(tenant_id, mongo_articles_col_name) if (tenant_id) else mongo_articles_col_name\n        table = db[tb_name]",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "criteria",
+        "kind": 2,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "def criteria(*args, **kwargs):\n    pass\n@smart_logger.catch\ndef __analyse_the_plans(twitter_bot_account=None, environ={}, json_path=None, options=Options.do_nothing, logger=None):\n    assert twitter_bot_account, 'Missing twitter_bot_account.'\n    assert environ, 'Missing environ.'\n    __options__ = options\n    count_all_articles = __get_articles(get_count_only=True, environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)\n    all_articles = __get_articles(environ=environ, tenant_id=twitter_bot_account.tenant_id, mongo_db_name=twitter_bot_account.mongo_db_name, mongo_articles_col_name=twitter_bot_account.mongo_articles_col_name, logger=logger)\n    assert count_all_articles > 0, '(1) Something wrong with getting the recs count? Please fix.'",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "analyse_the_plans",
+        "kind": 2,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "def analyse_the_plans(*args, **kwargs):\n    pass\n#######################################################################\ndef __get_Options():\n    return Options\n@args.kwargs(__get_Options)\ndef get_Options(*args, **kwargs):\n    pass",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "get_Options",
+        "kind": 2,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "def get_Options(*args, **kwargs):\n    pass",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "normalize_collection_name",
+        "kind": 5,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "normalize_collection_name = lambda t,c:'{}+{}'.format(c, t)\nfind_in_collection = lambda c,criteria:c.find() if (not criteria) else c.find(criteria)\nis_really_a_string = lambda s:(s is not None) and (len(s) > 0)\n__doy__ = lambda args:date(args[0],args[1],args[2]).timetuple().tm_yday if (len(args) == 3) else None\ndoy_from_ts = lambda ts:__doy__([int(s) for s in ts.split('T')[0].split('-')])\nget_rotations_from = lambda item:item.get(__rotation__, []) if (isinstance(item.get(__rotation__, []), list)) else []\ncollection_name = lambda c,t:'{}{}{}'.format(c,'+' if (is_really_a_string(t)) else '', t if (is_really_a_string(t)) else '')\ndatabase_name = lambda db,t:'{}{}{}'.format(db,'+' if (is_really_a_string(t)) else '', t if (is_really_a_string(t)) else '')\nclass RotationProcessor(dict):\n    def __setitem__(self, k, v):",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "find_in_collection",
+        "kind": 5,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "find_in_collection = lambda c,criteria:c.find() if (not criteria) else c.find(criteria)\nis_really_a_string = lambda s:(s is not None) and (len(s) > 0)\n__doy__ = lambda args:date(args[0],args[1],args[2]).timetuple().tm_yday if (len(args) == 3) else None\ndoy_from_ts = lambda ts:__doy__([int(s) for s in ts.split('T')[0].split('-')])\nget_rotations_from = lambda item:item.get(__rotation__, []) if (isinstance(item.get(__rotation__, []), list)) else []\ncollection_name = lambda c,t:'{}{}{}'.format(c,'+' if (is_really_a_string(t)) else '', t if (is_really_a_string(t)) else '')\ndatabase_name = lambda db,t:'{}{}{}'.format(db,'+' if (is_really_a_string(t)) else '', t if (is_really_a_string(t)) else '')\nclass RotationProcessor(dict):\n    def __setitem__(self, k, v):\n        '''",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "is_really_a_string",
+        "kind": 5,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "is_really_a_string = lambda s:(s is not None) and (len(s) > 0)\n__doy__ = lambda args:date(args[0],args[1],args[2]).timetuple().tm_yday if (len(args) == 3) else None\ndoy_from_ts = lambda ts:__doy__([int(s) for s in ts.split('T')[0].split('-')])\nget_rotations_from = lambda item:item.get(__rotation__, []) if (isinstance(item.get(__rotation__, []), list)) else []\ncollection_name = lambda c,t:'{}{}{}'.format(c,'+' if (is_really_a_string(t)) else '', t if (is_really_a_string(t)) else '')\ndatabase_name = lambda db,t:'{}{}{}'.format(db,'+' if (is_really_a_string(t)) else '', t if (is_really_a_string(t)) else '')\nclass RotationProcessor(dict):\n    def __setitem__(self, k, v):\n        '''\n        key is the timestamp and value is a number > 0",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "__doy__",
+        "kind": 5,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "__doy__ = lambda args:date(args[0],args[1],args[2]).timetuple().tm_yday if (len(args) == 3) else None\ndoy_from_ts = lambda ts:__doy__([int(s) for s in ts.split('T')[0].split('-')])\nget_rotations_from = lambda item:item.get(__rotation__, []) if (isinstance(item.get(__rotation__, []), list)) else []\ncollection_name = lambda c,t:'{}{}{}'.format(c,'+' if (is_really_a_string(t)) else '', t if (is_really_a_string(t)) else '')\ndatabase_name = lambda db,t:'{}{}{}'.format(db,'+' if (is_really_a_string(t)) else '', t if (is_really_a_string(t)) else '')\nclass RotationProcessor(dict):\n    def __setitem__(self, k, v):\n        '''\n        key is the timestamp and value is a number > 0\n        ts -> day_of_year -> key",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "doy_from_ts",
+        "kind": 5,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "doy_from_ts = lambda ts:__doy__([int(s) for s in ts.split('T')[0].split('-')])\nget_rotations_from = lambda item:item.get(__rotation__, []) if (isinstance(item.get(__rotation__, []), list)) else []\ncollection_name = lambda c,t:'{}{}{}'.format(c,'+' if (is_really_a_string(t)) else '', t if (is_really_a_string(t)) else '')\ndatabase_name = lambda db,t:'{}{}{}'.format(db,'+' if (is_really_a_string(t)) else '', t if (is_really_a_string(t)) else '')\nclass RotationProcessor(dict):\n    def __setitem__(self, k, v):\n        '''\n        key is the timestamp and value is a number > 0\n        ts -> day_of_year -> key\n        value is dict where key is the hour number and value is the count for that hour",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "get_rotations_from",
+        "kind": 5,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "get_rotations_from = lambda item:item.get(__rotation__, []) if (isinstance(item.get(__rotation__, []), list)) else []\ncollection_name = lambda c,t:'{}{}{}'.format(c,'+' if (is_really_a_string(t)) else '', t if (is_really_a_string(t)) else '')\ndatabase_name = lambda db,t:'{}{}{}'.format(db,'+' if (is_really_a_string(t)) else '', t if (is_really_a_string(t)) else '')\nclass RotationProcessor(dict):\n    def __setitem__(self, k, v):\n        '''\n        key is the timestamp and value is a number > 0\n        ts -> day_of_year -> key\n        value is dict where key is the hour number and value is the count for that hour\n        '''",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "collection_name",
+        "kind": 5,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "collection_name = lambda c,t:'{}{}{}'.format(c,'+' if (is_really_a_string(t)) else '', t if (is_really_a_string(t)) else '')\ndatabase_name = lambda db,t:'{}{}{}'.format(db,'+' if (is_really_a_string(t)) else '', t if (is_really_a_string(t)) else '')\nclass RotationProcessor(dict):\n    def __setitem__(self, k, v):\n        '''\n        key is the timestamp and value is a number > 0\n        ts -> day_of_year -> key\n        value is dict where key is the hour number and value is the count for that hour\n        '''\n        toks = k.split('T')",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "database_name",
+        "kind": 5,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "database_name = lambda db,t:'{}{}{}'.format(db,'+' if (is_really_a_string(t)) else '', t if (is_really_a_string(t)) else '')\nclass RotationProcessor(dict):\n    def __setitem__(self, k, v):\n        '''\n        key is the timestamp and value is a number > 0\n        ts -> day_of_year -> key\n        value is dict where key is the hour number and value is the count for that hour\n        '''\n        toks = k.split('T')\n        yy,mm,dd = tuple([int(s) for s in toks[0].split('-')])",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "__rotation__",
+        "kind": 5,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "__rotation__ = '__rotation__'\n__plans__ = '__plans__'\n__rotation_processor__ = '__rotation_processor__'\ndef __store_the_account(account, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None):\n    @__with.database(environ=environ)\n    def db_store_the_account(db=None):\n        assert vyperapi.is_not_none(db), 'There is no db.'\n        assert vyperapi.is_not_none(mongo_db_name), 'There is no mongo_db_name.'\n        assert vyperapi.is_not_none(mongo_articles_col_name), 'There is no mongo_articles_col_name.'\n        tb_name = mongo_db_name",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "__plans__",
+        "kind": 5,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "__plans__ = '__plans__'\n__rotation_processor__ = '__rotation_processor__'\ndef __store_the_account(account, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None):\n    @__with.database(environ=environ)\n    def db_store_the_account(db=None):\n        assert vyperapi.is_not_none(db), 'There is no db.'\n        assert vyperapi.is_not_none(mongo_db_name), 'There is no mongo_db_name.'\n        assert vyperapi.is_not_none(mongo_articles_col_name), 'There is no mongo_articles_col_name.'\n        tb_name = mongo_db_name\n        col_name = mongo_articles_col_name",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "__rotation_processor__",
+        "kind": 5,
+        "importPath": "plugins.articles_list",
+        "description": "plugins.articles_list",
+        "peekOfCode": "__rotation_processor__ = '__rotation_processor__'\ndef __store_the_account(account, environ=None, tenant_id=None, mongo_db_name=None, mongo_articles_col_name=None):\n    @__with.database(environ=environ)\n    def db_store_the_account(db=None):\n        assert vyperapi.is_not_none(db), 'There is no db.'\n        assert vyperapi.is_not_none(mongo_db_name), 'There is no mongo_db_name.'\n        assert vyperapi.is_not_none(mongo_articles_col_name), 'There is no mongo_articles_col_name.'\n        tb_name = mongo_db_name\n        col_name = mongo_articles_col_name\n        table = db[tb_name]",
+        "detail": "plugins.articles_list",
+        "documentation": {}
+    },
+    {
+        "label": "TwitterAPIProxy",
+        "kind": 6,
+        "importPath": "plugins.twitter_verse",
+        "description": "plugins.twitter_verse",
+        "peekOfCode": "class TwitterAPIProxy(MagicObject2):\n    def __init__(self, consumer_key=None, consumer_secret=None, access_token=None, access_token_secret=None, logger=None):\n        self.consumer_key = consumer_key\n        self.consumer_secret = consumer_secret\n        self.access_token = access_token\n        self.access_token_secret = access_token_secret\n        self.logger = logger\n        self.calls_count = 0\n        self.start_time = time.time()\n        self.rate_limit = normalize_float_from_str(os.environ.get('twitter_rate_limit', 0.25))",
+        "detail": "plugins.twitter_verse",
+        "documentation": {}
+    },
+    {
+        "label": "get_api",
+        "kind": 2,
+        "importPath": "plugins.twitter_verse",
+        "description": "plugins.twitter_verse",
+        "peekOfCode": "def get_api(*args, **kwargs):\n    pass\ndef __get_top_trending_hashtags(api):\n    data = api.trends_place(1)\n    hashtags = dict([tuple([trend['name'], trend['tweet_volume']]) for trend in data[0]['trends'] if (trend['name'].startswith('#')) and (len(_utils.ascii_only(trend['name'])) == len(trend['name']))])\n    return _utils.sorted_dict(hashtags, reversed=True, default=-1)\ndef __get_shorter_url(url):\n    from vyperlogix.bitly import shorten\n    bitly_access_token = os.environ.get('bitly_access_token')\n    assert bitly_access_token and (len(bitly_access_token) > 0), 'Missing the bitly_access_token. Check your .env file.'",
+        "detail": "plugins.twitter_verse",
+        "documentation": {}
+    },
+    {
+        "label": "do_the_tweet",
+        "kind": 2,
+        "importPath": "plugins.twitter_verse",
+        "description": "plugins.twitter_verse",
+        "peekOfCode": "def do_the_tweet(*args, **kwargs):\n    pass\ndef __handle_hashtags(service_runner=None, environ=None, logger=None, hashtags=[]):\n    for hashtag in hashtags:\n        doc = service_runner.exec(word_cloud, get_hashtag_matching, **plugins_handler.get_kwargs(hashtag=hashtag, environ=environ, logger=logger))\n        if (not doc):\n            count = service_runner.exec(word_cloud, store_one_hashtag, **plugins_handler.get_kwargs(data={'hashtag': hashtag}, environ=environ))\n            assert count > -1, 'Problem with store_one_hashtag for {}.'.format(count)\n            if (logger):\n                logger.info('Added hashtag (\"{}\").'.format(hashtag))",
+        "detail": "plugins.twitter_verse",
+        "documentation": {}
+    },
+    {
+        "label": "get_more_followers",
+        "kind": 2,
+        "importPath": "plugins.twitter_verse",
+        "description": "plugins.twitter_verse",
+        "peekOfCode": "def get_more_followers(*args, **kwargs):\n    pass\ndef __like_own_tweets(api=None, environ=None, logger=None, runtime=0):\n    '''\n    This function was designed to be a long-running background task that seeks to like my own tweets because who better to like my tweets.\n    '''\n    assert api, 'Missing api.'\n    assert environ, 'Missing environ.'\n    me = api.me()\n    if (logger):",
+        "detail": "plugins.twitter_verse",
+        "documentation": {}
+    },
+    {
+        "label": "like_own_tweets",
+        "kind": 2,
+        "importPath": "plugins.twitter_verse",
+        "description": "plugins.twitter_verse",
+        "peekOfCode": "def like_own_tweets(*args, **kwargs):\n    pass",
+        "detail": "plugins.twitter_verse",
+        "documentation": {}
+    },
+    {
+        "label": "word_cloud",
+        "kind": 5,
+        "importPath": "plugins.twitter_verse",
+        "description": "plugins.twitter_verse",
+        "peekOfCode": "word_cloud = 'word_cloud'\nget_final_word_cloud = 'get_final_word_cloud'\nstore_one_hashtag = 'store_one_hashtag'\nget_hashtag_matching = 'get_hashtag_matching'\ndelete_all_hashtags = 'delete_all_hashtags'\ndelete_one_hashtag = 'delete_one_hashtag'\nreset_all_hashtags = 'reset_all_hashtags'\nlast_followers = 'last_followers'\nclass TwitterAPIProxy(MagicObject2):\n    def __init__(self, consumer_key=None, consumer_secret=None, access_token=None, access_token_secret=None, logger=None):",
+        "detail": "plugins.twitter_verse",
+        "documentation": {}
+    },
+    {
+        "label": "get_final_word_cloud",
+        "kind": 5,
+        "importPath": "plugins.twitter_verse",
+        "description": "plugins.twitter_verse",
+        "peekOfCode": "get_final_word_cloud = 'get_final_word_cloud'\nstore_one_hashtag = 'store_one_hashtag'\nget_hashtag_matching = 'get_hashtag_matching'\ndelete_all_hashtags = 'delete_all_hashtags'\ndelete_one_hashtag = 'delete_one_hashtag'\nreset_all_hashtags = 'reset_all_hashtags'\nlast_followers = 'last_followers'\nclass TwitterAPIProxy(MagicObject2):\n    def __init__(self, consumer_key=None, consumer_secret=None, access_token=None, access_token_secret=None, logger=None):\n        self.consumer_key = consumer_key",
+        "detail": "plugins.twitter_verse",
+        "documentation": {}
+    },
+    {
+        "label": "store_one_hashtag",
+        "kind": 5,
+        "importPath": "plugins.twitter_verse",
+        "description": "plugins.twitter_verse",
+        "peekOfCode": "store_one_hashtag = 'store_one_hashtag'\nget_hashtag_matching = 'get_hashtag_matching'\ndelete_all_hashtags = 'delete_all_hashtags'\ndelete_one_hashtag = 'delete_one_hashtag'\nreset_all_hashtags = 'reset_all_hashtags'\nlast_followers = 'last_followers'\nclass TwitterAPIProxy(MagicObject2):\n    def __init__(self, consumer_key=None, consumer_secret=None, access_token=None, access_token_secret=None, logger=None):\n        self.consumer_key = consumer_key\n        self.consumer_secret = consumer_secret",
+        "detail": "plugins.twitter_verse",
+        "documentation": {}
+    },
+    {
+        "label": "get_hashtag_matching",
+        "kind": 5,
+        "importPath": "plugins.twitter_verse",
+        "description": "plugins.twitter_verse",
+        "peekOfCode": "get_hashtag_matching = 'get_hashtag_matching'\ndelete_all_hashtags = 'delete_all_hashtags'\ndelete_one_hashtag = 'delete_one_hashtag'\nreset_all_hashtags = 'reset_all_hashtags'\nlast_followers = 'last_followers'\nclass TwitterAPIProxy(MagicObject2):\n    def __init__(self, consumer_key=None, consumer_secret=None, access_token=None, access_token_secret=None, logger=None):\n        self.consumer_key = consumer_key\n        self.consumer_secret = consumer_secret\n        self.access_token = access_token",
+        "detail": "plugins.twitter_verse",
+        "documentation": {}
+    },
+    {
+        "label": "delete_all_hashtags",
+        "kind": 5,
+        "importPath": "plugins.twitter_verse",
+        "description": "plugins.twitter_verse",
+        "peekOfCode": "delete_all_hashtags = 'delete_all_hashtags'\ndelete_one_hashtag = 'delete_one_hashtag'\nreset_all_hashtags = 'reset_all_hashtags'\nlast_followers = 'last_followers'\nclass TwitterAPIProxy(MagicObject2):\n    def __init__(self, consumer_key=None, consumer_secret=None, access_token=None, access_token_secret=None, logger=None):\n        self.consumer_key = consumer_key\n        self.consumer_secret = consumer_secret\n        self.access_token = access_token\n        self.access_token_secret = access_token_secret",
+        "detail": "plugins.twitter_verse",
+        "documentation": {}
+    },
+    {
+        "label": "delete_one_hashtag",
+        "kind": 5,
+        "importPath": "plugins.twitter_verse",
+        "description": "plugins.twitter_verse",
+        "peekOfCode": "delete_one_hashtag = 'delete_one_hashtag'\nreset_all_hashtags = 'reset_all_hashtags'\nlast_followers = 'last_followers'\nclass TwitterAPIProxy(MagicObject2):\n    def __init__(self, consumer_key=None, consumer_secret=None, access_token=None, access_token_secret=None, logger=None):\n        self.consumer_key = consumer_key\n        self.consumer_secret = consumer_secret\n        self.access_token = access_token\n        self.access_token_secret = access_token_secret\n        self.logger = logger",
+        "detail": "plugins.twitter_verse",
+        "documentation": {}
+    },
+    {
+        "label": "reset_all_hashtags",
+        "kind": 5,
+        "importPath": "plugins.twitter_verse",
+        "description": "plugins.twitter_verse",
+        "peekOfCode": "reset_all_hashtags = 'reset_all_hashtags'\nlast_followers = 'last_followers'\nclass TwitterAPIProxy(MagicObject2):\n    def __init__(self, consumer_key=None, consumer_secret=None, access_token=None, access_token_secret=None, logger=None):\n        self.consumer_key = consumer_key\n        self.consumer_secret = consumer_secret\n        self.access_token = access_token\n        self.access_token_secret = access_token_secret\n        self.logger = logger\n        self.calls_count = 0",
+        "detail": "plugins.twitter_verse",
+        "documentation": {}
+    },
+    {
+        "label": "last_followers",
+        "kind": 5,
+        "importPath": "plugins.twitter_verse",
+        "description": "plugins.twitter_verse",
+        "peekOfCode": "last_followers = 'last_followers'\nclass TwitterAPIProxy(MagicObject2):\n    def __init__(self, consumer_key=None, consumer_secret=None, access_token=None, access_token_secret=None, logger=None):\n        self.consumer_key = consumer_key\n        self.consumer_secret = consumer_secret\n        self.access_token = access_token\n        self.access_token_secret = access_token_secret\n        self.logger = logger\n        self.calls_count = 0\n        self.start_time = time.time()",
+        "detail": "plugins.twitter_verse",
+        "documentation": {}
+    },
+    {
+        "label": "get_account_id",
+        "kind": 2,
+        "importPath": "plugins.twitterbot_accounts",
+        "description": "plugins.twitterbot_accounts",
+        "peekOfCode": "def get_account_id(*args, **kwargs):\n    pass",
+        "detail": "plugins.twitterbot_accounts",
+        "documentation": {}
+    },
+    {
+        "label": "store_one_hashtag",
+        "kind": 2,
+        "importPath": "plugins.word_cloud",
+        "description": "plugins.word_cloud",
+        "peekOfCode": "def store_one_hashtag(*args, **kwargs):\n    pass\ndef __get_hashtag_matching(hashtag=None, environ=None, criteria=None, logger=None):\n    @__with.database(environ=environ)\n    def db_get_hashtag_matching(db=None, hashtag=None):\n        mongo_db_name = environ.get('mongo_db_name')\n        mongo_hashtags_col_name = environ.get('mongo_hashtags_col_name')\n        assert vyperapi.is_not_none(db), 'There is no db.'\n        assert vyperapi.is_not_none(mongo_db_name), 'There is no mongo_db_name.'\n        assert vyperapi.is_not_none(mongo_hashtags_col_name), 'There is no mongo_hashtags_col_name.'",
+        "detail": "plugins.word_cloud",
+        "documentation": {}
+    },
+    {
+        "label": "get_hashtag_matching",
+        "kind": 2,
+        "importPath": "plugins.word_cloud",
+        "description": "plugins.word_cloud",
+        "peekOfCode": "def get_hashtag_matching(*args, **kwargs):\n    pass\ndef __delete_one_hashtag(hashtag=None, environ=None, logger=None):\n    @__with.database(environ=environ)\n    def db_delete_one_hashtag(db=None, hashtag=None):\n        mongo_db_name = environ.get('mongo_db_name')\n        mongo_hashtags_col_name = environ.get('mongo_hashtags_col_name')\n        assert vyperapi.is_not_none(db), 'There is no db.'\n        assert vyperapi.is_not_none(mongo_db_name), 'There is no mongo_db_name.'\n        assert vyperapi.is_not_none(mongo_hashtags_col_name), 'There is no mongo_hashtags_col_name.'",
+        "detail": "plugins.word_cloud",
+        "documentation": {}
+    },
+    {
+        "label": "delete_one_hashtag",
+        "kind": 2,
+        "importPath": "plugins.word_cloud",
+        "description": "plugins.word_cloud",
+        "peekOfCode": "def delete_one_hashtag(*args, **kwargs):\n    pass\ndef __delete_all_hashtags(environ=None, logger=None):\n    @__with.database(environ=environ)\n    def db_delete_all_hashtags(db=None, hashtag=None):\n        mongo_db_name = environ.get('mongo_db_name')\n        mongo_hashtags_col_name = environ.get('mongo_hashtags_col_name')\n        assert vyperapi.is_not_none(db), 'There is no db.'\n        assert vyperapi.is_not_none(mongo_db_name), 'There is no mongo_db_name.'\n        assert vyperapi.is_not_none(mongo_hashtags_col_name), 'There is no mongo_hashtags_col_name.'",
+        "detail": "plugins.word_cloud",
+        "documentation": {}
+    },
+    {
+        "label": "delete_all_hashtags",
+        "kind": 2,
+        "importPath": "plugins.word_cloud",
+        "description": "plugins.word_cloud",
+        "peekOfCode": "def delete_all_hashtags(*args, **kwargs):\n    pass\ndef __reset_all_hashtags(environ=None, attr=None, logger=None):\n    @__with.database(environ=environ)\n    def db_reset_all_hashtags(db=None, hashtag=None):\n        mongo_db_name = environ.get('mongo_db_name')\n        mongo_hashtags_col_name = environ.get('mongo_hashtags_col_name')\n        assert vyperapi.is_not_none(db), 'There is no db.'\n        assert vyperapi.is_not_none(mongo_db_name), 'There is no mongo_db_name.'\n        assert vyperapi.is_not_none(mongo_hashtags_col_name), 'There is no mongo_hashtags_col_name.'",
+        "detail": "plugins.word_cloud",
+        "documentation": {}
+    },
+    {
+        "label": "reset_all_hashtags",
+        "kind": 2,
+        "importPath": "plugins.word_cloud",
+        "description": "plugins.word_cloud",
+        "peekOfCode": "def reset_all_hashtags(*args, **kwargs):\n    pass\ndef __get_final_word_cloud(environ=None, callback=None, logger=None):\n    @__with.database(environ=environ)\n    def db_get_final_word_cloud(db=None, _id=None):\n        mongo_db_name = environ.get('mongo_db_name')\n        mongo_cloud_col_name = environ.get('mongo_cloud_col_name')\n        assert vyperapi.is_not_none(db), 'There is no db.'\n        assert vyperapi.is_not_none(mongo_db_name), 'There is no mongo_db_name.'\n        assert vyperapi.is_not_none(mongo_cloud_col_name), 'There is no mongo_cloud_col_name.'",
+        "detail": "plugins.word_cloud",
+        "documentation": {}
+    },
+    {
+        "label": "get_final_word_cloud",
+        "kind": 2,
+        "importPath": "plugins.word_cloud",
+        "description": "plugins.word_cloud",
+        "peekOfCode": "def get_final_word_cloud(*args, **kwargs):\n    pass",
+        "detail": "plugins.word_cloud",
+        "documentation": {}
+    },
+    {
+        "label": "determine_pip_install_arguments",
+        "kind": 2,
+        "importPath": "get-pip",
+        "description": "get-pip",
+        "peekOfCode": "def determine_pip_install_arguments():\n    implicit_pip = True\n    implicit_setuptools = True\n    implicit_wheel = True\n    # Check if the user has requested us not to install setuptools\n    if \"--no-setuptools\" in sys.argv or os.environ.get(\"PIP_NO_SETUPTOOLS\"):\n        args = [x for x in sys.argv[1:] if x != \"--no-setuptools\"]\n        implicit_setuptools = False\n    else:\n        args = sys.argv[1:]",
+        "detail": "get-pip",
+        "documentation": {}
+    },
+    {
+        "label": "monkeypatch_for_cert",
+        "kind": 2,
+        "importPath": "get-pip",
+        "description": "get-pip",
+        "peekOfCode": "def monkeypatch_for_cert(tmpdir):\n    \"\"\"Patches `pip install` to provide default certificate with the lowest priority.\n    This ensures that the bundled certificates are used unless the user specifies a\n    custom cert via any of pip's option passing mechanisms (config, env-var, CLI).\n    A monkeypatch is the easiest way to achieve this, without messing too much with\n    the rest of pip's internals.\n    \"\"\"\n    from pip._internal.commands.install import InstallCommand\n    # We want to be using the internal certificates.\n    cert_path = os.path.join(tmpdir, \"cacert.pem\")",
+        "detail": "get-pip",
+        "documentation": {}
+    },
+    {
+        "label": "bootstrap",
+        "kind": 2,
+        "importPath": "get-pip",
+        "description": "get-pip",
+        "peekOfCode": "def bootstrap(tmpdir):\n    monkeypatch_for_cert(tmpdir)\n    # Execute the included pip and use it to install the latest pip and\n    # setuptools from PyPI\n    from pip._internal.cli.main import main as pip_entry_point\n    args = determine_pip_install_arguments()\n    sys.exit(pip_entry_point(args))\ndef main():\n    tmpdir = None\n    try:",
+        "detail": "get-pip",
+        "documentation": {}
+    },
+    {
+        "label": "main",
+        "kind": 2,
+        "importPath": "get-pip",
+        "description": "get-pip",
+        "peekOfCode": "def main():\n    tmpdir = None\n    try:\n        # Create a temporary working directory\n        tmpdir = tempfile.mkdtemp()\n        # Unpack the zipfile into the temporary directory\n        pip_zip = os.path.join(tmpdir, \"pip.zip\")\n        with open(pip_zip, \"wb\") as fp:\n            fp.write(b85decode(DATA.replace(b\"\\n\", b\"\")))\n        # Add the zipfile to sys.path so that we can import it",
+        "detail": "get-pip",
+        "documentation": {}
+    },
+    {
+        "label": "this_python",
+        "kind": 5,
+        "importPath": "get-pip",
+        "description": "get-pip",
+        "peekOfCode": "this_python = sys.version_info[:2]\nmin_version = (3, 6)\nif this_python < min_version:\n    message_parts = [\n        \"This script does not work on Python {}.{}\".format(*this_python),\n        \"The minimum supported Python version is {}.{}.\".format(*min_version),\n        \"Please use https://bootstrap.pypa.io/pip/{}.{}/get-pip.py instead.\".format(*this_python),\n    ]\n    print(\"ERROR: \" + \" \".join(message_parts))\n    sys.exit(1)",
+        "detail": "get-pip",
+        "documentation": {}
+    },
+    {
+        "label": "min_version",
+        "kind": 5,
+        "importPath": "get-pip",
+        "description": "get-pip",
+        "peekOfCode": "min_version = (3, 6)\nif this_python < min_version:\n    message_parts = [\n        \"This script does not work on Python {}.{}\".format(*this_python),\n        \"The minimum supported Python version is {}.{}.\".format(*min_version),\n        \"Please use https://bootstrap.pypa.io/pip/{}.{}/get-pip.py instead.\".format(*this_python),\n    ]\n    print(\"ERROR: \" + \" \".join(message_parts))\n    sys.exit(1)\nimport os.path",
+        "detail": "get-pip",
+        "documentation": {}
+    },
+    {
+        "label": "DATA",
+        "kind": 5,
+        "importPath": "get-pip",
+        "description": "get-pip",
+        "peekOfCode": "DATA = b\"\"\"\nP)h>@6aWAK2mrTXK2kc9;DIXv007wm000jF003}la4%n9X>MtBUtcb8d2Ny1O2a@9h3^A-haq0rLfu#\nq)ItR*{uDJ9(Th^bvTY{qLbAK;Oe}eOH`Ww|E_-!m_~y)+!rKa*c0y{y=#45x&AKGPjnifWx^mVtyv}\nEHIeEIDJj?gbESqMJaTG_oI8qqJ5rkK?;Qx>pO+0`%$J&NDEg+7h{6bGbkP^m_Tnxpz7$*B#js;Xoo1\nXF;8fVsE{}+DJl5qsR4z_673u3=q_TlUn!ZQ2LBuPHDnjm~-pxY7dW>c`HY@kAA7z*p5CWKYfW^qbjc\nLvthkS!5t?X_bPt)&+E5Smq<>-}WNkyQw60E7rzW=Eqm-Duv{E3vj!>KdogKutAKjg($p-du}=xj$hY\ny8;^ajk7_eE=9TX$~p9%9gkdlbC7?+>c`PHP)h>@6aWAK2mrTXK2oHy6TH9y003$O000jF003}la4%n\n9ZDDC{Utcb8d0kRXkJ}&+y+_J_7-<i-E3Y@_s;SgtudCixD}?YkM!|pp$MydDox!F_*C!0Tk9iM0c^4\nA6cs%HB8CO~#4^Qxlle-~Q6-e8InnOUFU~%E9?FD)rP$d^u7=oK1jR=DdF#%l)E92e3T%DI`Y(Wp;14\nd>@4&=@09_GkIh4>#KW3>gZJt#L#BpyMHsIDzZA$}mS*_fm;Ef`ITY%h*(X&JeUXzBdsuGoW&;MX)d3",
+        "detail": "get-pip",
+        "documentation": {}
+    },
+    {
+        "label": "numerics",
+        "kind": 5,
+        "importPath": "sort",
+        "description": "sort",
+        "peekOfCode": "numerics = lambda s:''.join([ch for ch in s if (ch.isdigit() or (ch == '.'))])\nnormalize = lambda n:eval(n) if (len(n) > 0) else 0.0\nd = {}\nl = sys.argv[1:]\nif (is_debugging):\n    print('BEGIN:')\nfor item in l:\n    n = normalize(numerics(item))\n    if (item.endswith('m')):\n        n += 0.01",
+        "detail": "sort",
+        "documentation": {}
+    },
+    {
+        "label": "normalize",
+        "kind": 5,
+        "importPath": "sort",
+        "description": "sort",
+        "peekOfCode": "normalize = lambda n:eval(n) if (len(n) > 0) else 0.0\nd = {}\nl = sys.argv[1:]\nif (is_debugging):\n    print('BEGIN:')\nfor item in l:\n    n = normalize(numerics(item))\n    if (item.endswith('m')):\n        n += 0.01\n    d[n] = item",
+        "detail": "sort",
+        "documentation": {}
+    },
+    {
+        "label": "d",
+        "kind": 5,
+        "importPath": "sort",
+        "description": "sort",
+        "peekOfCode": "d = {}\nl = sys.argv[1:]\nif (is_debugging):\n    print('BEGIN:')\nfor item in l:\n    n = normalize(numerics(item))\n    if (item.endswith('m')):\n        n += 0.01\n    d[n] = item\n    if (is_debugging):",
+        "detail": "sort",
+        "documentation": {}
+    },
+    {
+        "label": "l",
+        "kind": 5,
+        "importPath": "sort",
+        "description": "sort",
+        "peekOfCode": "l = sys.argv[1:]\nif (is_debugging):\n    print('BEGIN:')\nfor item in l:\n    n = normalize(numerics(item))\n    if (item.endswith('m')):\n        n += 0.01\n    d[n] = item\n    if (is_debugging):\n        print('{} -> {}'.format(item, n))",
+        "detail": "sort",
+        "documentation": {}
+    },
+    {
+        "label": "items",
+        "kind": 5,
+        "importPath": "sort",
+        "description": "sort",
+        "peekOfCode": "items = []\nfor i in l:\n    items.append(d.get(i))\nprint('{}'.format(' '.join(items)))",
+        "detail": "sort",
+        "documentation": {}
+    },
+    {
+        "label": "TheRunMode",
+        "kind": 6,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "class TheRunMode(enum.Enum):\n    development = 0\n    production = 1\n    prod_dev = 2\nis_really_a_string = lambda s:(isinstance(s, str)) and (s is not None) and (len(s) > 0)\nproduction_token = 'production'\ndevelopment_token = 'development'\nis_running_production = __production__ = lambda : (socket.gethostname() not in ['DESKTOP-JJ95ENL', 'DESKTOP-9J3LL5Q'])\n__run_mode__ = TheRunMode.production if (__production__) else TheRunMode.development\nis_production = lambda : __run_mode__ in [TheRunMode.production, TheRunMode.prod_dev]",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "TheOptions",
+        "kind": 6,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "class TheOptions(enum.Enum):\n    use_local = 0\n    master_list = 1\n    use_cluster = 2\n    use_cosmos0 = 4\n    use_cluster_local_hybrid = 8\navailable_options = {}\navailable_options['use_local'] = TheOptions.use_local\navailable_options['master_list'] = TheOptions.master_list\navailable_options['use_cluster'] = TheOptions.use_cluster",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "TwitterPlan",
+        "kind": 6,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "class TwitterPlan():\n    def __init__(self, num_items=-1, secs_until_tomorrow_morning=-1):\n        self.num_items = num_items\n        self.secs_until_tomorrow_morning = secs_until_tomorrow_morning\n        self.__wait_per_choice__ = self.secs_until_tomorrow_morning / self.num_items\n        self.__real_list__ = {}\n        self.__ts_tweeted_time__ = None\n        self.__required_velocity__ = -1\n        self.__wait_per_choice__ = -1\n        self.__the_choice__ = None",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "TwitterBotAccount",
+        "kind": 6,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "class TwitterBotAccount(MongoDBObject):\n    def __init__(self, tenant_id=None, service_runner=None, environ=None, desired_advert_velocity=0.0, track_velocities=False, logger=None):\n        self.__logger__ = logger\n        self.__tenant_id__ = tenant_id\n        self.__environ__ = environ\n        self.__service_runner__ = service_runner\n        self.__account_cache__ = {}\n        self.__tweet_stats__ = {}\n        self.__desired_advert_velocity__ = float(desired_advert_velocity)\n        self.__adverts_cache__ = {}",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "get_local_ether_interface",
+        "kind": 2,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "def get_local_ether_interface():\n    import ifcfg\n    import ipaddress\n    for name, interface in ifcfg.interfaces().items():\n        ip_addr = interface.get('inet')\n        ip_ether = interface.get('ether')\n        if (ip_addr and ip_ether):\n            i = ipaddress.ip_address(ip_addr)\n            if (i.is_private):\n                return interface",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "get_stream_handler",
+        "kind": 2,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "def get_stream_handler(streamformat=\"%(asctime)s:%(levelname)s:%(message)s\"):\n    stream = logging.StreamHandler()\n    stream.setLevel(logging.INFO if (not is_simulated_production()) else logging.DEBUG)\n    stream.setFormatter(logging.Formatter(streamformat))\n    return stream\ndef setup_rotating_file_handler(logname, logfile, max_bytes, backup_count):\n    assert is_really_something(backup_count, something_greater_than_zero), 'Missing backup_count?'\n    assert is_really_something(max_bytes, something_greater_than_zero), 'Missing max_bytes?'\n    ch = RotatingFileHandler(logfile, 'a', max_bytes, backup_count)\n    l = logging.getLogger(logname)",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "setup_rotating_file_handler",
+        "kind": 2,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "def setup_rotating_file_handler(logname, logfile, max_bytes, backup_count):\n    assert is_really_something(backup_count, something_greater_than_zero), 'Missing backup_count?'\n    assert is_really_something(max_bytes, something_greater_than_zero), 'Missing max_bytes?'\n    ch = RotatingFileHandler(logfile, 'a', max_bytes, backup_count)\n    l = logging.getLogger(logname)\n    l.addHandler(ch)\n    return l\nbase_filename = os.path.splitext(os.path.basename(__file__))[0]\nlog_filename = '{}{}{}{}{}{}{}_{}.log'.format('logs', os.sep, base_filename, os.sep, production_token if (not is_simulated_production()) else development_token, os.sep, base_filename, default_timestamp(datetime.utcnow()))\nlog_filename = os.sep.join([os.path.dirname(__file__), log_filename])",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "get_environ_keys",
+        "kind": 2,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "def get_environ_keys(*args, **kwargs):\n    from expandvars import expandvars\n    k = kwargs.get('key')\n    v = kwargs.get('value')\n    assert (k is not None) and (v is not None), 'Problem with kwargs -> {}, k={}, v={}'.format(kwargs,k,v)\n    __logger__ = kwargs.get('logger')\n    if (k == '__LITERALS__'):\n        for item in v:\n            env_literals.append(item)\n    if (isinstance(v, str)):",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "get_hashtags_for",
+        "kind": 2,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "def get_hashtags_for(api, screen_name, count=200, verbose=False, hashtags_dict={}):\n    tweets = api.user_timeline(screen_name=screen_name,count=count)\n    for tweet in tweets:\n        hashtags = tweet.entities.get('hashtags')\n        for hashtag in hashtags:\n            if hashtag['text'] in hashtags_dict.keys():\n                hashtags_dict[hashtag['text']] += 1\n            else:\n                hashtags_dict[hashtag['text']] = 1\n    if (verbose):",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "log_traceback",
+        "kind": 2,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "def log_traceback(ex, ex_traceback=None):\n    if ex_traceback is None:\n        ex_traceback = ex.__traceback__\n    tb_lines = [ line.rstrip('\\n') for line in\n                traceback.format_exception(ex.__class__, ex, ex_traceback)]\n    logger.critical(tb_lines)\ndef get_top_trending_hashtags(api):\n    data = api.trends_place(1)\n    hashtags = dict([tuple([trend['name'], trend['tweet_volume']]) for trend in data[0]['trends'] if (trend['name'].startswith('#')) and (len(_utils.ascii_only(trend['name'])) == len(trend['name']))])\n    return _utils.sorted_dict(hashtags, reversed=True, default=-1)",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "get_top_trending_hashtags",
+        "kind": 2,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "def get_top_trending_hashtags(api):\n    data = api.trends_place(1)\n    hashtags = dict([tuple([trend['name'], trend['tweet_volume']]) for trend in data[0]['trends'] if (trend['name'].startswith('#')) and (len(_utils.ascii_only(trend['name'])) == len(trend['name']))])\n    return _utils.sorted_dict(hashtags, reversed=True, default=-1)\nenviron = lambda : __env__ if (__the_options__ is not TheOptions.use_cluster) else __env2__\n__vector__ = {}\ndef save_tweet_stats(fpath, data, logger=None):\n    def eat_numbers_from_end(value):\n        while(1):\n            if (len(value) > 0) and (value[-1].isdigit()):",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "save_tweet_stats",
+        "kind": 2,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "def save_tweet_stats(fpath, data, logger=None):\n    def eat_numbers_from_end(value):\n        while(1):\n            if (len(value) > 0) and (value[-1].isdigit()):\n                value = value[0:-1]\n            else:\n                break\n        return value\n    try:\n        with open(fpath, 'w') as fOut:",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "main_loop",
+        "kind": 2,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "def main_loop(twitter_bot_account, max_tweets=None, debug=False, logger=None):\n    plugins_manager = plugins_handler.SmartPluginManager(plugins, debug=True, logger=logger)\n    service_runner = plugins_manager.get_runner()\n    twitter_bot_account.service_runner = service_runner\n    assert is_really_a_string(twitter_bot_account.tenant_id), 'Missing the twitter_bot_account.tenant_id.'\n    service_runner.allow(articles_list, get_Options)\n    Options = service_runner.articles_list.get_Options(**plugins_handler.get_kwargs())\n    __options__ = Options.do_nothing\n    #__options__ = Options.init_articles\n    __followers_executor_running__ = True #not __production__",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "is_really_something",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "is_really_something = lambda s,t:s and t(s)\nsomething_greater_than_zero = lambda s:(s > 0)\ndefault_timestamp = lambda t:t.isoformat().replace(':', '').replace('-','').split('.')[0]\nis_uppercase = lambda ch:''.join([c for c in str(ch) if c.isupper()])\nclass TheRunMode(enum.Enum):\n    development = 0\n    production = 1\n    prod_dev = 2\nis_really_a_string = lambda s:(isinstance(s, str)) and (s is not None) and (len(s) > 0)\nproduction_token = 'production'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "something_greater_than_zero",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "something_greater_than_zero = lambda s:(s > 0)\ndefault_timestamp = lambda t:t.isoformat().replace(':', '').replace('-','').split('.')[0]\nis_uppercase = lambda ch:''.join([c for c in str(ch) if c.isupper()])\nclass TheRunMode(enum.Enum):\n    development = 0\n    production = 1\n    prod_dev = 2\nis_really_a_string = lambda s:(isinstance(s, str)) and (s is not None) and (len(s) > 0)\nproduction_token = 'production'\ndevelopment_token = 'development'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "default_timestamp",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "default_timestamp = lambda t:t.isoformat().replace(':', '').replace('-','').split('.')[0]\nis_uppercase = lambda ch:''.join([c for c in str(ch) if c.isupper()])\nclass TheRunMode(enum.Enum):\n    development = 0\n    production = 1\n    prod_dev = 2\nis_really_a_string = lambda s:(isinstance(s, str)) and (s is not None) and (len(s) > 0)\nproduction_token = 'production'\ndevelopment_token = 'development'\nis_running_production = __production__ = lambda : (socket.gethostname() not in ['DESKTOP-JJ95ENL', 'DESKTOP-9J3LL5Q'])",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "is_uppercase",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "is_uppercase = lambda ch:''.join([c for c in str(ch) if c.isupper()])\nclass TheRunMode(enum.Enum):\n    development = 0\n    production = 1\n    prod_dev = 2\nis_really_a_string = lambda s:(isinstance(s, str)) and (s is not None) and (len(s) > 0)\nproduction_token = 'production'\ndevelopment_token = 'development'\nis_running_production = __production__ = lambda : (socket.gethostname() not in ['DESKTOP-JJ95ENL', 'DESKTOP-9J3LL5Q'])\n__run_mode__ = TheRunMode.production if (__production__) else TheRunMode.development",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "is_really_a_string",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "is_really_a_string = lambda s:(isinstance(s, str)) and (s is not None) and (len(s) > 0)\nproduction_token = 'production'\ndevelopment_token = 'development'\nis_running_production = __production__ = lambda : (socket.gethostname() not in ['DESKTOP-JJ95ENL', 'DESKTOP-9J3LL5Q'])\n__run_mode__ = TheRunMode.production if (__production__) else TheRunMode.development\nis_production = lambda : __run_mode__ in [TheRunMode.production, TheRunMode.prod_dev]\nis_simulated_production = lambda : __run_mode__ in [TheRunMode.prod_dev]\nproduction_token = production_token if (is_production()) else development_token\nassert (TheRunMode.production if (any([arg == production_token for arg in [production_token]])) else TheRunMode.development) == TheRunMode.production, 'Something wrong with production mode detection.'\ndef get_local_ether_interface():",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "production_token",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "production_token = 'production'\ndevelopment_token = 'development'\nis_running_production = __production__ = lambda : (socket.gethostname() not in ['DESKTOP-JJ95ENL', 'DESKTOP-9J3LL5Q'])\n__run_mode__ = TheRunMode.production if (__production__) else TheRunMode.development\nis_production = lambda : __run_mode__ in [TheRunMode.production, TheRunMode.prod_dev]\nis_simulated_production = lambda : __run_mode__ in [TheRunMode.prod_dev]\nproduction_token = production_token if (is_production()) else development_token\nassert (TheRunMode.production if (any([arg == production_token for arg in [production_token]])) else TheRunMode.development) == TheRunMode.production, 'Something wrong with production mode detection.'\ndef get_local_ether_interface():\n    import ifcfg",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "development_token",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "development_token = 'development'\nis_running_production = __production__ = lambda : (socket.gethostname() not in ['DESKTOP-JJ95ENL', 'DESKTOP-9J3LL5Q'])\n__run_mode__ = TheRunMode.production if (__production__) else TheRunMode.development\nis_production = lambda : __run_mode__ in [TheRunMode.production, TheRunMode.prod_dev]\nis_simulated_production = lambda : __run_mode__ in [TheRunMode.prod_dev]\nproduction_token = production_token if (is_production()) else development_token\nassert (TheRunMode.production if (any([arg == production_token for arg in [production_token]])) else TheRunMode.development) == TheRunMode.production, 'Something wrong with production mode detection.'\ndef get_local_ether_interface():\n    import ifcfg\n    import ipaddress",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "is_running_production",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "is_running_production = __production__ = lambda : (socket.gethostname() not in ['DESKTOP-JJ95ENL', 'DESKTOP-9J3LL5Q'])\n__run_mode__ = TheRunMode.production if (__production__) else TheRunMode.development\nis_production = lambda : __run_mode__ in [TheRunMode.production, TheRunMode.prod_dev]\nis_simulated_production = lambda : __run_mode__ in [TheRunMode.prod_dev]\nproduction_token = production_token if (is_production()) else development_token\nassert (TheRunMode.production if (any([arg == production_token for arg in [production_token]])) else TheRunMode.development) == TheRunMode.production, 'Something wrong with production mode detection.'\ndef get_local_ether_interface():\n    import ifcfg\n    import ipaddress\n    for name, interface in ifcfg.interfaces().items():",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "__run_mode__",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "__run_mode__ = TheRunMode.production if (__production__) else TheRunMode.development\nis_production = lambda : __run_mode__ in [TheRunMode.production, TheRunMode.prod_dev]\nis_simulated_production = lambda : __run_mode__ in [TheRunMode.prod_dev]\nproduction_token = production_token if (is_production()) else development_token\nassert (TheRunMode.production if (any([arg == production_token for arg in [production_token]])) else TheRunMode.development) == TheRunMode.production, 'Something wrong with production mode detection.'\ndef get_local_ether_interface():\n    import ifcfg\n    import ipaddress\n    for name, interface in ifcfg.interfaces().items():\n        ip_addr = interface.get('inet')",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "is_production",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "is_production = lambda : __run_mode__ in [TheRunMode.production, TheRunMode.prod_dev]\nis_simulated_production = lambda : __run_mode__ in [TheRunMode.prod_dev]\nproduction_token = production_token if (is_production()) else development_token\nassert (TheRunMode.production if (any([arg == production_token for arg in [production_token]])) else TheRunMode.development) == TheRunMode.production, 'Something wrong with production mode detection.'\ndef get_local_ether_interface():\n    import ifcfg\n    import ipaddress\n    for name, interface in ifcfg.interfaces().items():\n        ip_addr = interface.get('inet')\n        ip_ether = interface.get('ether')",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "is_simulated_production",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "is_simulated_production = lambda : __run_mode__ in [TheRunMode.prod_dev]\nproduction_token = production_token if (is_production()) else development_token\nassert (TheRunMode.production if (any([arg == production_token for arg in [production_token]])) else TheRunMode.development) == TheRunMode.production, 'Something wrong with production mode detection.'\ndef get_local_ether_interface():\n    import ifcfg\n    import ipaddress\n    for name, interface in ifcfg.interfaces().items():\n        ip_addr = interface.get('inet')\n        ip_ether = interface.get('ether')\n        if (ip_addr and ip_ether):",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "production_token",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "production_token = production_token if (is_production()) else development_token\nassert (TheRunMode.production if (any([arg == production_token for arg in [production_token]])) else TheRunMode.development) == TheRunMode.production, 'Something wrong with production mode detection.'\ndef get_local_ether_interface():\n    import ifcfg\n    import ipaddress\n    for name, interface in ifcfg.interfaces().items():\n        ip_addr = interface.get('inet')\n        ip_ether = interface.get('ether')\n        if (ip_addr and ip_ether):\n            i = ipaddress.ip_address(ip_addr)",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "local_ether_interface",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "local_ether_interface = get_local_ether_interface()\nassert local_ether_interface is not None, 'Cannot get the local ip address from the ifconfig interface. Please fix.'\nos.environ['LOCAL_INET'] = local_ether_interface.get('inet')\nassert is_really_a_string(os.environ.get('LOCAL_INET')), 'Cannot validate the local ip address from the ifconfig interface that was found.  Please fix.'\ndef get_stream_handler(streamformat=\"%(asctime)s:%(levelname)s:%(message)s\"):\n    stream = logging.StreamHandler()\n    stream.setLevel(logging.INFO if (not is_simulated_production()) else logging.DEBUG)\n    stream.setFormatter(logging.Formatter(streamformat))\n    return stream\ndef setup_rotating_file_handler(logname, logfile, max_bytes, backup_count):",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "os.environ['LOCAL_INET']",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "os.environ['LOCAL_INET'] = local_ether_interface.get('inet')\nassert is_really_a_string(os.environ.get('LOCAL_INET')), 'Cannot validate the local ip address from the ifconfig interface that was found.  Please fix.'\ndef get_stream_handler(streamformat=\"%(asctime)s:%(levelname)s:%(message)s\"):\n    stream = logging.StreamHandler()\n    stream.setLevel(logging.INFO if (not is_simulated_production()) else logging.DEBUG)\n    stream.setFormatter(logging.Formatter(streamformat))\n    return stream\ndef setup_rotating_file_handler(logname, logfile, max_bytes, backup_count):\n    assert is_really_something(backup_count, something_greater_than_zero), 'Missing backup_count?'\n    assert is_really_something(max_bytes, something_greater_than_zero), 'Missing max_bytes?'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "base_filename",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "base_filename = os.path.splitext(os.path.basename(__file__))[0]\nlog_filename = '{}{}{}{}{}{}{}_{}.log'.format('logs', os.sep, base_filename, os.sep, production_token if (not is_simulated_production()) else development_token, os.sep, base_filename, default_timestamp(datetime.utcnow()))\nlog_filename = os.sep.join([os.path.dirname(__file__), log_filename])\nif (is_simulated_production()):\n    import shutil\n    log_root = os.path.dirname(os.path.dirname(log_filename))\n    for p in [production_token, development_token]:\n        fp = os.sep.join([log_root, p])\n        if (os.path.exists(fp)):\n            shutil.rmtree(fp)",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "log_filename",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "log_filename = '{}{}{}{}{}{}{}_{}.log'.format('logs', os.sep, base_filename, os.sep, production_token if (not is_simulated_production()) else development_token, os.sep, base_filename, default_timestamp(datetime.utcnow()))\nlog_filename = os.sep.join([os.path.dirname(__file__), log_filename])\nif (is_simulated_production()):\n    import shutil\n    log_root = os.path.dirname(os.path.dirname(log_filename))\n    for p in [production_token, development_token]:\n        fp = os.sep.join([log_root, p])\n        if (os.path.exists(fp)):\n            shutil.rmtree(fp)\nif not os.path.exists(os.path.dirname(log_filename)):",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "log_filename",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "log_filename = os.sep.join([os.path.dirname(__file__), log_filename])\nif (is_simulated_production()):\n    import shutil\n    log_root = os.path.dirname(os.path.dirname(log_filename))\n    for p in [production_token, development_token]:\n        fp = os.sep.join([log_root, p])\n        if (os.path.exists(fp)):\n            shutil.rmtree(fp)\nif not os.path.exists(os.path.dirname(log_filename)):\n    os.makedirs(os.path.dirname(log_filename))",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "log_format",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "log_format = ('[%(asctime)s] %(levelname)-8s %(name)-12s %(message)s')\nlogging.basicConfig(\n    level=logging.DEBUG if (is_simulated_production()) else logging.INFO,\n    format=log_format,\n    filename=(log_filename),\n)\nlogger = setup_rotating_file_handler(base_filename, log_filename, (1024*1024*1024), 10)\nlogger.addHandler(get_stream_handler())\njson_path = os.sep.join([os.path.dirname(__file__), 'json', '{}_tweet-stats.json'.format(base_filename)])\njson_final_path = os.sep.join([os.path.dirname(__file__), 'json', '{}_tweet-stats-final_{}.json'.format(base_filename, default_timestamp(datetime.utcnow()))])",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "logger = setup_rotating_file_handler(base_filename, log_filename, (1024*1024*1024), 10)\nlogger.addHandler(get_stream_handler())\njson_path = os.sep.join([os.path.dirname(__file__), 'json', '{}_tweet-stats.json'.format(base_filename)])\njson_final_path = os.sep.join([os.path.dirname(__file__), 'json', '{}_tweet-stats-final_{}.json'.format(base_filename, default_timestamp(datetime.utcnow()))])\ntwitter_verse = 'twitter_verse'\nget_api = 'get_api'\ndo_the_tweet = 'do_the_tweet'\nlike_own_tweets = 'like_own_tweets'\narticles_list = 'articles_list'\nget_the_real_list = 'get_the_real_list'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "json_path",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "json_path = os.sep.join([os.path.dirname(__file__), 'json', '{}_tweet-stats.json'.format(base_filename)])\njson_final_path = os.sep.join([os.path.dirname(__file__), 'json', '{}_tweet-stats-final_{}.json'.format(base_filename, default_timestamp(datetime.utcnow()))])\ntwitter_verse = 'twitter_verse'\nget_api = 'get_api'\ndo_the_tweet = 'do_the_tweet'\nlike_own_tweets = 'like_own_tweets'\narticles_list = 'articles_list'\nget_the_real_list = 'get_the_real_list'\nupdate_the_article = 'update_the_article'\nupdate_the_plan = 'update_the_plan'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "json_final_path",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "json_final_path = os.sep.join([os.path.dirname(__file__), 'json', '{}_tweet-stats-final_{}.json'.format(base_filename, default_timestamp(datetime.utcnow()))])\ntwitter_verse = 'twitter_verse'\nget_api = 'get_api'\ndo_the_tweet = 'do_the_tweet'\nlike_own_tweets = 'like_own_tweets'\narticles_list = 'articles_list'\nget_the_real_list = 'get_the_real_list'\nupdate_the_article = 'update_the_article'\nupdate_the_plan = 'update_the_plan'\nanalyse_the_plans = 'analyse_the_plans'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "twitter_verse",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "twitter_verse = 'twitter_verse'\nget_api = 'get_api'\ndo_the_tweet = 'do_the_tweet'\nlike_own_tweets = 'like_own_tweets'\narticles_list = 'articles_list'\nget_the_real_list = 'get_the_real_list'\nupdate_the_article = 'update_the_article'\nupdate_the_plan = 'update_the_plan'\nanalyse_the_plans = 'analyse_the_plans'\nget_articles = 'get_articles'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "get_api",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "get_api = 'get_api'\ndo_the_tweet = 'do_the_tweet'\nlike_own_tweets = 'like_own_tweets'\narticles_list = 'articles_list'\nget_the_real_list = 'get_the_real_list'\nupdate_the_article = 'update_the_article'\nupdate_the_plan = 'update_the_plan'\nanalyse_the_plans = 'analyse_the_plans'\nget_articles = 'get_articles'\nget_a_choice = 'get_a_choice'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "do_the_tweet",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "do_the_tweet = 'do_the_tweet'\nlike_own_tweets = 'like_own_tweets'\narticles_list = 'articles_list'\nget_the_real_list = 'get_the_real_list'\nupdate_the_article = 'update_the_article'\nupdate_the_plan = 'update_the_plan'\nanalyse_the_plans = 'analyse_the_plans'\nget_articles = 'get_articles'\nget_a_choice = 'get_a_choice'\nget_more_followers = 'get_more_followers'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "like_own_tweets",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "like_own_tweets = 'like_own_tweets'\narticles_list = 'articles_list'\nget_the_real_list = 'get_the_real_list'\nupdate_the_article = 'update_the_article'\nupdate_the_plan = 'update_the_plan'\nanalyse_the_plans = 'analyse_the_plans'\nget_articles = 'get_articles'\nget_a_choice = 'get_a_choice'\nget_more_followers = 'get_more_followers'\nreset_plans_for_choices = 'reset_plans_for_choices'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "articles_list",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "articles_list = 'articles_list'\nget_the_real_list = 'get_the_real_list'\nupdate_the_article = 'update_the_article'\nupdate_the_plan = 'update_the_plan'\nanalyse_the_plans = 'analyse_the_plans'\nget_articles = 'get_articles'\nget_a_choice = 'get_a_choice'\nget_more_followers = 'get_more_followers'\nreset_plans_for_choices = 'reset_plans_for_choices'\nreset_article_plans = 'reset_article_plans'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "get_the_real_list",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "get_the_real_list = 'get_the_real_list'\nupdate_the_article = 'update_the_article'\nupdate_the_plan = 'update_the_plan'\nanalyse_the_plans = 'analyse_the_plans'\nget_articles = 'get_articles'\nget_a_choice = 'get_a_choice'\nget_more_followers = 'get_more_followers'\nreset_plans_for_choices = 'reset_plans_for_choices'\nreset_article_plans = 'reset_article_plans'\ntwitterbot_accounts = 'twitterbot_accounts'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "update_the_article",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "update_the_article = 'update_the_article'\nupdate_the_plan = 'update_the_plan'\nanalyse_the_plans = 'analyse_the_plans'\nget_articles = 'get_articles'\nget_a_choice = 'get_a_choice'\nget_more_followers = 'get_more_followers'\nreset_plans_for_choices = 'reset_plans_for_choices'\nreset_article_plans = 'reset_article_plans'\ntwitterbot_accounts = 'twitterbot_accounts'\nget_account_id = 'get_account_id'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "update_the_plan",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "update_the_plan = 'update_the_plan'\nanalyse_the_plans = 'analyse_the_plans'\nget_articles = 'get_articles'\nget_a_choice = 'get_a_choice'\nget_more_followers = 'get_more_followers'\nreset_plans_for_choices = 'reset_plans_for_choices'\nreset_article_plans = 'reset_article_plans'\ntwitterbot_accounts = 'twitterbot_accounts'\nget_account_id = 'get_account_id'\nget_Options = 'get_Options'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "analyse_the_plans",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "analyse_the_plans = 'analyse_the_plans'\nget_articles = 'get_articles'\nget_a_choice = 'get_a_choice'\nget_more_followers = 'get_more_followers'\nreset_plans_for_choices = 'reset_plans_for_choices'\nreset_article_plans = 'reset_article_plans'\ntwitterbot_accounts = 'twitterbot_accounts'\nget_account_id = 'get_account_id'\nget_Options = 'get_Options'\ndelete_all_local_articles = 'delete_all_local_articles'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "get_articles",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "get_articles = 'get_articles'\nget_a_choice = 'get_a_choice'\nget_more_followers = 'get_more_followers'\nreset_plans_for_choices = 'reset_plans_for_choices'\nreset_article_plans = 'reset_article_plans'\ntwitterbot_accounts = 'twitterbot_accounts'\nget_account_id = 'get_account_id'\nget_Options = 'get_Options'\ndelete_all_local_articles = 'delete_all_local_articles'\nbulk_store_the_articles = 'bulk_store_the_articles'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "get_a_choice",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "get_a_choice = 'get_a_choice'\nget_more_followers = 'get_more_followers'\nreset_plans_for_choices = 'reset_plans_for_choices'\nreset_article_plans = 'reset_article_plans'\ntwitterbot_accounts = 'twitterbot_accounts'\nget_account_id = 'get_account_id'\nget_Options = 'get_Options'\ndelete_all_local_articles = 'delete_all_local_articles'\nbulk_store_the_articles = 'bulk_store_the_articles'\nword_cloud = 'word_cloud'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "get_more_followers",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "get_more_followers = 'get_more_followers'\nreset_plans_for_choices = 'reset_plans_for_choices'\nreset_article_plans = 'reset_article_plans'\ntwitterbot_accounts = 'twitterbot_accounts'\nget_account_id = 'get_account_id'\nget_Options = 'get_Options'\ndelete_all_local_articles = 'delete_all_local_articles'\nbulk_store_the_articles = 'bulk_store_the_articles'\nword_cloud = 'word_cloud'\nget_final_word_cloud = 'get_final_word_cloud'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "reset_plans_for_choices",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "reset_plans_for_choices = 'reset_plans_for_choices'\nreset_article_plans = 'reset_article_plans'\ntwitterbot_accounts = 'twitterbot_accounts'\nget_account_id = 'get_account_id'\nget_Options = 'get_Options'\ndelete_all_local_articles = 'delete_all_local_articles'\nbulk_store_the_articles = 'bulk_store_the_articles'\nword_cloud = 'word_cloud'\nget_final_word_cloud = 'get_final_word_cloud'\nstore_one_hashtag = 'store_one_hashtag'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "reset_article_plans",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "reset_article_plans = 'reset_article_plans'\ntwitterbot_accounts = 'twitterbot_accounts'\nget_account_id = 'get_account_id'\nget_Options = 'get_Options'\ndelete_all_local_articles = 'delete_all_local_articles'\nbulk_store_the_articles = 'bulk_store_the_articles'\nword_cloud = 'word_cloud'\nget_final_word_cloud = 'get_final_word_cloud'\nstore_one_hashtag = 'store_one_hashtag'\npylibs = re.split(\";|: \", os.environ.get('pylib'))",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "twitterbot_accounts",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "twitterbot_accounts = 'twitterbot_accounts'\nget_account_id = 'get_account_id'\nget_Options = 'get_Options'\ndelete_all_local_articles = 'delete_all_local_articles'\nbulk_store_the_articles = 'bulk_store_the_articles'\nword_cloud = 'word_cloud'\nget_final_word_cloud = 'get_final_word_cloud'\nstore_one_hashtag = 'store_one_hashtag'\npylibs = re.split(\";|: \", os.environ.get('pylib'))\nassert all([is_really_a_string(s) for s in pylibs]), 'Cannot proceed without pylib.'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "get_account_id",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "get_account_id = 'get_account_id'\nget_Options = 'get_Options'\ndelete_all_local_articles = 'delete_all_local_articles'\nbulk_store_the_articles = 'bulk_store_the_articles'\nword_cloud = 'word_cloud'\nget_final_word_cloud = 'get_final_word_cloud'\nstore_one_hashtag = 'store_one_hashtag'\npylibs = re.split(\";|: \", os.environ.get('pylib'))\nassert all([is_really_a_string(s) for s in pylibs]), 'Cannot proceed without pylib.'\nfor pylib in pylibs:",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "get_Options",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "get_Options = 'get_Options'\ndelete_all_local_articles = 'delete_all_local_articles'\nbulk_store_the_articles = 'bulk_store_the_articles'\nword_cloud = 'word_cloud'\nget_final_word_cloud = 'get_final_word_cloud'\nstore_one_hashtag = 'store_one_hashtag'\npylibs = re.split(\";|: \", os.environ.get('pylib'))\nassert all([is_really_a_string(s) for s in pylibs]), 'Cannot proceed without pylib.'\nfor pylib in pylibs:\n    if (not any([f == pylib for f in sys.path])):",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "delete_all_local_articles",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "delete_all_local_articles = 'delete_all_local_articles'\nbulk_store_the_articles = 'bulk_store_the_articles'\nword_cloud = 'word_cloud'\nget_final_word_cloud = 'get_final_word_cloud'\nstore_one_hashtag = 'store_one_hashtag'\npylibs = re.split(\";|: \", os.environ.get('pylib'))\nassert all([is_really_a_string(s) for s in pylibs]), 'Cannot proceed without pylib.'\nfor pylib in pylibs:\n    if (not any([f == pylib for f in sys.path])):\n        print('Adding {}'.format(pylib))",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "bulk_store_the_articles",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "bulk_store_the_articles = 'bulk_store_the_articles'\nword_cloud = 'word_cloud'\nget_final_word_cloud = 'get_final_word_cloud'\nstore_one_hashtag = 'store_one_hashtag'\npylibs = re.split(\";|: \", os.environ.get('pylib'))\nassert all([is_really_a_string(s) for s in pylibs]), 'Cannot proceed without pylib.'\nfor pylib in pylibs:\n    if (not any([f == pylib for f in sys.path])):\n        print('Adding {}'.format(pylib))\n        sys.path.insert(0, pylib)",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "word_cloud",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "word_cloud = 'word_cloud'\nget_final_word_cloud = 'get_final_word_cloud'\nstore_one_hashtag = 'store_one_hashtag'\npylibs = re.split(\";|: \", os.environ.get('pylib'))\nassert all([is_really_a_string(s) for s in pylibs]), 'Cannot proceed without pylib.'\nfor pylib in pylibs:\n    if (not any([f == pylib for f in sys.path])):\n        print('Adding {}'.format(pylib))\n        sys.path.insert(0, pylib)\nfrom vyperlogix.misc import _utils",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "get_final_word_cloud",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "get_final_word_cloud = 'get_final_word_cloud'\nstore_one_hashtag = 'store_one_hashtag'\npylibs = re.split(\";|: \", os.environ.get('pylib'))\nassert all([is_really_a_string(s) for s in pylibs]), 'Cannot proceed without pylib.'\nfor pylib in pylibs:\n    if (not any([f == pylib for f in sys.path])):\n        print('Adding {}'.format(pylib))\n        sys.path.insert(0, pylib)\nfrom vyperlogix.misc import _utils\nfrom vyperlogix.env.environ import MyDotEnv",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "store_one_hashtag",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "store_one_hashtag = 'store_one_hashtag'\npylibs = re.split(\";|: \", os.environ.get('pylib'))\nassert all([is_really_a_string(s) for s in pylibs]), 'Cannot proceed without pylib.'\nfor pylib in pylibs:\n    if (not any([f == pylib for f in sys.path])):\n        print('Adding {}'.format(pylib))\n        sys.path.insert(0, pylib)\nfrom vyperlogix.misc import _utils\nfrom vyperlogix.env.environ import MyDotEnv\nfrom vyperlogix.plugins import handler as plugins_handler",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "pylibs",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "pylibs = re.split(\";|: \", os.environ.get('pylib'))\nassert all([is_really_a_string(s) for s in pylibs]), 'Cannot proceed without pylib.'\nfor pylib in pylibs:\n    if (not any([f == pylib for f in sys.path])):\n        print('Adding {}'.format(pylib))\n        sys.path.insert(0, pylib)\nfrom vyperlogix.misc import _utils\nfrom vyperlogix.env.environ import MyDotEnv\nfrom vyperlogix.plugins import handler as plugins_handler\nfrom vyperlogix.threads import pooled",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "available_options",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "available_options = {}\navailable_options['use_local'] = TheOptions.use_local\navailable_options['master_list'] = TheOptions.master_list\navailable_options['use_cluster'] = TheOptions.use_cluster\navailable_options['use_cosmos0'] = TheOptions.use_cosmos0\navailable_options['use_cluster_local_hybrid'] = TheOptions.use_cluster_local_hybrid\ndef __escape(v):\n    from urllib import parse\n    return parse.quote_plus(v)\ndef __unescape(v):",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "available_options['use_local']",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "available_options['use_local'] = TheOptions.use_local\navailable_options['master_list'] = TheOptions.master_list\navailable_options['use_cluster'] = TheOptions.use_cluster\navailable_options['use_cosmos0'] = TheOptions.use_cosmos0\navailable_options['use_cluster_local_hybrid'] = TheOptions.use_cluster_local_hybrid\ndef __escape(v):\n    from urllib import parse\n    return parse.quote_plus(v)\ndef __unescape(v):\n    from urllib import parse",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "available_options['master_list']",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "available_options['master_list'] = TheOptions.master_list\navailable_options['use_cluster'] = TheOptions.use_cluster\navailable_options['use_cosmos0'] = TheOptions.use_cosmos0\navailable_options['use_cluster_local_hybrid'] = TheOptions.use_cluster_local_hybrid\ndef __escape(v):\n    from urllib import parse\n    return parse.quote_plus(v)\ndef __unescape(v):\n    from urllib import parse\n    return parse.unquote_plus(v)",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "available_options['use_cluster']",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "available_options['use_cluster'] = TheOptions.use_cluster\navailable_options['use_cosmos0'] = TheOptions.use_cosmos0\navailable_options['use_cluster_local_hybrid'] = TheOptions.use_cluster_local_hybrid\ndef __escape(v):\n    from urllib import parse\n    return parse.quote_plus(v)\ndef __unescape(v):\n    from urllib import parse\n    return parse.unquote_plus(v)\n__env__ = {}",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "available_options['use_cosmos0']",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "available_options['use_cosmos0'] = TheOptions.use_cosmos0\navailable_options['use_cluster_local_hybrid'] = TheOptions.use_cluster_local_hybrid\ndef __escape(v):\n    from urllib import parse\n    return parse.quote_plus(v)\ndef __unescape(v):\n    from urllib import parse\n    return parse.unquote_plus(v)\n__env__ = {}\nenv_literals = []",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "available_options['use_cluster_local_hybrid']",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "available_options['use_cluster_local_hybrid'] = TheOptions.use_cluster_local_hybrid\ndef __escape(v):\n    from urllib import parse\n    return parse.quote_plus(v)\ndef __unescape(v):\n    from urllib import parse\n    return parse.unquote_plus(v)\n__env__ = {}\nenv_literals = []\ndef get_environ_keys(*args, **kwargs):",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "__env__",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "__env__ = {}\nenv_literals = []\ndef get_environ_keys(*args, **kwargs):\n    from expandvars import expandvars\n    k = kwargs.get('key')\n    v = kwargs.get('value')\n    assert (k is not None) and (v is not None), 'Problem with kwargs -> {}, k={}, v={}'.format(kwargs,k,v)\n    __logger__ = kwargs.get('logger')\n    if (k == '__LITERALS__'):\n        for item in v:",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "env_literals",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "env_literals = []\ndef get_environ_keys(*args, **kwargs):\n    from expandvars import expandvars\n    k = kwargs.get('key')\n    v = kwargs.get('value')\n    assert (k is not None) and (v is not None), 'Problem with kwargs -> {}, k={}, v={}'.format(kwargs,k,v)\n    __logger__ = kwargs.get('logger')\n    if (k == '__LITERALS__'):\n        for item in v:\n            env_literals.append(item)",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "dotenv",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "dotenv = MyDotEnv(find_dotenv(), verbose=True, interpolate=True, override=True, logger=logger, callback=get_environ_keys)\ndotenv.set_as_environment_variables()\nfor k in __env__.get('__ESCAPED__', ''):\n    __env__[k] = __unescape(__env__.get(k, ''))\n__env2__ = dict([tuple([k,v]) for k,v in __env__.items()])\n__env2__['MONGO_URI'] = os.environ.get('MONGO_CLUSTER')\n__env2__['MONGO_AUTH_MECHANISM'] = os.environ.get('MONGO_CLUSTER_AUTH_MECHANISM')\n__env3__ = dict([tuple([k,v]) for k,v in __env__.items()])\n__env3__['MONGO_URI'] = os.environ.get('COSMOSDB0')\n__env3__['MONGO_AUTH_MECHANISM'] = os.environ.get('COSMOS_AUTH_MECHANISM')",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "__env2__",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "__env2__ = dict([tuple([k,v]) for k,v in __env__.items()])\n__env2__['MONGO_URI'] = os.environ.get('MONGO_CLUSTER')\n__env2__['MONGO_AUTH_MECHANISM'] = os.environ.get('MONGO_CLUSTER_AUTH_MECHANISM')\n__env3__ = dict([tuple([k,v]) for k,v in __env__.items()])\n__env3__['MONGO_URI'] = os.environ.get('COSMOSDB0')\n__env3__['MONGO_AUTH_MECHANISM'] = os.environ.get('COSMOS_AUTH_MECHANISM')\n__env4__ = dict([tuple([k,v]) for k,v in __env3__.items()])\n__env4__['MONGO_URI'] = os.environ.get('COSMOSDB1')\ndef __getattr(name, default=None):\n    this_module = sys.modules[__name__]",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "__env2__['MONGO_URI']",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "__env2__['MONGO_URI'] = os.environ.get('MONGO_CLUSTER')\n__env2__['MONGO_AUTH_MECHANISM'] = os.environ.get('MONGO_CLUSTER_AUTH_MECHANISM')\n__env3__ = dict([tuple([k,v]) for k,v in __env__.items()])\n__env3__['MONGO_URI'] = os.environ.get('COSMOSDB0')\n__env3__['MONGO_AUTH_MECHANISM'] = os.environ.get('COSMOS_AUTH_MECHANISM')\n__env4__ = dict([tuple([k,v]) for k,v in __env3__.items()])\n__env4__['MONGO_URI'] = os.environ.get('COSMOSDB1')\ndef __getattr(name, default=None):\n    this_module = sys.modules[__name__]\n    return getattr(this_module, name, default)",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "__env2__['MONGO_AUTH_MECHANISM']",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "__env2__['MONGO_AUTH_MECHANISM'] = os.environ.get('MONGO_CLUSTER_AUTH_MECHANISM')\n__env3__ = dict([tuple([k,v]) for k,v in __env__.items()])\n__env3__['MONGO_URI'] = os.environ.get('COSMOSDB0')\n__env3__['MONGO_AUTH_MECHANISM'] = os.environ.get('COSMOS_AUTH_MECHANISM')\n__env4__ = dict([tuple([k,v]) for k,v in __env3__.items()])\n__env4__['MONGO_URI'] = os.environ.get('COSMOSDB1')\ndef __getattr(name, default=None):\n    this_module = sys.modules[__name__]\n    return getattr(this_module, name, default)\n__mirrors__ = [__getattr(m, {}) for m in os.environ.get('MIRRORS', [])]",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "__env3__",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "__env3__ = dict([tuple([k,v]) for k,v in __env__.items()])\n__env3__['MONGO_URI'] = os.environ.get('COSMOSDB0')\n__env3__['MONGO_AUTH_MECHANISM'] = os.environ.get('COSMOS_AUTH_MECHANISM')\n__env4__ = dict([tuple([k,v]) for k,v in __env3__.items()])\n__env4__['MONGO_URI'] = os.environ.get('COSMOSDB1')\ndef __getattr(name, default=None):\n    this_module = sys.modules[__name__]\n    return getattr(this_module, name, default)\n__mirrors__ = [__getattr(m, {}) for m in os.environ.get('MIRRORS', [])]\nexplainOptions = lambda x:str(x)",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "__env3__['MONGO_URI']",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "__env3__['MONGO_URI'] = os.environ.get('COSMOSDB0')\n__env3__['MONGO_AUTH_MECHANISM'] = os.environ.get('COSMOS_AUTH_MECHANISM')\n__env4__ = dict([tuple([k,v]) for k,v in __env3__.items()])\n__env4__['MONGO_URI'] = os.environ.get('COSMOSDB1')\ndef __getattr(name, default=None):\n    this_module = sys.modules[__name__]\n    return getattr(this_module, name, default)\n__mirrors__ = [__getattr(m, {}) for m in os.environ.get('MIRRORS', [])]\nexplainOptions = lambda x:str(x)\noptions_from_env = os.environ.get('OPTIONS')",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "__env3__['MONGO_AUTH_MECHANISM']",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "__env3__['MONGO_AUTH_MECHANISM'] = os.environ.get('COSMOS_AUTH_MECHANISM')\n__env4__ = dict([tuple([k,v]) for k,v in __env3__.items()])\n__env4__['MONGO_URI'] = os.environ.get('COSMOSDB1')\ndef __getattr(name, default=None):\n    this_module = sys.modules[__name__]\n    return getattr(this_module, name, default)\n__mirrors__ = [__getattr(m, {}) for m in os.environ.get('MIRRORS', [])]\nexplainOptions = lambda x:str(x)\noptions_from_env = os.environ.get('OPTIONS')\n__the_options__ = available_options.get(options_from_env, TheOptions.use_local)",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "__env4__",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "__env4__ = dict([tuple([k,v]) for k,v in __env3__.items()])\n__env4__['MONGO_URI'] = os.environ.get('COSMOSDB1')\ndef __getattr(name, default=None):\n    this_module = sys.modules[__name__]\n    return getattr(this_module, name, default)\n__mirrors__ = [__getattr(m, {}) for m in os.environ.get('MIRRORS', [])]\nexplainOptions = lambda x:str(x)\noptions_from_env = os.environ.get('OPTIONS')\n__the_options__ = available_options.get(options_from_env, TheOptions.use_local)\n__run_mode__ = TheRunMode.prod_dev if (socket.gethostname() == __env__.get('LOCAL_MACHINE_NAME')) else __run_mode__ # Comment this out for production deployment.",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "__env4__['MONGO_URI']",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "__env4__['MONGO_URI'] = os.environ.get('COSMOSDB1')\ndef __getattr(name, default=None):\n    this_module = sys.modules[__name__]\n    return getattr(this_module, name, default)\n__mirrors__ = [__getattr(m, {}) for m in os.environ.get('MIRRORS', [])]\nexplainOptions = lambda x:str(x)\noptions_from_env = os.environ.get('OPTIONS')\n__the_options__ = available_options.get(options_from_env, TheOptions.use_local)\n__run_mode__ = TheRunMode.prod_dev if (socket.gethostname() == __env__.get('LOCAL_MACHINE_NAME')) else __run_mode__ # Comment this out for production deployment.\nif (__run_mode__ == TheRunMode.prod_dev):",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "__mirrors__",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "__mirrors__ = [__getattr(m, {}) for m in os.environ.get('MIRRORS', [])]\nexplainOptions = lambda x:str(x)\noptions_from_env = os.environ.get('OPTIONS')\n__the_options__ = available_options.get(options_from_env, TheOptions.use_local)\n__run_mode__ = TheRunMode.prod_dev if (socket.gethostname() == __env__.get('LOCAL_MACHINE_NAME')) else __run_mode__ # Comment this out for production deployment.\nif (__run_mode__ == TheRunMode.prod_dev):\n    __the_options__ = TheOptions.use_local\nlogger.info('__the_options__ -> {} -> {}'.format(__the_options__, explainOptions(__the_options__)))\naccess_token = os.environ.get('access_token', __env__.get('access_token'))\naccess_token_secret = os.environ.get('access_token_secret', __env__.get('access_token_secret'))",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "explainOptions",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "explainOptions = lambda x:str(x)\noptions_from_env = os.environ.get('OPTIONS')\n__the_options__ = available_options.get(options_from_env, TheOptions.use_local)\n__run_mode__ = TheRunMode.prod_dev if (socket.gethostname() == __env__.get('LOCAL_MACHINE_NAME')) else __run_mode__ # Comment this out for production deployment.\nif (__run_mode__ == TheRunMode.prod_dev):\n    __the_options__ = TheOptions.use_local\nlogger.info('__the_options__ -> {} -> {}'.format(__the_options__, explainOptions(__the_options__)))\naccess_token = os.environ.get('access_token', __env__.get('access_token'))\naccess_token_secret = os.environ.get('access_token_secret', __env__.get('access_token_secret'))\nconsumer_key = os.environ.get('consumer_key', __env__.get('consumer_key'))",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "options_from_env",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "options_from_env = os.environ.get('OPTIONS')\n__the_options__ = available_options.get(options_from_env, TheOptions.use_local)\n__run_mode__ = TheRunMode.prod_dev if (socket.gethostname() == __env__.get('LOCAL_MACHINE_NAME')) else __run_mode__ # Comment this out for production deployment.\nif (__run_mode__ == TheRunMode.prod_dev):\n    __the_options__ = TheOptions.use_local\nlogger.info('__the_options__ -> {} -> {}'.format(__the_options__, explainOptions(__the_options__)))\naccess_token = os.environ.get('access_token', __env__.get('access_token'))\naccess_token_secret = os.environ.get('access_token_secret', __env__.get('access_token_secret'))\nconsumer_key = os.environ.get('consumer_key', __env__.get('consumer_key'))\nconsumer_secret = os.environ.get('consumer_secret', __env__.get('consumer_secret'))",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "__the_options__",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "__the_options__ = available_options.get(options_from_env, TheOptions.use_local)\n__run_mode__ = TheRunMode.prod_dev if (socket.gethostname() == __env__.get('LOCAL_MACHINE_NAME')) else __run_mode__ # Comment this out for production deployment.\nif (__run_mode__ == TheRunMode.prod_dev):\n    __the_options__ = TheOptions.use_local\nlogger.info('__the_options__ -> {} -> {}'.format(__the_options__, explainOptions(__the_options__)))\naccess_token = os.environ.get('access_token', __env__.get('access_token'))\naccess_token_secret = os.environ.get('access_token_secret', __env__.get('access_token_secret'))\nconsumer_key = os.environ.get('consumer_key', __env__.get('consumer_key'))\nconsumer_secret = os.environ.get('consumer_secret', __env__.get('consumer_secret'))\nassert is_really_a_string(access_token), 'Missing access_token.'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "__run_mode__",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "__run_mode__ = TheRunMode.prod_dev if (socket.gethostname() == __env__.get('LOCAL_MACHINE_NAME')) else __run_mode__ # Comment this out for production deployment.\nif (__run_mode__ == TheRunMode.prod_dev):\n    __the_options__ = TheOptions.use_local\nlogger.info('__the_options__ -> {} -> {}'.format(__the_options__, explainOptions(__the_options__)))\naccess_token = os.environ.get('access_token', __env__.get('access_token'))\naccess_token_secret = os.environ.get('access_token_secret', __env__.get('access_token_secret'))\nconsumer_key = os.environ.get('consumer_key', __env__.get('consumer_key'))\nconsumer_secret = os.environ.get('consumer_secret', __env__.get('consumer_secret'))\nassert is_really_a_string(access_token), 'Missing access_token.'\nassert is_really_a_string(access_token_secret), 'Missing access_token_secret.'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "access_token",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "access_token = os.environ.get('access_token', __env__.get('access_token'))\naccess_token_secret = os.environ.get('access_token_secret', __env__.get('access_token_secret'))\nconsumer_key = os.environ.get('consumer_key', __env__.get('consumer_key'))\nconsumer_secret = os.environ.get('consumer_secret', __env__.get('consumer_secret'))\nassert is_really_a_string(access_token), 'Missing access_token.'\nassert is_really_a_string(access_token_secret), 'Missing access_token_secret.'\nassert is_really_a_string(consumer_key), 'Missing consumer_key.'\nassert is_really_a_string(consumer_secret), 'Missing consumer_secret.'\nmongo_db_name = os.environ.get('mongo_db_name', __env__.get('mongo_db_name'))\nmongo_articles_col_name = os.environ.get('mongo_articles_col_name', __env__.get('mongo_articles_col_name'))",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "access_token_secret",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "access_token_secret = os.environ.get('access_token_secret', __env__.get('access_token_secret'))\nconsumer_key = os.environ.get('consumer_key', __env__.get('consumer_key'))\nconsumer_secret = os.environ.get('consumer_secret', __env__.get('consumer_secret'))\nassert is_really_a_string(access_token), 'Missing access_token.'\nassert is_really_a_string(access_token_secret), 'Missing access_token_secret.'\nassert is_really_a_string(consumer_key), 'Missing consumer_key.'\nassert is_really_a_string(consumer_secret), 'Missing consumer_secret.'\nmongo_db_name = os.environ.get('mongo_db_name', __env__.get('mongo_db_name'))\nmongo_articles_col_name = os.environ.get('mongo_articles_col_name', __env__.get('mongo_articles_col_name'))\nmongo_articles_plan_col_name = os.environ.get('mongo_articles_plan_col_name', __env__.get('mongo_articles_plan_col_name'))",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "consumer_key",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "consumer_key = os.environ.get('consumer_key', __env__.get('consumer_key'))\nconsumer_secret = os.environ.get('consumer_secret', __env__.get('consumer_secret'))\nassert is_really_a_string(access_token), 'Missing access_token.'\nassert is_really_a_string(access_token_secret), 'Missing access_token_secret.'\nassert is_really_a_string(consumer_key), 'Missing consumer_key.'\nassert is_really_a_string(consumer_secret), 'Missing consumer_secret.'\nmongo_db_name = os.environ.get('mongo_db_name', __env__.get('mongo_db_name'))\nmongo_articles_col_name = os.environ.get('mongo_articles_col_name', __env__.get('mongo_articles_col_name'))\nmongo_articles_plan_col_name = os.environ.get('mongo_articles_plan_col_name', __env__.get('mongo_articles_plan_col_name'))\nmongo_article_text_col_name = os.environ.get('mongo_article_text_col_name', __env__.get('mongo_article_text_col_name'))",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "consumer_secret",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "consumer_secret = os.environ.get('consumer_secret', __env__.get('consumer_secret'))\nassert is_really_a_string(access_token), 'Missing access_token.'\nassert is_really_a_string(access_token_secret), 'Missing access_token_secret.'\nassert is_really_a_string(consumer_key), 'Missing consumer_key.'\nassert is_really_a_string(consumer_secret), 'Missing consumer_secret.'\nmongo_db_name = os.environ.get('mongo_db_name', __env__.get('mongo_db_name'))\nmongo_articles_col_name = os.environ.get('mongo_articles_col_name', __env__.get('mongo_articles_col_name'))\nmongo_articles_plan_col_name = os.environ.get('mongo_articles_plan_col_name', __env__.get('mongo_articles_plan_col_name'))\nmongo_article_text_col_name = os.environ.get('mongo_article_text_col_name', __env__.get('mongo_article_text_col_name'))\nmongo_words_col_name = os.environ.get('mongo_words_col_name', __env__.get('mongo_words_col_name'))",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "mongo_db_name",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "mongo_db_name = os.environ.get('mongo_db_name', __env__.get('mongo_db_name'))\nmongo_articles_col_name = os.environ.get('mongo_articles_col_name', __env__.get('mongo_articles_col_name'))\nmongo_articles_plan_col_name = os.environ.get('mongo_articles_plan_col_name', __env__.get('mongo_articles_plan_col_name'))\nmongo_article_text_col_name = os.environ.get('mongo_article_text_col_name', __env__.get('mongo_article_text_col_name'))\nmongo_words_col_name = os.environ.get('mongo_words_col_name', __env__.get('mongo_words_col_name'))\nmongo_cloud_col_name = os.environ.get('mongo_cloud_col_name', __env__.get('mongo_cloud_col_name'))\nassert is_really_a_string(mongo_db_name), 'Missing mongo_db_name.'\nassert is_really_a_string(mongo_articles_col_name), 'Missing mongo_articles_col_name.'\nassert is_really_a_string(mongo_article_text_col_name), 'Missing mongo_article_text_col_name.'\nassert is_really_a_string(mongo_words_col_name), 'Missing mongo_words_col_name.'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "mongo_articles_col_name",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "mongo_articles_col_name = os.environ.get('mongo_articles_col_name', __env__.get('mongo_articles_col_name'))\nmongo_articles_plan_col_name = os.environ.get('mongo_articles_plan_col_name', __env__.get('mongo_articles_plan_col_name'))\nmongo_article_text_col_name = os.environ.get('mongo_article_text_col_name', __env__.get('mongo_article_text_col_name'))\nmongo_words_col_name = os.environ.get('mongo_words_col_name', __env__.get('mongo_words_col_name'))\nmongo_cloud_col_name = os.environ.get('mongo_cloud_col_name', __env__.get('mongo_cloud_col_name'))\nassert is_really_a_string(mongo_db_name), 'Missing mongo_db_name.'\nassert is_really_a_string(mongo_articles_col_name), 'Missing mongo_articles_col_name.'\nassert is_really_a_string(mongo_article_text_col_name), 'Missing mongo_article_text_col_name.'\nassert is_really_a_string(mongo_words_col_name), 'Missing mongo_words_col_name.'\nassert is_really_a_string(mongo_cloud_col_name), 'Missing mongo_cloud_col_name.'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "mongo_articles_plan_col_name",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "mongo_articles_plan_col_name = os.environ.get('mongo_articles_plan_col_name', __env__.get('mongo_articles_plan_col_name'))\nmongo_article_text_col_name = os.environ.get('mongo_article_text_col_name', __env__.get('mongo_article_text_col_name'))\nmongo_words_col_name = os.environ.get('mongo_words_col_name', __env__.get('mongo_words_col_name'))\nmongo_cloud_col_name = os.environ.get('mongo_cloud_col_name', __env__.get('mongo_cloud_col_name'))\nassert is_really_a_string(mongo_db_name), 'Missing mongo_db_name.'\nassert is_really_a_string(mongo_articles_col_name), 'Missing mongo_articles_col_name.'\nassert is_really_a_string(mongo_article_text_col_name), 'Missing mongo_article_text_col_name.'\nassert is_really_a_string(mongo_words_col_name), 'Missing mongo_words_col_name.'\nassert is_really_a_string(mongo_cloud_col_name), 'Missing mongo_cloud_col_name.'\nmongo_twitterbot_db_name = os.environ.get('mongo_twitterbot_db_name', __env__.get('mongo_twitterbot_db_name'))",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "mongo_article_text_col_name",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "mongo_article_text_col_name = os.environ.get('mongo_article_text_col_name', __env__.get('mongo_article_text_col_name'))\nmongo_words_col_name = os.environ.get('mongo_words_col_name', __env__.get('mongo_words_col_name'))\nmongo_cloud_col_name = os.environ.get('mongo_cloud_col_name', __env__.get('mongo_cloud_col_name'))\nassert is_really_a_string(mongo_db_name), 'Missing mongo_db_name.'\nassert is_really_a_string(mongo_articles_col_name), 'Missing mongo_articles_col_name.'\nassert is_really_a_string(mongo_article_text_col_name), 'Missing mongo_article_text_col_name.'\nassert is_really_a_string(mongo_words_col_name), 'Missing mongo_words_col_name.'\nassert is_really_a_string(mongo_cloud_col_name), 'Missing mongo_cloud_col_name.'\nmongo_twitterbot_db_name = os.environ.get('mongo_twitterbot_db_name', __env__.get('mongo_twitterbot_db_name'))\nmongo_articles_list_col_name = os.environ.get('mongo_articles_list_col_name', __env__.get('mongo_articles_list_col_name'))",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "mongo_words_col_name",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "mongo_words_col_name = os.environ.get('mongo_words_col_name', __env__.get('mongo_words_col_name'))\nmongo_cloud_col_name = os.environ.get('mongo_cloud_col_name', __env__.get('mongo_cloud_col_name'))\nassert is_really_a_string(mongo_db_name), 'Missing mongo_db_name.'\nassert is_really_a_string(mongo_articles_col_name), 'Missing mongo_articles_col_name.'\nassert is_really_a_string(mongo_article_text_col_name), 'Missing mongo_article_text_col_name.'\nassert is_really_a_string(mongo_words_col_name), 'Missing mongo_words_col_name.'\nassert is_really_a_string(mongo_cloud_col_name), 'Missing mongo_cloud_col_name.'\nmongo_twitterbot_db_name = os.environ.get('mongo_twitterbot_db_name', __env__.get('mongo_twitterbot_db_name'))\nmongo_articles_list_col_name = os.environ.get('mongo_articles_list_col_name', __env__.get('mongo_articles_list_col_name'))\nmongo_articles_plans_col_name = os.environ.get('mongo_articles_plans_col_name', __env__.get('mongo_articles_plans_col_name'))",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "mongo_cloud_col_name",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "mongo_cloud_col_name = os.environ.get('mongo_cloud_col_name', __env__.get('mongo_cloud_col_name'))\nassert is_really_a_string(mongo_db_name), 'Missing mongo_db_name.'\nassert is_really_a_string(mongo_articles_col_name), 'Missing mongo_articles_col_name.'\nassert is_really_a_string(mongo_article_text_col_name), 'Missing mongo_article_text_col_name.'\nassert is_really_a_string(mongo_words_col_name), 'Missing mongo_words_col_name.'\nassert is_really_a_string(mongo_cloud_col_name), 'Missing mongo_cloud_col_name.'\nmongo_twitterbot_db_name = os.environ.get('mongo_twitterbot_db_name', __env__.get('mongo_twitterbot_db_name'))\nmongo_articles_list_col_name = os.environ.get('mongo_articles_list_col_name', __env__.get('mongo_articles_list_col_name'))\nmongo_articles_plans_col_name = os.environ.get('mongo_articles_plans_col_name', __env__.get('mongo_articles_plans_col_name'))\nmongo_twitterbot_account_col_name = os.environ.get('mongo_twitterbot_account_col_name', __env__.get('mongo_twitterbot_account_col_name'))",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "mongo_twitterbot_db_name",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "mongo_twitterbot_db_name = os.environ.get('mongo_twitterbot_db_name', __env__.get('mongo_twitterbot_db_name'))\nmongo_articles_list_col_name = os.environ.get('mongo_articles_list_col_name', __env__.get('mongo_articles_list_col_name'))\nmongo_articles_plans_col_name = os.environ.get('mongo_articles_plans_col_name', __env__.get('mongo_articles_plans_col_name'))\nmongo_twitterbot_account_col_name = os.environ.get('mongo_twitterbot_account_col_name', __env__.get('mongo_twitterbot_account_col_name'))\nassert is_really_a_string(mongo_twitterbot_db_name), 'Missing mongo_twitterbot_db_name.'\nassert is_really_a_string(mongo_articles_list_col_name), 'Missing mongo_articles_list_col_name.'\nassert is_really_a_string(mongo_articles_plans_col_name), 'Missing mongo_articles_plans_col_name.'\nplugins = __env__.get('plugins')\nassert is_really_a_string(plugins) and os.path.exists(plugins), 'Missing plugins.'\nif (0):",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "mongo_articles_list_col_name",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "mongo_articles_list_col_name = os.environ.get('mongo_articles_list_col_name', __env__.get('mongo_articles_list_col_name'))\nmongo_articles_plans_col_name = os.environ.get('mongo_articles_plans_col_name', __env__.get('mongo_articles_plans_col_name'))\nmongo_twitterbot_account_col_name = os.environ.get('mongo_twitterbot_account_col_name', __env__.get('mongo_twitterbot_account_col_name'))\nassert is_really_a_string(mongo_twitterbot_db_name), 'Missing mongo_twitterbot_db_name.'\nassert is_really_a_string(mongo_articles_list_col_name), 'Missing mongo_articles_list_col_name.'\nassert is_really_a_string(mongo_articles_plans_col_name), 'Missing mongo_articles_plans_col_name.'\nplugins = __env__.get('plugins')\nassert is_really_a_string(plugins) and os.path.exists(plugins), 'Missing plugins.'\nif (0):\n    from tweepy import binder",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "mongo_articles_plans_col_name",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "mongo_articles_plans_col_name = os.environ.get('mongo_articles_plans_col_name', __env__.get('mongo_articles_plans_col_name'))\nmongo_twitterbot_account_col_name = os.environ.get('mongo_twitterbot_account_col_name', __env__.get('mongo_twitterbot_account_col_name'))\nassert is_really_a_string(mongo_twitterbot_db_name), 'Missing mongo_twitterbot_db_name.'\nassert is_really_a_string(mongo_articles_list_col_name), 'Missing mongo_articles_list_col_name.'\nassert is_really_a_string(mongo_articles_plans_col_name), 'Missing mongo_articles_plans_col_name.'\nplugins = __env__.get('plugins')\nassert is_really_a_string(plugins) and os.path.exists(plugins), 'Missing plugins.'\nif (0):\n    from tweepy import binder\n    m = sys.modules.get('tweepy.binder')",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "mongo_twitterbot_account_col_name",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "mongo_twitterbot_account_col_name = os.environ.get('mongo_twitterbot_account_col_name', __env__.get('mongo_twitterbot_account_col_name'))\nassert is_really_a_string(mongo_twitterbot_db_name), 'Missing mongo_twitterbot_db_name.'\nassert is_really_a_string(mongo_articles_list_col_name), 'Missing mongo_articles_list_col_name.'\nassert is_really_a_string(mongo_articles_plans_col_name), 'Missing mongo_articles_plans_col_name.'\nplugins = __env__.get('plugins')\nassert is_really_a_string(plugins) and os.path.exists(plugins), 'Missing plugins.'\nif (0):\n    from tweepy import binder\n    m = sys.modules.get('tweepy.binder')\n    assert m is not None, 'Problems with tweepy.binder.'",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "plugins",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "plugins = __env__.get('plugins')\nassert is_really_a_string(plugins) and os.path.exists(plugins), 'Missing plugins.'\nif (0):\n    from tweepy import binder\n    m = sys.modules.get('tweepy.binder')\n    assert m is not None, 'Problems with tweepy.binder.'\n    def my_bind_api(*args, **kwargs):\n        print()\n    setattr(m, 'bind_api', my_bind_api)\nclass TwitterPlan():",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "environ",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "environ = lambda : __env__ if (__the_options__ is not TheOptions.use_cluster) else __env2__\n__vector__ = {}\ndef save_tweet_stats(fpath, data, logger=None):\n    def eat_numbers_from_end(value):\n        while(1):\n            if (len(value) > 0) and (value[-1].isdigit()):\n                value = value[0:-1]\n            else:\n                break\n        return value",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    },
+    {
+        "label": "__vector__",
+        "kind": 5,
+        "importPath": "tweepy-bot1",
+        "description": "tweepy-bot1",
+        "peekOfCode": "__vector__ = {}\ndef save_tweet_stats(fpath, data, logger=None):\n    def eat_numbers_from_end(value):\n        while(1):\n            if (len(value) > 0) and (value[-1].isdigit()):\n                value = value[0:-1]\n            else:\n                break\n        return value\n    try:",
+        "detail": "tweepy-bot1",
+        "documentation": {}
+    }
+]

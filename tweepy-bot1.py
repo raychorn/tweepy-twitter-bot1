@@ -747,7 +747,7 @@ def main_loop(twitter_bot_account, max_tweets=None, debug=False, logger=None):
         num = service_runner.articles_list.delete_all_local_articles(**plugins_handler.get_kwargs(environ=__env__, twitter_bot_account=twitter_bot_account, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, options=Options.do_reset, logger=logger))
         logger.info('Deleted {} from the local database and this is a normal function because the cluster has the master data for redundancy by design.'.format(num if (isinstance(num, int) or isinstance(num, float)) else 0))
 
-        service_runner.allow(bulk_store_the_articles)
+        service_runner.allow(articles_list, bulk_store_the_articles)
 
         the_master_list = service_runner.articles_list.get_articles(**plugins_handler.get_kwargs(_id=None, environ=__env2__, mongo_db_name=mongo_db_name, mongo_articles_col_name=mongo_articles_col_name, return_doc_ids=False, logger=logger))
 

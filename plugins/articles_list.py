@@ -468,16 +468,13 @@ def __store_articles(items=None, environ=None, tenant_id=None, mongo_db_name=Non
 
         assert vyperapi.is_not_none(db), 'There is no db.'
 
-        tb_name = mongo_db_name
         col_name = normalize_collection_name(tenant_id, mongo_articles_col_name) if (tenant_id) else mongo_articles_col_name
-        table = db[tb_name]
-        coll = table[col_name]
         
-        criteria = {'Class':'2'}
-        table.drop_collection(col_name)
+        assert isinstance(items, list) and (len(items) > 0), 'Items must be a non-empty list.'
+        results = database.db_collection(db, mongo_db_name, col_name).insert_many(items)
 
-        return 0
-    return db_store_articles()
+        return results
+    return db_store_articles(items=items)
 
 
 def __bulk_store_the_articles(items=None, tenant_id=None, environ={}, mongo_db_name=None, mongo_articles_col_name=None, logger=None):
